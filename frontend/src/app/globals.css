@@ -1,0 +1,234 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: light;
+  
+  /* --- Civic Horizon Theme Variables (Mapped for Shadcn) --- */
+  --background: #f8f8ff; /* Ghost White Canvas */
+  --foreground: #191c20; /* Ink Black */
+
+  --surface: #f9f9ff;
+  --surface-container-low: #f3f3fa;
+  --surface-container: #ededf4;
+  
+  --card: #ffffff; /* Pure White */
+  --card-foreground: #191c20;
+  
+  --popover: #ffffff;
+  --popover-foreground: #191c20;
+  
+  --primary: #00734b; /* Primary Green */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #ffffff;
+  --secondary-foreground: #191c20;
+  
+  --muted: #f3f3fa; /* surface-container-low */
+  --muted-foreground: #696969; /* slate-gray */
+  
+  --accent: #e7e8ee; /* surface-container-high */
+  --accent-foreground: #191c20;
+  
+  --destructive: #ba1a1a; /* error */
+  --destructive-foreground: #ffffff;
+  
+  --border: #d1cdc7; /* Border Gray */
+  --input: #d1cdc7;
+  --ring: #98f5c3; /* on-primary-container / glow */
+  
+  --radius: 0.5rem; /* DEFAULT: 8px */
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #191c20;
+  --sidebar-primary: #00734b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f3fa;
+  --sidebar-accent-foreground: #191c20;
+  --sidebar-border: #d1cdc7;
+  --sidebar-ring: #98f5c3;
+}
+
+.dark {
+  /* Inverse colors derived from Civic Horizon */
+  --background: #2e3036; /* inverse-surface */
+  --foreground: #f0f0f7; /* inverse-on-surface */
+
+  --surface: #2e3036;
+  --surface-container-low: #24262b; /* เข้มกว่า surface เล็กน้อยให้มีมิติ */
+  --surface-container: #1e1f23;
+
+  --card: #2e3036;
+  --card-foreground: #f0f0f7;
+  --popover: #2e3036;
+  --popover-foreground: #f0f0f7;
+  --primary: #7dd9a8; /* inverse-primary */
+  --primary-foreground: #005838;
+  --secondary: #3f4942;
+  --secondary-foreground: #f0f0f7;
+  --muted: #3f4942;
+  --muted-foreground: #bec9c0;
+  --accent: #3f4942;
+  --accent-foreground: #f0f0f7;
+  --destructive: #ffdad6;
+  --destructive-foreground: #93000a;
+  --border: #6f7a71;
+  --input: #6f7a71;
+  --ring: #7dd9a8;
+  
+  --sidebar: #2e3036;
+  --sidebar-foreground: #f0f0f7;
+  --sidebar-primary: #7dd9a8;
+  --sidebar-primary-foreground: #005838;
+  --sidebar-accent: #3f4942;
+  --sidebar-accent-foreground: #f0f0f7;
+  --sidebar-border: #6f7a71;
+  --sidebar-ring: #7dd9a8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* font-family: var(--font-noto-sans-thai), sans-serif; */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(0, 115, 75, 0.2); /* Primary Green at 20% opacity */
+}
+
+.landing-shell {
+    position: relative;
+    overflow: hidden;
+}
+
+.landing-shell::before,
+.landing-shell::after {
+    content: "";
+    position: absolute;
+    inset: auto;
+    border-radius: 999px;
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.landing-shell::before {
+    width: 20rem;
+    height: 20rem;
+    top: -7rem;
+    right: -4rem;
+    background: rgba(179, 236, 231, 0.6);
+}
+
+.landing-shell::after {
+    width: 16rem;
+    height: 16rem;
+    left: -5rem;
+    bottom: 10rem;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+@theme inline {
+  /* Typography */
+  --font-sans: var(--font-noto-sans-thai), sans-serif;    
+
+  /* Civic Horizon Custom Extensions */
+  --color-primary-dark: #005838;
+  --color-primary-light: #98f5c3;
+  --color-status-orange: #cf4500;
+  --color-slate-gray: #696969;
+  --color-surface-container: #ededf4;
+
+  --color-surface: var(--surface);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+
+  /* Shadcn Variable Mapping */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground); 
+  
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  /* Shadows (Atmospheric Depth) */
+  --shadow-level-1: 0px 4px 24px rgba(0, 0, 0, 0.04);
+  --shadow-level-2: 0px 24px 48px rgba(0, 0, 0, 0.08);
+  --shadow-level-3: 0px 70px 110px rgba(0, 0, 0, 0.15);
+
+  /* Radii (Extreme Radii System) */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-container: 40px; 
+  --radius-full: 9999px; 
+}
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+/* ซ่อนลูกศรขึ้น-ลง ของ input type number */
+@layer utilities {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield; /* สำหรับ Firefox */
+  }
+}

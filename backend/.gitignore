@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+bun.lockb
+bun.lock
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist
+build
+
+# Uploaded files are runtime data and must not be committed
+/uploads/
+
+# Prisma
+prisma/*.sqlite
+prisma/*.sqlite-journal
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/

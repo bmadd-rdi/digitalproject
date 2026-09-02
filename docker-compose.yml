@@ -1,0 +1,75 @@
+services:
+
+
+  # ----------------------------------------
+  # 1. Frontend (Next.js)
+  # ----------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://digitalproject.bangkok.go.th/api/v1}
+    container_name: digitalproject-frontend
+    restart: always
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # - NODE_ENV=development
+      # - BACKEND_URL=http://backend:8081
+      # - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-/api/v1}
+      # - BACKEND_URL=${BACKEND_URL:?BACKEND_URL is required}
+    # จำกัดทรัพยากร (Optional: ป้องกันไม่ให้ Next.js กินแรมเซิร์ฟเวอร์จนหมด)
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - bma_network
+
+  # ----------------------------------------
+  # 2. Backend (Bun / Hono)
+  # ----------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: digitalproject-backend
+    restart: always
+    volumes:
+      - bma_uploads:/app/uploads
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - NODE_ENV=production
+      # - UPLOAD_STORAGE_DIR=/app/uploads   # เพิ่มบรรทัดนี้เข้าไปครับ
+      # - PUBLIC_API_URL=https://digitalproject.bangkok.go.th/api/v1
+      # - FRONTEND_URL=https://digitalproject.bangkok.go.th
+      # - CORS_ORIGINS=https://digitalproject.bangkok.go.th
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - bma_network
+
+volumes:
+  bma_uploads:
+
+networks:
+  bma_network:
+    driver: bridge

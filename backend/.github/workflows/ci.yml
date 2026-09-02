@@ -1,0 +1,109 @@
+name: Backend CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Configure disposable CI environment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          upload_dir="$RUNNER_TEMP/bma-backend-uploads"
+          mkdir -p "$upload_dir"
+          cat >>"$GITHUB_ENV" <<EOF
+          NODE_ENV=test
+          PORT=18081
+          DATABASE_URL=postgresql://bma_test:bma_ci_disposable_password@127.0.0.1:55439/bma_test
+          TEST_DATABASE_URL=postgresql://bma_test:bma_ci_disposable_password@127.0.0.1:55439/bma_test
+          JWT_SECRET=bma_ci_disposable_jwt_secret_2026_long_enough
+          PUBLIC_API_URL=http://127.0.0.1:18081/api/v1
+          CORS_ORIGINS=http://127.0.0.1:18081
+          UPLOAD_STORAGE_DIR=$upload_dir
+          MAX_UPLOAD_SIZE=26214400
+          TRUST_PROXY=false
+          COOKIE_SECURE=false
+          COOKIE_SAME_SITE=lax
+          COOKIE_DOMAIN=
+          FRONTEND_URL=http://127.0.0.1:13000
+          SMTP_HOST=127.0.0.1
+          SMTP_PORT=2525
+          SMTP_USER=ci-only
+          SMTP_PASS=ci-only
+          SMTP_FROM_NAME=BMA CI
+          SMTP_FROM_EMAIL=ci@example.invalid
+          EOF
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Run typecheck and unit tests
+        run: |
+          bun run typecheck
+          bun run test
+      - name: Start disposable backend and PostgreSQL service
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          work_dir="$(mktemp -d)"
+          upload_dir="$work_dir/uploads"
+          env_file="$work_dir/backend.env"
+          mkdir -p "$upload_dir"
+          cat >"$env_file" <<EOF
+          NODE_ENV=test
+          PORT=18081
+          DATABASE_URL=postgresql://bma_test:bma_ci_disposable_password@127.0.0.1:55439/bma_test
+          TEST_DATABASE_URL=postgresql://bma_test:bma_ci_disposable_password@127.0.0.1:55439/bma_test
+          JWT_SECRET=bma_ci_disposable_jwt_secret_2026_long_enough
+          PUBLIC_API_URL=http://127.0.0.1:18081/api/v1
+          CORS_ORIGINS=http://127.0.0.1:18081
+          UPLOAD_STORAGE_DIR=$upload_dir
+          MAX_UPLOAD_SIZE=26214400
+          TRUST_PROXY=false
+          COOKIE_SECURE=false
+          COOKIE_SAME_SITE=lax
+          EOF
+          set -a
+          source "$env_file"
+          set +a
+          server_pid=""
+          cleanup() {
+            if [[ -n "$server_pid" ]]; then kill "$server_pid" 2>/dev/null || true; fi
+            docker rm -f bma-ci-postgres >/dev/null 2>&1 || true
+            rm -rf "$work_dir"
+          }
+          trap cleanup EXIT
+          bun run src/index.ts >"$work_dir/backend.log" 2>&1 &
+          server_pid=$!
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:18081/health/live >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:18081/health/live >/dev/null
+          docker run -d --name bma-ci-postgres -p 127.0.0.1:55439:5432 \
+            -e POSTGRES_USER=bma_test \
+            -e POSTGRES_PASSWORD=bma_ci_disposable_password \
+            -e POSTGRES_DB=bma_test \
+            postgres:15.18-alpine3.24 >/dev/null
+          for attempt in {1..40}; do
+            if docker exec bma-ci-postgres pg_isready -U bma_test -d bma_test >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          docker exec bma-ci-postgres pg_isready -U bma_test -d bma_test
+          bun run db:migrate
+          bun run db:seed:required
+          bun run test:integration
+          mkdir -p "$upload_dir"
+          curl --fail --silent http://127.0.0.1:18081/health/ready >/dev/null
+          cat "$work_dir/backend.log"
+      - name: Build backend image
+        run: docker build --tag bma-backend:ci .

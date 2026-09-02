@@ -1,0 +1,52 @@
+{
+  "name": "backend",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:preflight:meeting-workflow": "bun run src/db/scripts/preflight-meeting-workflow.ts",
+    "db:migrate": "bun run db:preflight:meeting-workflow && bun run src/db/scripts/migrate.ts",
+    "db:reset-attachment-types": "bun run src/db/scripts/reset-attachment-types.ts",
+    "db:backfill-attachment-sizes": "bun run src/db/scripts/backfill-attachment-sizes.ts",
+    "db:backfill-project-snapshots": "bun run src/db/scripts/backfill-project-snapshots.ts",
+    "db:create-super-admin": "bun run src/db/scripts/create-super-admin.ts",
+    "db:seed": "bun run db:seed:required",
+    "db:seed:required": "bun run src/db/seeds/seed-required.ts",
+    "db:seed:demo": "bun run src/db/seeds/seed-demo.ts",
+    "test:db:up": "docker compose -f ../infrastructure/compose.test.yml up -d --wait",
+    "test:db:prepare": "bun run tests/setup/prepare-db.ts",
+    "test:db:down": "docker compose -f ../infrastructure/compose.test.yml down",
+    "test:db:reset": "bun run tests/setup/reset-test-db.ts",
+    "test": "bun test tests/unit --max-concurrency=1",
+    "test:integration": "bun run tests/setup/prepare-db.ts && bun test tests/integration --max-concurrency=1",
+    "test:coverage": "bun run tests/setup/prepare-db.ts && bun test tests/unit tests/integration --coverage --max-concurrency=1",
+    "test:all": "bun run typecheck && bun run test && bun run test:integration",
+    "test:ci": "bun run test:all && bun run test:contract:backend && bun run test:coverage",
+    "test:contract:backend": "bun run tests/contract/verify-backend-openapi.ts",
+    "test:contract:frontend": "bun run tests/contract/verify-frontend-generation.ts",
+    "test:contract": "bun run test:contract:backend && bun run test:contract:frontend",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.6.1",
+    "@hono/zod-openapi": "^1.4.0",
+    "crypto": "^1.0.1",
+    "drizzle-orm": "^0.45.2",
+    "drizzle-zod": "^0.8.3",
+    "hono": "^4.12.25",
+    "nodemailer": "^9.0.4",
+    "postgres": "^3.4.9",
+    "resend": "^6.12.4",
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/nodemailer": "^8.0.1",
+    "@types/pg": "^8.20.0",
+    "@types/uuid": "^11.0.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.5",
+    "typescript": "^7.0.2"
+  }
+}
