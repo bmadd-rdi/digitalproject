@@ -1,6 +1,6 @@
 วิธีที่ติดตั้ง Docker and Docker Desktop on WSL2 of Windows
 1. ติดตั้ง VS Code -> https://code.visualstudio.com/
-2. ติดตั้ง Docker Desktop -> https://www.docker.com/products/docker-desktop/
+2. ติดตั้ง Docker Desktop -> [https://www.docker.com/products/docker-desktop/](https://docs.docker.com/desktop/setup/install/windows-install/)
 3. เลือก "Use WSL 2 instead of Hyper-V" (แนะนำเพราะทำงานได้เร็วกว่าและเสถียรกว่า)
 4. รีสตาร์ทเครื่อง 1 ครั้ง เมื่อเปิดโปรแกรม Docker Desktop ขึ้นมาครั้งแรก ให้ทำตามขั้นตอนแนะนำจนสถานะขึ้นว่า "Engine running"
 5. เปิด VS Code ไปที่เมนู Extensions (หรือกด Ctrl+Shift+X)
