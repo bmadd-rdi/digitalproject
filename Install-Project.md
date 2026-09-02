@@ -24,30 +24,30 @@
    docker-compose version
    git -v
    ```
-6. สร้างโฟลเดอร์สำหรับเก็บโปรเจกต์
+5. สร้างโฟลเดอร์สำหรับเก็บโปรเจกต์
    > bash
    ```
    mkdir -p ~/projects/digitalproject
    cd ~/projects/digitalproject
    ```
-7. Clone โปรเจกต์
+6. Clone โปรเจกต์
    > bash
    ```
    git clone https://github.com/bmadd-rdi/digitalproject .
    ```
-8. เปิด VS Code ในโปรเจกต์
+7. เปิด VS Code ในโปรเจกต์
    > bash
    ```
    code .
    ```
-9. ทำสำเนาไฟล์และเปลี่ยนชื่อ
+8. ทำสำเนาไฟล์และเปลี่ยนชื่อ
    > bash
    ```
    cp backend/.env.example backend/.env
       cp backend/bun.lock.example backend/bun.lock
       cp frontend/.env.example frontend/.env
    ```
-10. สร้างและสั่งรัน (Build/Pull Image)
+9. สร้างและสั่งรัน (Build/Pull Image)
    > bash
    ```
    docker compose up -d
