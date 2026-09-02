@@ -14,7 +14,7 @@
 4. เลือก Distro (เช่น Ubuntu) ที่คุณติดตั้งไว้ใน WSL ให้เป็น ON
 
 วิะีติดตั้งโปรแกรม Digital project
-1. เปิด VS Code กด Ctrl+Shift+P
+1. เปิด VS Code กด Ctrl + Shift + p
 2. พิมพ์และเลือก WSL: Connect to WSL
 3. เลือกเมนู Terminal -> New Terminal บนเมนูบาร์
 4. ตรวจสอบสถานะและเวอร์ชัน
@@ -40,4 +40,15 @@
    ```
    code .
    ```
-9. 
+9. ทำสำเนาไฟล์และเปลี่ยนชื่อ
+   > bash
+   ```
+   cp backend/.env.example backend/.env
+      cp backend/bun.lock.example backend/bun.lock
+      cp frontend/.env.example frontend/.env
+   ```
+10. สร้างและสั่งรัน (Build/Pull Image)
+   > bash
+   ```
+   docker compose up -d
+   ```
