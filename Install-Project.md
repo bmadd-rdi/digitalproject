@@ -44,7 +44,7 @@
    code .
    ```
 9. ทำสำเนาไฟล์และเปลี่ยนชื่อ
-   9.1 เปิด Terminal เลือก Terminal -> New Terminal บนเมนูบาร์
+   เปิด Terminal เลือก Terminal -> New Terminal บนเมนูบาร์
    > bash
    ```
    cp backend/.env.example backend/.env
