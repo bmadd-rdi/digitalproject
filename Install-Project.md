@@ -1,6 +1,6 @@
 วิธีที่ติดตั้ง Docker and Docker Desktop on Windows
 1. ติดตั้ง VS Code -> https://code.visualstudio.com/
-2. ติดตั้ง Docker Desktop -> https://www.docker.com/products/docker-desktop/
+2. ติดตั้ง Docker Desktop -> [https://www.docker.com/products/docker-desktop/](https://docs.docker.com/desktop/setup/install/windows-install/)
 3. เลือก "Use WSL 2 instead of Hyper-V" (แนะนำเพราะทำงานได้เร็วกว่าและเสถียรกว่า)
 4. รีสตาร์ทเครื่อง 1 ครั้ง เมื่อเปิดโปรแกรม Docker Desktop ขึ้นมาครั้งแรก ให้ทำตามขั้นตอนแนะนำจนสถานะขึ้นว่า "Engine running"
 5. เปิด VS Code ไปที่เมนู Extensions (หรือกด Ctrl+Shift+X)
@@ -27,18 +27,18 @@
    docker-compose version
    git -v
    ```
-6. สร้างโฟลเดอร์สำหรับเก็บโปรเจกต์
+5. สร้างโฟลเดอร์สำหรับเก็บโปรเจกต์
    > bash
    ```
    mkdir -p /projects/digitalproject
    cd /projects/digitalproject
    ```
-7. Clone โปรเจกต์
+6. Clone โปรเจกต์
    > bash
    ```
    git clone https://github.com/bmadd-rdi/digitalproject .
    ```
-8. เปิด VS Code ในโปรเจกต์
+7. เปิด VS Code ในโปรเจกต์
    > bash
    ```
    code .
@@ -51,7 +51,7 @@
    cp backend/bun.lock.example backend/bun.lock
    cp frontend/.env.example frontend/.env
    ```
-10. สร้างและสั่งรัน (Build/Pull Image)
+9. สร้างและสั่งรัน (Build/Pull Image)
    > bash
    ```
    docker compose up -d
