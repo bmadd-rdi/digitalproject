@@ -1,4 +1,4 @@
-วิธีที่ติดตั้ง Docker and Docker Desktop on WSL2 of Windows
+วิธีที่ติดตั้ง Docker and Docker Desktop on Windows
 1. ติดตั้ง VS Code -> https://code.visualstudio.com/
 2. ติดตั้ง Docker Desktop -> https://www.docker.com/products/docker-desktop/
 3. เลือก "Use WSL 2 instead of Hyper-V" (แนะนำเพราะทำงานได้เร็วกว่าและเสถียรกว่า)
@@ -6,6 +6,9 @@
 5. เปิด VS Code ไปที่เมนู Extensions (หรือกด Ctrl+Shift+X)
 6. ค้นหาและติดตั้ง Extension ชื่อ "Docker" (โดย Microsoft)
 7. ค้นหาและติดตั้ง Extension ชื่อ "Dev Containers" (ตัวนี้สำคัญมากสำหรับการจำลอง Environment)
+8. ติดตั้ง Git -> https://git-scm.com/
+9. เลือก "Use Visual Studio Code as Git's default editor"
+10. เลือก "Use Windows' default console window"
 
 วิธีที่ตรวจสอบว่าคุณตั้งค่าเป็น WSL 2 แล้วหรือยัง
 1. เปิด Docker Desktop Settings (รูปเฟือง)
@@ -27,8 +30,8 @@
 6. สร้างโฟลเดอร์สำหรับเก็บโปรเจกต์
    > bash
    ```
-   mkdir -p ~/projects/digitalproject
-   cd ~/projects/digitalproject
+   mkdir -p /projects/digitalproject
+   cd /projects/digitalproject
    ```
 7. Clone โปรเจกต์
    > bash
@@ -41,11 +44,12 @@
    code .
    ```
 9. ทำสำเนาไฟล์และเปลี่ยนชื่อ
+   9.1 เปิด Terminal เลือก Terminal -> New Terminal บนเมนูบาร์
    > bash
    ```
    cp backend/.env.example backend/.env
-      cp backend/bun.lock.example backend/bun.lock
-      cp frontend/.env.example frontend/.env
+   cp backend/bun.lock.example backend/bun.lock
+   cp frontend/.env.example frontend/.env
    ```
 10. สร้างและสั่งรัน (Build/Pull Image)
    > bash
