@@ -51,7 +51,7 @@
    cp backend/bun.lock.example backend/bun.lock
    cp frontend/.env.example frontend/.env
    ```
-9. สร้างและสั่งรัน (Build/Pull Image)
+9. สร้างและสั่งรัน (Build/Pull Image) จากไฟล์ docker-compose.yml
    > bash
    ```
    docker compose up -d

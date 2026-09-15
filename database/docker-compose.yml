@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: bma_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      # POSTGRES_DB: bma_db # <--- จุดที่ต้องแก้: เปลี่ยนเป็น postgres เพื่อไม่ให้สร้าง bma_db ซ้ำซ้อน
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # แมปไฟล์ dump เข้าไปในคอนเทนเนอร์เพื่อให้ Import ข้อมูลให้อัตโนมัติในครั้งแรก
+      - ./dump-bma_db-202609141312.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:
