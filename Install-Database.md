@@ -5,7 +5,7 @@
 4. เปิดโฟลเดอร์ database
    > bash
    ```
-   cd /projects/digitalproject/database
+   cd projects/digitalproject/database
    ```
 5. พิมพ์คำสั่งด้านล่างนี้ใน Terminal เพื่อเริ่มรัน PostgreSQL
    > bash
