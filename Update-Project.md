@@ -10,7 +10,12 @@
    ```
    code .
    ```
-3. ทำการ build image ใหม่
+3. หยุดและลบคอนเทนเนอร์ (Containers) จากไฟล์ docker-compose.yml
+   > bash
+   ```
+   docker compose down
+   ```
+4. ทำการ build image ใหม่
    แบบ A - ทุก Image ที่อยู่ในไฟล์ docker-compose.yml
    > bash
    ```
@@ -23,11 +28,7 @@
    docker build -t digitalproject-frontend .
    docker build -t digitalproject-backend .
    ```
-4. หยุดและลบคอนเทนเนอร์ (Containers) จากไฟล์ docker-compose.yml
-   > bash
-   ```
-   docker compose down
-   ```
+
 5. สร้างและสั่งรัน (Build/Pull Image) จากไฟล์ docker-compose.yml
    > bash
    ```
