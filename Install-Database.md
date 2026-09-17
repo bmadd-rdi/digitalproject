@@ -29,3 +29,18 @@
    ```
    ระบบจะแสดงรายการตาราง (List of relations) ทั้งหมดในฐานข้อมูล bma_db
 9. ออกจากหน้าแสดงรายการตาราง (List of relations) พิมพ์ q
+
+
+วิธีตั้งค่าฐานข้อมูล PostgreSQL@Localhost
+1. ตรวจสอบไฟล์ .env ที่อยู่ /home/administrator/projects/digitalproject/backend/
+2. กำหนด DATABASE_URL=postgresql://postgres:mysecretpassword@host.docker.internal:5432/bma_db
+3. เปิดเบราว์เซอร์ไปที่: `http://localhost:8081/docs/`
+4. ไปที่หมวด **Auth** -> เลือก `POST /api/v1/auth/login`
+5. กด **Try it out** แล้วใส่ข้อมูล:
+     ```json
+     {
+       "username": "SUPER_ADMIN",
+       "password": "***********"
+     }
+     ```
+   กด **Execute** (ระบบจะตอบกลับ `200 OK` พร้อมบันทึก Session Cookie ในเบราว์เซอร์)
