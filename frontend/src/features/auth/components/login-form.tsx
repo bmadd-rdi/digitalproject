@@ -136,7 +136,7 @@ export function LoginForm() {
             >
               Password
             </Label>
-            <Link href="/forgot-password">
+            <Link href="/forgot-password" tabIndex={-1}>
               <p className="text-sm font-medium text-primary transition-colors hover:underline hover:text-primary/80 whitespace-nowrap">
                 ลืมรหัสผ่าน?
               </p>
