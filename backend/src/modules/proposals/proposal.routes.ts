@@ -8,13 +8,13 @@ import {
   getMyDrafts,
   submitProposal,
   initializeDraft,
-  patchSubmittedProposal,
+  // patchSubmittedProposal, /************************************ JOJO ********************************************/
 } from "./proposal.controller";
 import {
   draftProposalSchema,
   ProposalProjectParamsSchema,
   submitProposalSchema,
-  submittedProposalPatchSchema,
+  // submittedProposalPatchSchema, /************************************ JOJO ********************************************/
   proposalDataResponseSchema,
 } from "./proposal.schema";
 import { authMiddleware } from "../../middlewares/auth.middleware";
@@ -93,49 +93,52 @@ proposalRoutes.openapi(
   },
 );
 
+/************************************ JOJO ********************************************/
 //
 // POST /projects/{projectId}/draft
 //
-proposalRoutes.openapi(
-  createRoute({
-    method: "patch",
-    path: "/projects/{projectId}",
-    tags: ["Proposals"],
-    request: {
-      params: ProposalProjectParamsSchema,
-      body: {
-        content: {
-          "application/json": {
-            schema: submittedProposalPatchSchema,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: "Updated submitted proposal",
-        content: {
-          "application/json": {
-            schema: DataResponseSchema,
-          },
-        },
-      },
-      403: {
-        description: "Forbidden",
-        content: {
-          "application/json": {
-            schema: ErrorSchema,
-          },
-        },
-      },
-    },
-  }),
-  (c) => {
-    const { projectId } = c.req.valid("param");
-    const body = c.req.valid("json");
-    return patchSubmittedProposal(c, projectId, body);
-  },
-);
+// proposalRoutes.openapi(
+//   createRoute({
+//     method: "patch",
+//     path: "/projects/{projectId}",
+//     tags: ["Proposals"],
+//     request: {
+//       params: ProposalProjectParamsSchema,
+//       body: {
+//         content: {
+//           "application/json": {
+//             schema: submittedProposalPatchSchema,
+//           },
+//         },
+//       },
+//     },
+//     responses: {
+//       200: {
+//         description: "Updated submitted proposal",
+//         content: {
+//           "application/json": {
+//             schema: DataResponseSchema,
+//           },
+//         },
+//       },
+//       403: {
+//         description: "Forbidden",
+//         content: {
+//           "application/json": {
+//             schema: ErrorSchema,
+//           },
+//         },
+//       },
+//     },
+//   }),
+//   (c) => {
+//     const { projectId } = c.req.valid("param");
+//     const body = c.req.valid("json");
+//     return patchSubmittedProposal(c, projectId, body);
+//   },
+// );
+/************************************ JOJO ********************************************/
+
 
 proposalRoutes.openapi(
   createRoute({

@@ -163,6 +163,13 @@ export const reviewAnalystProject = async (
   return c.json(result, 200);
 };
 
+export const recallAnalystApproval = async (c: Context, id: string) => {
+  const user = getUserContext(c);
+  const result = await projectService.recallAnalystApproval(id, user);
+  return c.json(result, 200);
+};
+
+
 export const deleteProject = async (c: Context, id: string) => {
   const user = getUserContext(c); 
   await projectService.removeProject(id, user);

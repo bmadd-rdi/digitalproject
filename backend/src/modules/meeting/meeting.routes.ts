@@ -168,4 +168,12 @@ meetingAdminRouter.openapi(createRoute({
   responses: { 200: { description: "Rejected project reopened", content: { "application/json": { schema: z.any() } } }, ...errors },
 }), (c) => projectController.reopenRejectedProject(c, c.req.valid("param").id, c.req.valid("json")));
 
+meetingAdminRouter.openapi(createRoute({
+  method: "post", path: "/projects/{id}/recall-analyst-approval", tags: ["Admin", "Projects"],
+  summary: "ดึงสถานะโครงการกลับหลัง Analyst อนุมัติไปแล้ว เพื่อให้ทบทวนใหม่",
+  request: { params: IdParamSchema },
+  responses: { 200: { description: "Recalled to analyst review", content: { "application/json": { schema: z.any() } } }, ...errors },
+}), (c) => projectController.recallAnalystApproval(c, c.req.valid("param").id));
+
+
 export default meetingsRouter;

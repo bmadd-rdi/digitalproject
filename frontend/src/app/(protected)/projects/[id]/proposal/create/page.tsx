@@ -4,16 +4,16 @@ import { CreateProposalWizard } from "@/features/proposals/components/ProposalWi
 
 export default async function CreateProposalPage({
   params,
-  searchParams,
+  // searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ mode?: string }>;
+  // searchParams?: Promise<{ mode?: string }>;
 }) {
   // ดึง Project ID จาก URL (เช่น PRJ-ABCD123)
   const { id } = await params;
   const projectId = id;
-  const query = await searchParams;
-  const mode = query?.mode === "review" ? "submitted" : "draft";
+  // const query = await searchParams;
+  // const mode = query?.mode === "review" ? "submitted" : "draft";
 
   return (
     <div className="min-h-full bg-[#f9f9ff] py-4 md:py-6">
@@ -28,7 +28,8 @@ export default async function CreateProposalPage({
           </p>
         </div>
 
-        <CreateProposalWizard projectId={projectId} mode={mode} />
+        {/* <CreateProposalWizard projectId={projectId} mode={mode} /> */}
+        <CreateProposalWizard projectId={projectId} />
 
       </div>
     </div>

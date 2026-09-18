@@ -1,10 +1,11 @@
 // src/modules/proposals/proposal.service.ts
 import { db } from "../../db";
 import { and, desc, eq, isNull, lt, sql } from "drizzle-orm";
-import {
-  proposals,
-  proposalBudgets,
-} from "../../db/schema/proposals";
+// import {
+//   proposals,
+//   proposalBudgets,
+// } from "../../db/schema/proposals";
+import { proposals } from "../../db/schema/proposals";
 import { proposalDrafts } from "../../db/schema/proposal_drafts";
 import { projects } from "../../db/schema/projects";
 import { divisions } from "../../db/schema/lookups";
@@ -83,13 +84,14 @@ async function getProposalProjectAccess(projectId: string, user: UserContext) {
   const isGlobalProjectManager = roles.some((role) =>
     ["admin", "super_admin", "secretary"].includes(role),
   );
+  const isOwner = project.ownerId === user.userId;
   const isSameDepartmentUser = roles.includes("user") && project.departmentId === user.departmentId;
   if (!isGlobalProjectManager && !roles.includes("analyst") && project.ownerId !== user.userId && !isSameDepartmentUser) {
     throw new HTTPException(403, {
       message: "Users may access proposal data only for their own projects",
     });
   }
-  if (roles.includes("analyst") && !isGlobalProjectManager && project.analystId !== user.userId) {
+  if (roles.includes("analyst") && !isGlobalProjectManager && !isOwner && project.analystId !== user.userId) {
     throw new HTTPException(403, {
       message: "This project is not assigned to the authenticated Analyst",
     });
@@ -98,43 +100,43 @@ async function getProposalProjectAccess(projectId: string, user: UserContext) {
   return { project, roles };
 }
 
-const submittedProposalScalarColumns = {
-  agencyName: proposals.agencyName,
-  headOfAgency: proposals.headOfAgency,
-  dcioName: proposals.dcioName,
-  projectManager: proposals.projectManager,
-  requestedBudgetTotal: proposals.requestedBudgetTotal,
-  estimatedCostTotal: proposals.estimatedCostTotal,
-  submittedAt: proposals.submittedAt,
-  background: proposals.background,
-  objective: proposals.objective,
-  target: proposals.target,
-  scope: proposals.scope,
-  projectType: proposals.projectType,
-  currentSystemStatus: proposals.currentSystemStatus,
-  currentProblems: proposals.currentProblems,
-  isBmaPlan: proposals.isBmaPlan,
-  isAgencyPlan: proposals.isAgencyPlan,
-  agencyStrategy: proposals.agencyStrategy,
-  agencyIssue: proposals.agencyIssue,
-  agencyKpi: proposals.agencyKpi,
-  isGovernorPolicy: proposals.isGovernorPolicy,
-  governorPolicyCode: proposals.governorPolicyCode,
-  governorPolicyName: proposals.governorPolicyName,
-  obstacleLaws: proposals.obstacleLaws,
-  appArchitecture: proposals.appArchitecture,
-  dataOwner: proposals.dataOwner,
-  dataExchangePlan: proposals.dataExchangePlan,
-  isReady: proposals.isReady,
-  readinessDetails: proposals.readinessDetails,
-  durationDays: proposals.durationDays,
-  otherReadiness: proposals.otherReadiness,
-  expectedBenefits: proposals.expectedBenefits,
-  isInRoadmap: proposals.isInRoadmap,
-} as const;
+// const submittedProposalScalarColumns = {
+//   agencyName: proposals.agencyName,
+//   headOfAgency: proposals.headOfAgency,
+//   dcioName: proposals.dcioName,
+//   projectManager: proposals.projectManager,
+//   requestedBudgetTotal: proposals.requestedBudgetTotal,
+//   estimatedCostTotal: proposals.estimatedCostTotal,
+//   submittedAt: proposals.submittedAt,
+//   background: proposals.background,
+//   objective: proposals.objective,
+//   target: proposals.target,
+//   scope: proposals.scope,
+//   projectType: proposals.projectType,
+//   currentSystemStatus: proposals.currentSystemStatus,
+//   currentProblems: proposals.currentProblems,
+//   isBmaPlan: proposals.isBmaPlan,
+//   isAgencyPlan: proposals.isAgencyPlan,
+//   agencyStrategy: proposals.agencyStrategy,
+//   agencyIssue: proposals.agencyIssue,
+//   agencyKpi: proposals.agencyKpi,
+//   isGovernorPolicy: proposals.isGovernorPolicy,
+//   governorPolicyCode: proposals.governorPolicyCode,
+//   governorPolicyName: proposals.governorPolicyName,
+//   obstacleLaws: proposals.obstacleLaws,
+//   appArchitecture: proposals.appArchitecture,
+//   dataOwner: proposals.dataOwner,
+//   dataExchangePlan: proposals.dataExchangePlan,
+//   isReady: proposals.isReady,
+//   readinessDetails: proposals.readinessDetails,
+//   durationDays: proposals.durationDays,
+//   otherReadiness: proposals.otherReadiness,
+//   expectedBenefits: proposals.expectedBenefits,
+//   isInRoadmap: proposals.isInRoadmap,
+// } as const;
 
-const hasOwn = (payload: Record<string, unknown>, key: string) =>
-  Object.prototype.hasOwnProperty.call(payload, key);
+// const hasOwn = (payload: Record<string, unknown>, key: string) =>
+//   Object.prototype.hasOwnProperty.call(payload, key);
 
 const SUBMIT_PROPOSAL_FIELD_NAMES = new Set(Object.keys(submitProposalSchema.shape));
 
@@ -320,82 +322,86 @@ export const proposalService = {
     }
   },
 
-  async patchSubmittedProposal(
-    projectId: string,
-    user: UserContext,
-    payload: Record<string, any>,
-  ) {
-    throw new HTTPException(409, {
-      message: "Submitted Proposal versions are immutable; edit the current Draft instead",
-    });
-    const { project, roles } = await getProposalProjectAccess(projectId, user);
-    const isSecretary = roles.includes("secretary");
-    const isAssignedAnalyst = roles.includes("analyst") && project.analystId === user.userId;
-    if (!isSecretary && !isAssignedAnalyst) {
-      throw new HTTPException(403, {
-        message: "Only a Secretary or the assigned Analyst can update submitted proposals",
-      });
-    }
-    if (isAssignedAnalyst && project.statusId !== PROJECT_STATUS.IN_ANALYSIS) {
-      throw new HTTPException(403, {
-        message: "Analysts may update submitted proposals only while the project is in analysis",
-      });
-    }
-    if (hasOwn(payload, "projectName")) {
-      throw new HTTPException(403, {
-        message: "Project name can only be changed by the project owner during an editable stage",
-      });
-    }
-    checkPermission(user, "update", "proposal_form");
+/************************************ JOJO ********************************************/
 
-    const [existing] = await db
-      .select({ id: proposals.id, projectId: proposals.projectId })
-      .from(proposals)
-      .where(and(eq(proposals.projectId, projectId), eq(proposals.status, "submitted")))
-      .orderBy(desc(proposals.updatedAt), desc(proposals.id))
-      .limit(1);
+  // async patchSubmittedProposal(
+  //   projectId: string,
+  //   user: UserContext,
+  //   payload: Record<string, any>,
+  // ) {
+  //   throw new HTTPException(409, {
+  //     message: "Submitted Proposal versions are immutable; edit the current Draft instead",
+  //   });
+  //   const { project, roles } = await getProposalProjectAccess(projectId, user);
+  //   const isSecretary = roles.includes("secretary");
+  //   const isAssignedAnalyst = roles.includes("analyst") && project.analystId === user.userId;
+  //   if (!isSecretary && !isAssignedAnalyst) {
+  //     throw new HTTPException(403, {
+  //       message: "Only a Secretary or the assigned Analyst can update submitted proposals",
+  //     });
+  //   }
+  //   if (isAssignedAnalyst && project.statusId !== PROJECT_STATUS.IN_ANALYSIS) {
+  //     throw new HTTPException(403, {
+  //       message: "Analysts may update submitted proposals only while the project is in analysis",
+  //     });
+  //   }
+  //   if (hasOwn(payload, "projectName")) {
+  //     throw new HTTPException(403, {
+  //       message: "Project name can only be changed by the project owner during an editable stage",
+  //     });
+  //   }
+  //   checkPermission(user, "update", "proposal_form");
 
-    if (!existing) {
-      throw new HTTPException(404, { message: "Submitted proposal not found" });
-    }
+  //   const [existing] = await db
+  //     .select({ id: proposals.id, projectId: proposals.projectId })
+  //     .from(proposals)
+  //     .where(and(eq(proposals.projectId, projectId), eq(proposals.status, "submitted")))
+  //     .orderBy(desc(proposals.updatedAt), desc(proposals.id))
+  //     .limit(1);
 
-    await db.transaction(async (tx) => {
-      const scalarUpdates: Record<string, unknown> = {};
+  //   if (!existing) {
+  //     throw new HTTPException(404, { message: "Submitted proposal not found" });
+  //   }
 
-      for (const [field, column] of Object.entries(submittedProposalScalarColumns)) {
-        if (!hasOwn(payload, field) || payload[field] === undefined) continue;
-        scalarUpdates[column.name] = field === "requestedBudgetTotal" && payload[field] !== null
-          ? String(payload[field])
-          : payload[field];
-      }
+  //   await db.transaction(async (tx) => {
+  //     const scalarUpdates: Record<string, unknown> = {};
 
-      if (Object.keys(scalarUpdates).length > 0) {
-        await tx
-          .update(proposals)
-          .set({
-            ...(scalarUpdates as any),
-            updatedBy: user.userId,
-            updatedAt: new Date(),
-          })
-          .where(eq(proposals.id, existing.id));
-      }
+  //     for (const [field, column] of Object.entries(submittedProposalScalarColumns)) {
+  //       if (!hasOwn(payload, field) || payload[field] === undefined) continue;
+  //       scalarUpdates[column.name] = field === "requestedBudgetTotal" && payload[field] !== null
+  //         ? String(payload[field])
+  //         : payload[field];
+  //     }
 
-      await syncProposalCollections(tx, existing.id, payload);
+  //     if (Object.keys(scalarUpdates).length > 0) {
+  //       await tx
+  //         .update(proposals)
+  //         .set({
+  //           ...(scalarUpdates as any),
+  //           updatedBy: user.userId,
+  //           updatedAt: new Date(),
+  //         })
+  //         .where(eq(proposals.id, existing.id));
+  //     }
 
-      const budgetRows = hasOwn(payload, "budgetsByYear")
-        ? payload.budgetsByYear
-        : hasOwn(payload, "budgets")
-          ? payload.budgets
-          : await tx.select().from(proposalBudgets).where(eq(proposalBudgets.proposalId, existing.id));
-      await tx.update(projects).set({
-        latestRequestedBudget: sumProposalBudgets(Array.isArray(budgetRows) ? budgetRows : []),
-        updatedBy: user.userId,
-        updatedAt: new Date(),
-      }).where(and(eq(projects.id, projectId), isNull(projects.deletedAt)));
-    });
+  //     await syncProposalCollections(tx, existing.id, payload);
 
-    return await this.getProposalByProjectId(projectId, user);
-  },
+  //     const budgetRows = hasOwn(payload, "budgetsByYear")
+  //       ? payload.budgetsByYear
+  //       : hasOwn(payload, "budgets")
+  //         ? payload.budgets
+  //         : await tx.select().from(proposalBudgets).where(eq(proposalBudgets.proposalId, existing.id));
+  //     await tx.update(projects).set({
+  //       latestRequestedBudget: sumProposalBudgets(Array.isArray(budgetRows) ? budgetRows : []),
+  //       updatedBy: user.userId,
+  //       updatedAt: new Date(),
+  //     }).where(and(eq(projects.id, projectId), isNull(projects.deletedAt)));
+  //   });
+
+  //   return await this.getProposalByProjectId(projectId, user);
+  // },
+/************************************ JOJO ********************************************/
+  
 
   async submitProposal(user: UserContext, data: any) {
     await assertUserExists(user.userId);

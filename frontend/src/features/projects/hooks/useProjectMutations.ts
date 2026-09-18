@@ -123,3 +123,32 @@ export function useReopenRejectedProject(projectId: string) {
     },
   });
 }
+export function useRecallAnalystApproval(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${API_BASE}/admin/projects/${projectId}/recall-analyst-approval`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw Object.assign(new Error(payload.message ?? "ไม่สามารถดึงสถานะโครงการกลับได้"), {
+          status: response.status,
+          dependencies: payload.dependencies,
+        });
+      }
+      return payload;
+    },
+    onSettled: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
+        queryClient.invalidateQueries({ queryKey: ["projects"] }),
+        queryClient.invalidateQueries({ queryKey: ["proposals", "draft", projectId] }),
+        queryClient.invalidateQueries({ queryKey: ["proposals", "submitted", projectId] }),
+        queryClient.invalidateQueries({ queryKey: ["timeline", projectId] }),
+        queryClient.invalidateQueries({ queryKey: ["meetings"] }),
+      ]);
+    },
+  });
+}

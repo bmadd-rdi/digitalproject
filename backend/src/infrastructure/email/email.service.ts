@@ -77,6 +77,8 @@ const dispatchEmail = async (payload: SendEmailPayload): Promise<{ success: bool
         tls: {
           rejectUnauthorized: false
         }
+        // logger: true, // เปิด Log
+        // debug: true,  // เปิด Debug ละเอียด
       });
 
       await transporter.sendMail({

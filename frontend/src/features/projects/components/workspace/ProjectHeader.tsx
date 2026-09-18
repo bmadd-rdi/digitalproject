@@ -22,6 +22,7 @@ import { useFourQuadrants, useDeputyGovernors } from "@/features/lookups/hooks/u
 import { useProposalState } from "@/features/proposals/hooks/useProposalState";
 import { useGetDraft } from "@/features/proposals/hooks/useProposalDraftQuery";
 import { useSubmitProposal } from "@/features/proposals/hooks/useProposalMutations";
+// import { useProposalFormStore } from "@/features/proposals/stores/useProposalFormStore";
 import type { ProposalDraftValues } from "@/features/proposals/types";
 import { ProposalExportButton } from "@/features/proposals/components/ProposalExportButton";
 import {
@@ -29,11 +30,13 @@ import {
   useDeleteProject,
   useUpdateProjectVisibility,
   useReopenRejectedProject,
+  useRecallAnalystApproval,
 } from "../../hooks/useProjectMutations";
 import { getProjectStatusMeta } from "../../utils/projectStatus";
 import { ReturnedFeedbackBanner } from "./ReturnedFeedbackBanner";
 import { ProjectDetailsEditDialog } from "./ProjectDetailsEditDialog";
 import { useHasRole } from "@/features/auth/RoleContext";
+import { useProposalFormStore } from "@/features/proposals/stores/useProposalFormStore";
 
 type HeaderProposal = {
   budgetsByYear?: Array<{ year?: number | string | null }>;
@@ -54,15 +57,21 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
   });
   const { data: currentDraft, isLoading: isDraftLoading } = useGetDraft(projectId);
   const { mutate: submitProposal, isPending: isSubmitting } = useSubmitProposal(projectId);
+  // const { setStep, addStepError } = useProposalFormStore();
+  // const { setStep, addStepError, setProjectId } = useProposalFormStore();
   const deleteMutation = useDeleteProject(projectId);
   const cancelSubmitMutation = useCancelSubmitProject(projectId);
   const visibilityMutation = useUpdateProjectVisibility(projectId);
   const reopenMutation = useReopenRejectedProject(projectId);
+  const recallMutation = useRecallAnalystApproval(projectId);
   const isSuperAdmin = useHasRole("super_admin");
+  const isAdmin = useHasRole("admin");
+  const { setStep, addStepError, setProjectId } = useProposalFormStore();
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [cancelSubmitConfirmOpen, setCancelSubmitConfirmOpen] = useState(false);
   const [visibilityConfirmOpen, setVisibilityConfirmOpen] = useState(false);
+  const [recallConfirmOpen, setRecallConfirmOpen] = useState(false);
   const [editDetailsOpen, setEditDetailsOpen] = useState(false);
   const canSubmitProposal = project.permissions?.canSubmitProposal === true;
   const isSubmitDisabled = isDraftLoading || isSubmitting || !currentDraft || !canSubmitProposal;
@@ -103,7 +112,29 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
     if (!currentDraft) return;
     submitProposal(currentDraft, {
       onSuccess: () => setSubmitConfirmOpen(false),
-      onError: () => toast.error("ส่งโครงการไม่สำเร็จ", { description: fallbackError }),
+      onError: (error) => {
+        // const err = error as Error & { isValidationError?: boolean };
+        const err = error as Error & {
+          isValidationError?: boolean;
+          minStep?: number;
+          fieldErrors?: { step?: number }[];
+        };
+        if (err.isValidationError) {
+          setSubmitConfirmOpen(false);
+          setProjectId(projectId);
+
+          const invalidSteps = new Set(
+            (err.fieldErrors ?? [])
+              .map((e) => e.step)
+              .filter((step): step is number => step != null),
+          );
+          invalidSteps.forEach((step) => addStepError(step));
+          if (err.minStep) setStep(err.minStep);
+
+          router.push(`/projects/${projectId}/proposal/create`);
+        }
+      },
+      // onError: () => toast.error("ส่งโครงการไม่สำเร็จ", { description: fallbackError }),
     });
   };
 
@@ -198,6 +229,17 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
                   {reopenMutation.isPending ? "กำลังดำเนินการ..." : "เปิดโครงการกลับมาแก้ไข"}
                 </Button>
               )}
+              {isAdmin && [9, 12].includes(project.projectStatusId ?? -1) && (
+                <Button
+                  variant="outline"
+                  disabled={recallMutation.isPending}
+                  onClick={() => setRecallConfirmOpen(true)}
+                  className="gap-2 rounded-xl border-amber-300 text-amber-700 hover:bg-amber-50"
+                >
+                  <RotateCcw className="size-4" />
+                  {recallMutation.isPending ? "กำลังดำเนินการ..." : "ดึงกลับให้นักวิเคราะห์ทบทวนใหม่"}
+                </Button>
+              )}
               {project.permissions?.canEditProject && (
                 <Button
                   variant="outline"
@@ -275,6 +317,37 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
             <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
             <AlertDialogAction onClick={confirmSubmit} disabled={isSubmitting}>
               {isSubmitting ? "กำลังส่งโครงการ..." : "ยืนยันการส่ง"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={recallConfirmOpen} onOpenChange={setRecallConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ยืนยันการดึงสถานะกลับหรือไม่</AlertDialogTitle>
+            <AlertDialogDescription>
+              โครงการจะกลับไปอยู่ในสถานะ "รอผลการวิเคราะห์" ให้นักวิเคราะห์ทบทวนใหม่อีกครั้ง
+              การดึงกลับจะไม่สำเร็จหากโครงการถูกบรรจุเข้าวาระการประชุมที่เริ่มดำเนินการแล้ว
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ไม่ใช่</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={recallMutation.isPending}
+              onClick={() => {
+                recallMutation.mutate(undefined, {
+                  onSuccess: () => {
+                    setRecallConfirmOpen(false);
+                    toast.success("ดึงสถานะกลับสำเร็จ");
+                  },
+                  onError: (error) => toast.error("ดึงสถานะกลับไม่สำเร็จ", {
+                    description: error instanceof Error ? error.message : "สถานะโครงการอาจเปลี่ยนแล้ว กรุณารีเฟรชหน้าเพื่อดูสถานะล่าสุด",
+                  }),
+                });
+              }}
+            >
+              {recallMutation.isPending ? "กำลังดำเนินการ..." : "ยืนยันการดึงกลับ"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

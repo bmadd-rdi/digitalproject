@@ -37,8 +37,33 @@ export async function initializeDraftAction(projectId: string): Promise<ActionRe
 // รองรับข้อมูลแบบ Loose Schema ตามที่ Backend กำหนดไว้ใน draftProposalSchema
 export async function saveDraftAction(projectId: string, payload: JsonRecord): Promise<ActionResponse> {
   try {
+
+    // กรองหรือเลือกเฉพาะฟิลด์ที่ backend ของ draftProposalSchema อนุญาตให้อัปเดต
+    // const sanitizedPayload = {
+    //   projectId: payload.projectId ?? projectId,
+    //   currentStep: payload.currentStep,
+    //   draftPayload: payload.draftPayload ?? payload, // เก็บข้อมูลฟอร์มทั้งหมดไว้ในนี้ตามโครงสร้าง
+    //   projectName: payload.projectName,
+    //   objective: payload.objective,
+    //   requestedBudgetTotal: payload.requestedBudgetTotal,
+    //   estimatedCostTotal: payload.estimatedCostTotal,
+    // };
+
+    // const sanitizedPayload = {
+    //   projectId: payload.projectId ?? projectId,
+    //   currentStep: payload.currentStep ?? 1,
+    //   projectName: payload.projectName,
+    //   objective: payload.objective,
+    //   requestedBudgetTotal: payload.requestedBudgetTotal,
+    //   estimatedCostTotal: payload.estimatedCostTotal,
+    //   // 👈 หัวใจสำคัญ: เอาข้อมูลทั้งหมด (รวมถึงฟิลด์ยาวๆ อย่าง background, hardwareCosts ฯลฯ) 
+    //   // ยัดใส่ก้อน draftPayload เพื่อไม่ให้มันไปกองอยู่ที่ Root Level จนโดน Zod ปฏิเสธ
+    //   draftPayload: payload, 
+    // };
+
     const result = await serverFetch(`/api/v1/proposals/projects/${projectId}/draft`, {
       method: "PATCH",
+      // body: JSON.stringify(sanitizedPayload),
       body: JSON.stringify(payload),
     });
 

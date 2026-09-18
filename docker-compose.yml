@@ -5,6 +5,7 @@ services:
   # 1. Frontend (Next.js)
   # ----------------------------------------
   frontend:
+    image: digitalproject-frontend:v2.3
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -40,6 +41,7 @@ services:
   # 2. Backend (Bun / Hono)
   # ----------------------------------------
   backend:
+    image: digitalproject-backend:v2.3
     build:
       context: ./backend
       dockerfile: Dockerfile

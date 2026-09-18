@@ -15,7 +15,9 @@ import {
 import { v7 as uuidv7 } from "uuid";
 import { db } from "../../db";
 import { projects, projectAttachments, projectSequences } from "../../db/schema/projects";
-import { agendas, meetingAttachments } from "../../db/schema/meetings";
+// import { agendas, meetingAttachments } from "../../db/schema/meetings";
+import { agendas, meetingAttachments, meetings, resolutions } from "../../db/schema/meetings";
+import { MEETING_STATUS } from "../meeting/meeting.service";
 import { proposals } from "../../db/schema/proposals";
 import { proposalDrafts } from "../../db/schema/proposal_drafts";
 import { projectStatusLogs } from "../../db/schema/project_status_logs";
@@ -435,7 +437,9 @@ export const findProjectById = async (id: string, user: UserContext) => {
   const isGlobalProjectManager = rolesForAccess.some((role) =>
     ["admin", "super_admin", "secretary"].includes(role),
   );
-  if (rolesForAccess.includes("analyst") && !isGlobalProjectManager && project.analystId !== user.userId) {
+  // if (rolesForAccess.includes("analyst") && !isGlobalProjectManager && project.analystId !== user.userId) {
+  const isOwner = project.userId === user.userId;
+  if (rolesForAccess.includes("analyst") && !isGlobalProjectManager && !isOwner && project.analystId !== user.userId) {
     throw new HTTPException(403, {
       message: "This project is not assigned to the authenticated Analyst",
     });
@@ -496,7 +500,7 @@ export const findProjectById = async (id: string, user: UserContext) => {
   const isSuperAdmin = rolesForAccess.includes("super_admin");
   const isAdmin = rolesForAccess.includes("admin") || isSuperAdmin;
   const isSecretary = rolesForAccess.includes("secretary");
-  const isOwner = project.userId === user.userId;
+  // const isOwner = project.userId === user.userId;
   const isSameDepartment = isSameDepartmentUser(user, project.division?.departmentId);
   const isAssignedAnalyst = rolesForAccess.includes("analyst") && project.analystId === user.userId;
   const isAnalystEditableStage = isAssignedAnalyst && project.projectStatusId === PROJECT_STATUS.IN_ANALYSIS;
@@ -797,7 +801,36 @@ export const reviewAnalystProject = async (
       : PROJECT_STATUS.REJECTED_ANALYST;
   const remark = data.remark.trim();
 
+  /************************************ JOJO ********************************************/
   await db.transaction(async (tx) => {
+    if (data.decision === "return") {
+      const [submitted] = await tx
+        .select({ id: proposals.id })
+        .from(proposals)
+        .where(and(eq(proposals.projectId, id), eq(proposals.status, "submitted")))
+        .orderBy(desc(proposals.submittedAt), desc(proposals.updatedAt), desc(proposals.id))
+        .for("update")
+        .limit(1);
+
+      if (!submitted) {
+        throw new HTTPException(409, { message: "Submitted proposal history was not found" });
+      }
+
+      const restored = await restoreEditableProposalDraft(tx, {
+        proposalId: submitted.id,
+        projectId: id,
+        draftUserId: project.userId, // เจ้าของโครงการ ไม่ใช่ analyst ที่กด return
+        updatedBy: user.userId,
+        projectName: project.projectName,
+      });
+
+      await tx.update(projects).set({
+        latestRequestedBudget: restored.requestedBudgetTotal,
+        latestEstimatedCost: restored.estimatedCostTotal,
+      }).where(and(eq(projects.id, id), eq(projects.projectStatusId, PROJECT_STATUS.IN_ANALYSIS)));
+    }
+    /************************************ JOJO ********************************************/
+    
     await applyProjectStatusTransition(tx, {
       projectId: id,
       userId: user.userId,
@@ -808,6 +841,7 @@ export const reviewAnalystProject = async (
       clearReturnStage: data.decision === "approve" && Boolean(project.returnStage),
     });
   });
+
 
   return {
     message: "Analyst review completed successfully",
@@ -831,6 +865,103 @@ const getSecretaryProjectType = async (projectTypeId: number) => {
 
   return projectType;
 };
+
+
+
+
+export const recallAnalystApproval = async (id: string, user: UserContext) => {
+  await assertUserExists(user.userId);
+  if (!hasRole(user, "admin")) {
+    throw new HTTPException(403, {
+      message: "Only an admin can recall a project's analyst approval",
+    });
+  }
+
+  await db.transaction(async (tx) => {
+    const [project] = await tx
+      .select({ id: projects.id, statusId: projects.projectStatusId })
+      .from(projects)
+      .where(and(eq(projects.id, id), isNull(projects.deletedAt)))
+      .for("update")
+      .limit(1);
+
+    if (!project) throw new HTTPException(404, { message: "Project not found" });
+
+    if (
+      project.statusId !== PROJECT_STATUS.PENDING_SMALL_BOARD &&
+      project.statusId !== PROJECT_STATUS.PENDING_BIG_BOARD
+    ) {
+      throw new HTTPException(409, {
+        message: "Can only recall a project that is currently pending board review",
+      });
+    }
+
+
+    // A meeting's agenda can only be edited while the meeting itself is
+    // still DRAFT/SCHEDULED (see assertAgendaEditable in meeting.service.ts).
+    // So: if this project sits on an agenda whose meeting hasn't started
+    // yet, it's safe to recall — just remove that agenda entry in the same
+    // transaction so nothing is left pointing at a project that's no longer
+    // pending board review. If the meeting has already started (IN_PROGRESS)
+    // or finished (COMPLETED), block outright — the committee may already be
+    // looking at it, so the secretary needs to handle it manually.
+    const pendingAgendas = await tx
+      .select({
+        agendaId: agendas.id,
+        meetingStatusId: meetings.meetingStatusId,
+      })
+      .from(agendas)
+      .innerJoin(meetings, eq(meetings.id, agendas.meetingId))
+      .leftJoin(resolutions, eq(resolutions.agendaId, agendas.id))
+      .where(and(
+        eq(agendas.projectId, id),
+        ne(meetings.meetingStatusId, MEETING_STATUS.CANCELLED),
+        isNull(resolutions.id),
+      // ))
+      // .limit(1);
+      ));
+
+    // if (pendingAgenda) {
+    const lockedAgenda = pendingAgendas.find(
+      (a) => a.meetingStatusId !== MEETING_STATUS.DRAFT && a.meetingStatusId !== MEETING_STATUS.SCHEDULED,
+    );
+    if (lockedAgenda) {
+      throw new HTTPException(409, {
+        // message: "ไม่สามารถดึงสถานะกลับได้ เนื่องจากโครงการถูกบรรจุเข้าวาระการประชุมแล้ว กรุณาติดต่อเลขาฯ เพื่อถอนออกจากวาระก่อน",
+        message: "ไม่สามารถดึงสถานะกลับได้ เนื่องจากการประชุมที่บรรจุโครงการนี้เริ่มดำเนินการแล้ว กรุณาติดต่อเลขาฯ",
+      });
+    }
+
+    if (pendingAgendas.length > 0) {
+      await tx.delete(agendas).where(
+        inArray(agendas.id, pendingAgendas.map((a) => a.agendaId)),
+      );
+    }
+
+    await applyProjectStatusTransition(tx, {
+      projectId: id,
+      userId: user.userId,
+      oldStatusId: project.statusId,
+      newStatusId: PROJECT_STATUS.IN_ANALYSIS,
+      remark: "ดึงสถานะกลับโดยผู้ดูแลระบบ เพื่อให้นักวิเคราะห์ทบทวนใหม่",
+      sourceOperation: "ADMIN_RECALL_ANALYST_APPROVAL",
+    });
+  });
+
+  // return await findProjectById(id, user);
+  return {
+    message: "ดึงสถานะโครงการกลับให้นักวิเคราะห์ทบทวนใหม่สำเร็จ",
+    project: await findProjectById(id, user),
+  };
+};
+
+
+
+
+
+
+
+
 
 export const reviewSecretaryProject = async (
   id: string,
@@ -997,7 +1128,10 @@ export const updateProject = async (
     project.projectStatusId as typeof OWNER_EDITABLE_STATUS_IDS[number],
   );
 
-  if (hasRole(user, "analyst") && !hasRole(user, "admin") && !hasRole(user, "super_admin") && !hasRole(user, "secretary")) {
+  // if (hasRole(user, "analyst") && !hasRole(user, "admin") && !hasRole(user, "super_admin") && !hasRole(user, "secretary")) {
+  const isOwner = project.userId === user.userId;
+
+  if (hasRole(user, "analyst") && !hasRole(user, "admin") && !hasRole(user, "super_admin") && !hasRole(user, "secretary") && !isOwner) {
     assertAssignedAnalyst(user, project);
     if (project.projectStatusId !== PROJECT_STATUS.IN_ANALYSIS) {
       throw new HTTPException(403, {
@@ -1012,7 +1146,7 @@ export const updateProject = async (
     });
   }
 
-  const isOwner = project.userId === user.userId;
+  // const isOwner = project.userId === user.userId;
   const isDepartmentCollaborator = isSameDepartmentUser(user, project.division?.departmentId);
   const isCentralReviewer = hasRole(user, "secretary") || hasRole(user, "super_admin");
   if (isOwner && !isCentralReviewer && !isAnalystEditableStage && !isOwnerEditableStage) {
@@ -1054,7 +1188,9 @@ export const updateProjectType = async (
   user: UserContext,
 ) => {
   const project = await findProjectById(id, user);
-  if (hasRole(user, "analyst") && !hasRole(user, "admin") && !hasRole(user, "super_admin") && !hasRole(user, "secretary")) {
+  // if (hasRole(user, "analyst") && !hasRole(user, "admin") && !hasRole(user, "super_admin") && !hasRole(user, "secretary")) {
+  const isOwner = project.userId === user.userId;
+  if (hasRole(user, "analyst") && !hasRole(user, "admin") && !hasRole(user, "super_admin") && !hasRole(user, "secretary") && !isOwner) {
     assertAssignedAnalyst(user, project);
     if (project.projectStatusId !== PROJECT_STATUS.IN_ANALYSIS) {
       throw new HTTPException(403, { message: "Analysts may edit project details only while the project is in analysis" });

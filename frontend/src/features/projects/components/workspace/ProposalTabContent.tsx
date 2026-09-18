@@ -66,7 +66,8 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
       <SubmittedProposalView
         project={project}
         proposal={proposalState.data as RawSubmittedProposal}
-        onEdit={() => router.push(`/projects/${projectId}/proposal/create?mode=review`)}
+        // onEdit={() => router.push(`/projects/${projectId}/proposal/create?mode=review`)}
+        onEdit={() => router.push(`/projects/${projectId}/proposal/create`)}
       />
     );
   }

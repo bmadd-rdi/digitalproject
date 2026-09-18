@@ -373,25 +373,27 @@ export function toProposalSubmitPayload(source: Record<string, unknown>) {
   return stripMetadata(normalized) as Record<string, unknown>;
 }
 
-export function normalizeProposalPatchPayload(source: Record<string, unknown>) {
-  const input = record(source);
-  const normalized = normalizeProposalForForm(source);
-  const aliases: Record<string, string> = {
-    budgets: "budgetsByYear",
-    existingEquipments: "existingEquipment",
-    trainings: "trainingCourses",
-  };
-  const result: JsonRecord = {};
+/************************************ JOJO ********************************************/
+// export function normalizeProposalPatchPayload(source: Record<string, unknown>) {
+//   const input = record(source);
+//   const normalized = normalizeProposalForForm(source);
+//   const aliases: Record<string, string> = {
+//     budgets: "budgetsByYear",
+//     existingEquipments: "existingEquipment",
+//     trainings: "trainingCourses",
+//   };
+//   const result: JsonRecord = {};
 
-  for (const key of Object.keys(input)) {
-    if (UI_ONLY_FIELDS.includes(key as typeof UI_ONLY_FIELDS[number])) continue;
-    if (key === "totalBudget" || key === "latestApprovedBudget") continue;
-    const canonicalKey = aliases[key] ?? key;
-    if (!(FORM_FIELD_KEYS as readonly string[]).includes(canonicalKey)) continue;
-    result[canonicalKey] = canonicalKey in normalized
-      ? normalized[canonicalKey]
-      : input[key];
-  }
+//   for (const key of Object.keys(input)) {
+//     if (UI_ONLY_FIELDS.includes(key as typeof UI_ONLY_FIELDS[number])) continue;
+//     if (key === "totalBudget" || key === "latestApprovedBudget") continue;
+//     const canonicalKey = aliases[key] ?? key;
+//     if (!(FORM_FIELD_KEYS as readonly string[]).includes(canonicalKey)) continue;
+//     result[canonicalKey] = canonicalKey in normalized
+//       ? normalized[canonicalKey]
+//       : input[key];
+//   }
 
-  return stripMetadata(result) as Record<string, unknown>;
-}
+//   return stripMetadata(result) as Record<string, unknown>;
+// }
+/************************************ JOJO ********************************************/

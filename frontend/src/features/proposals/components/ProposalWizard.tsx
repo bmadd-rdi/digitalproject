@@ -20,7 +20,7 @@ import {
 import { useProposalFormStore } from "../stores/useProposalFormStore";
 import { useAutoSaveForm } from "../hooks/useAutoSaveForm";
 import { useGetDraft } from "../hooks/useProposalDraftQuery";
-import { useGetProposal } from "../hooks/useProposalDraftQuery";
+// import { useGetProposal } from "../hooks/useProposalDraftQuery";
 import { useInitializeDraft } from "../hooks/useProposalMutations";
 
 import { StepperIndicator } from "./StepperIndicator";
@@ -52,14 +52,15 @@ const AutoSaveWatcher = ({
   projectId,
   disabled,
   flushRef,
-  mode,
+  // mode,
 }: {
   projectId: string;
   disabled: boolean;
   flushRef: { current: (() => Promise<boolean>) | null };
-  mode: "draft" | "submitted";
+  // mode: "draft" | "submitted";
 }) => {
-  const { flush } = useAutoSaveForm(projectId, disabled, mode);
+  // const { flush } = useAutoSaveForm(projectId, disabled, mode);
+  const { flush } = useAutoSaveForm(projectId, disabled);
 
   useEffect(() => {
     flushRef.current = flush;
@@ -76,10 +77,10 @@ const AutoSaveWatcher = ({
 // ---------------------------------------------------------------------------
 const WizardForm = ({
   projectId,
-  mode,
+  // mode,
 }: {
   projectId: string;
-  mode: "draft" | "submitted";
+  // mode: "draft" | "submitted";
 }) => {
   const router = useRouter();
   const flushDraftRef = useRef<(() => Promise<boolean>) | null>(null);
@@ -91,15 +92,27 @@ const WizardForm = ({
     prevStep,
     addStepError,
     removeStepError,
+    setProjectId,
   } = useProposalFormStore();
+
+  // Must run before anything reads currentStep/stepErrors, so it's declared
+  // as the first effect. Scopes the store to this project — see
+  // useProposalFormStore.ts for why rehydrate() has to be called explicitly
+  // here rather than automatically on store creation.
+  useEffect(() => {
+    setProjectId(projectId);
+    void useProposalFormStore.persist.rehydrate();
+  }, [projectId, setProjectId]);
+
 
   // ── React Query: fetch existing draft ─────────────────────────────────────
   const { data: existingDraft, isLoading: isDraftLoading } = useGetDraft(projectId);
-  const { data: existingProposal, isLoading: isProposalLoading } = useGetProposal(projectId);
+  // const { data: existingProposal, isLoading: isProposalLoading } = useGetProposal(projectId);
   const { mutate: initDraft } = useInitializeDraft(projectId);
   const canEditProposal = projectDetail?.permissions?.canEditProposal === true;
-  const isReadOnly = isProjectLoading || isDraftLoading || isProposalLoading || !projectDetail || !canEditProposal ||
-    (mode === "submitted" && !existingProposal);
+  // const isReadOnly = isProjectLoading || isDraftLoading || isProposalLoading || !projectDetail || !canEditProposal ||
+    // (mode === "submitted" && !existingProposal);
+  const isReadOnly = isProjectLoading || isDraftLoading || !projectDetail || !canEditProposal;
 
   // ── RHF setup ─────────────────────────────────────────────────────────────
   const methods = useForm<ProposalFormValues>({
@@ -131,13 +144,14 @@ const WizardForm = ({
     if (
       isProjectLoading ||
       isDraftLoading ||
-      isProposalLoading ||
+      // isProposalLoading ||
       !projectDetail ||
       hasHydratedRef.current
     ) return;
 
-    const sourceValues = mode === "submitted" ? existingProposal : existingDraft;
-    const hydratedDraft: Record<string, unknown> = normalizeProposalForForm(sourceValues ?? {});
+    // const sourceValues = mode === "submitted" ? existingProposal : existingDraft;
+    // const hydratedDraft: Record<string, unknown> = normalizeProposalForForm(sourceValues ?? {});
+    const hydratedDraft: Record<string, unknown> = normalizeProposalForForm(existingDraft ?? {});
     Object.assign(hydratedDraft, getProposalStep1ContextValues(projectDetail));
 
     const fileFields = [
@@ -194,14 +208,16 @@ const WizardForm = ({
     }
 
     reset(hydratedDraft as Partial<ProposalFormValues>);
-    if (!existingDraft && mode === "draft" && !isReadOnly) {
+    // if (!existingDraft && mode === "draft" && !isReadOnly) {
       // No draft yet — create one so we have a record to PATCH against.
+    if (!existingDraft && !isReadOnly) {
++      // No draft yet — create one so auto-save has a record to write to.
       initDraft();
     }
     hasHydratedRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [existingDraft, existingProposal, getAttachmentTypeId, isDraftLoading, isProjectLoading, isProposalLoading, isReadOnly, mode, projectDetail]);
-
+  // }, [existingDraft, existingProposal, getAttachmentTypeId, isDraftLoading, isProjectLoading, isProposalLoading, isReadOnly, mode, projectDetail]);
+  }, [existingDraft, getAttachmentTypeId, isDraftLoading, isProjectLoading, isReadOnly, projectDetail]);
   // ── Step validation helper ─────────────────────────────────────────────────
   const getCurrentSchema = (step: number) => {
     switch (step) {
@@ -306,7 +322,7 @@ const WizardForm = ({
         <AutoSaveWatcher
           projectId={projectId}
           disabled={isReadOnly}
-          mode={mode}
+          // mode={mode}
           flushRef={flushDraftRef}
         />
 
@@ -417,10 +433,10 @@ const WizardForm = ({
 // ---------------------------------------------------------------------------
 export const CreateProposalWizard = ({
   projectId,
-  mode = "draft",
+  // mode = "draft",
 }: {
   projectId: string;
-  mode?: "draft" | "submitted";
+  // mode?: "draft" | "submitted";
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -430,5 +446,6 @@ export const CreateProposalWizard = ({
   }, []);
 
   if (!isMounted) return null;
-  return <WizardForm projectId={projectId} mode={mode} />;
+  // return <WizardForm projectId={projectId} mode={mode} />;
+  return <WizardForm projectId={projectId} />;
 };

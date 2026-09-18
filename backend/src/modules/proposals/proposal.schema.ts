@@ -19,6 +19,7 @@ export const draftProposalSchema = z.object({
   requestedBudgetTotal: z.coerce.number().optional(),
   estimatedCostTotal: z.coerce.number().optional(),
 }).partial().strict().openapi('DraftProposalRequest', {
+// }).partial().passthrough().openapi('DraftProposalRequest', {
   description: 'Schema สำหรับข้อมูลแบบร่างโครงการ (Auto-Save)'
 });
 
@@ -243,9 +244,15 @@ export const submitProposalSchema = z.object({
   isInRoadmap: z.boolean(),
 }).openapi("SubmitProposalRequest");
 
-export const submittedProposalPatchSchema = z.object({}).strict().openapi("SubmittedProposalPatchRequest", {
-  description: "Submitted proposal versions are immutable; this request is retained only for compatibility and rejects all fields",
-});
+
+
+/************************************ JOJO ********************************************/
+// export const submittedProposalPatchSchema = z.object({}).strict().openapi("SubmittedProposalPatchRequest", {
+//   description: "Submitted proposal versions are immutable; this request is retained only for compatibility and rejects all fields",
+// });
+/************************************ JOJO ********************************************/
+
+
 
 // ---------------------------------------------------------------------------
 // Submitted proposal response
@@ -483,4 +490,7 @@ export const ProposalProjectParamsSchema = z.object({
 
 export type DraftProposalDTO = z.infer<typeof draftProposalSchema>;
 export type SubmitProposalDTO = z.infer<typeof submitProposalSchema>;
-export type SubmittedProposalPatchDTO = z.infer<typeof submittedProposalPatchSchema>;
+
+/************************************ JOJO ********************************************/
+// export type SubmittedProposalPatchDTO = z.infer<typeof submittedProposalPatchSchema>;
+/************************************ JOJO ********************************************/

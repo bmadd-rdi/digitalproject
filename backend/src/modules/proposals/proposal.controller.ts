@@ -4,7 +4,10 @@ import { proposalService } from "./proposal.service";
 import type {
   DraftProposalDTO,
   SubmitProposalDTO,
-  SubmittedProposalPatchDTO,
+/************************************ JOJO ********************************************/
+  // SubmittedProposalPatchDTO,
+/************************************ JOJO ********************************************/
+
 } from "./proposal.schema";
 import { getUserContext, getUserId } from "../../shared/http/controller-helper";
 
@@ -16,23 +19,25 @@ export const getProposal = async (c: Context, projectId: string) => {
   return c.json({ data: proposal }, 200);
 };
 
-export const patchSubmittedProposal = async (
-  c: Context,
-  projectId: string,
-  body: SubmittedProposalPatchDTO,
-) => {
-  const user = getUserContext(c);
-  const proposal = await proposalService.patchSubmittedProposal(projectId, user, body);
+/************************************ JOJO ********************************************/
+// export const patchSubmittedProposal = async (
+//   c: Context,
+//   projectId: string,
+//   body: SubmittedProposalPatchDTO,
+// ) => {
+//   const user = getUserContext(c);
+//   const proposal = await proposalService.patchSubmittedProposal(projectId, user, body);
 
-  return c.json(
-    {
-      success: true,
-      message: "Submitted proposal updated successfully",
-      data: proposal,
-    },
-    200,
-  );
-};
+//   return c.json(
+//     {
+//       success: true,
+//       message: "Submitted proposal updated successfully",
+//       data: proposal,
+//     },
+//     200,
+//   );
+// };
+/************************************ JOJO ********************************************/
 
 export const getDraftByProjectId = async (c: Context, projectId: string) => {
   const user = getUserContext(c);

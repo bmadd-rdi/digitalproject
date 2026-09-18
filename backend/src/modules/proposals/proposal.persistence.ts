@@ -531,6 +531,10 @@ async function syncCloudRequests(
  * Persists every nested proposal collection using the canonical request
  * names while preserving compatibility aliases. The function is intentionally
  * shared by final submission and submitted-proposal PATCH operations.
+ 
+ * names while preserving compatibility aliases. Used by final submission;
+ * submitted proposals are edited via a restored draft, not patched directly.
+ * shared by final submission.
  */
 export async function syncProposalCollections(
   tx: Transaction,
