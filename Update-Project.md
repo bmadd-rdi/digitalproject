@@ -34,3 +34,10 @@
    ```
    docker compose up -d
    ```
+
+แบบ B - อัปเดตโค้ด/Image ใหม่ให้ Container
+   > bash
+   ```
+   docker compose up -d --build
+   ```
+   Docker จะทำการบิลด์ Image ใหม่ก่อน จากนั้นจะทำการ Recreate (ลบ Container เก่าแล้วสร้างใหม่ด้วย Image ใหม่) ให้ทันทีในคำสั่งเดียว โดยใช้เวลารีสตาร์ท Container เพียงไม่กี่วินาที ทำให้เกิด Downtime นานน้อยกว่าการสั่ง down แล้วค่อย up ครับ
