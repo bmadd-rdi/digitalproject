@@ -81,13 +81,12 @@ export function LoginForm() {
     >
       {statusMessage && (
         <div
-          className={`p-4 mb-6 rounded-md text-sm font-medium animate-in fade-in slide-in-from-top-2 border ${
-            statusMessage.type === "success"
+          className={`p-4 mb-6 rounded-md text-sm font-medium animate-in fade-in slide-in-from-top-2 border ${statusMessage.type === "success"
               ? "bg-green-50 text-green-700 border-green-200"
               : statusMessage.type === "warning"
                 ? "bg-orange-50 text-orange-700 border-orange-200"
                 : "bg-red-50 text-red-700 border-red-200"
-          }`}
+            }`}
         >
           {statusMessage.text}
         </div>
@@ -136,7 +135,7 @@ export function LoginForm() {
             >
               Password
             </Label>
-            <Link href="/forgot-password">
+            <Link href="/forgot-password" tabIndex={-1}>
               <p className="text-sm font-medium text-primary transition-colors hover:underline hover:text-primary/80 whitespace-nowrap">
                 ลืมรหัสผ่าน?
               </p>
@@ -186,10 +185,10 @@ export function LoginForm() {
         </Button>
 
         {/* เส้นคั่น "หรือ" */}
-        
+
 
         {/* ปุ่ม Login ด้วย Google */}
-        
+
 
         <span className="flex flex-row items-end gap-1 mx-auto justify-center pt-2">
           <p className="text-center text-base text-muted-foreground">
