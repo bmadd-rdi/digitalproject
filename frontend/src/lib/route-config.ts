@@ -25,6 +25,8 @@ export type ProtectedRoute = {
   icon: RouteIconName;
   roles: readonly AppRole[] | typeof ALL_AUTHENTICATED_ROLES;
   aliases?: readonly string[];
+  /** แสดงในเมนูแต่ปิดใช้งาน (กดเลือกไม่ได้) เมื่อตั้งค่าเป็น true */
+  disabled?: boolean;
 };
 
 export type ProtectedRouteGroup = {
@@ -56,12 +58,15 @@ export const APP_ROUTE_GROUPS = [
         roles: ALL_AUTHENTICATED_ROLES,
       },
       {
+        // ปิดใช้งานชั่วคราว: ยังแสดงในเมนูแต่กดเลือกไม่ได้
+        // (aliases /projects/active ถูกถอดออก ให้หน้า /projects/active
+        // ไปเน้นเมนู "จัดการโครงการ" แทนเมนูที่ disabled)
         label: "ติดตามโครงการ",
         path: "/projects/tracking",
         group: "โครงการ",
         icon: "tracking",
         roles: ALL_AUTHENTICATED_ROLES,
-        aliases: ["/projects/active"],
+        disabled: true,
       },
     ],
   },
@@ -187,7 +192,9 @@ export function canAccessRoute(route: ProtectedRoute, roles: readonly AppRole[])
   );
 }
 
-export function getVisibleRouteGroups(roles: readonly AppRole[]) {
+export function getVisibleRouteGroups(
+  roles: readonly AppRole[],
+): ProtectedRouteGroup[] {
   return APP_ROUTE_GROUPS.map((group) => ({
     ...group,
     routes: group.routes.filter((route) => canAccessRoute(route, roles)),

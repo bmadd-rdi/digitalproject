@@ -33,7 +33,14 @@ const formatRoleName = (name: string) =>
 
 export const RoleModal = ({ isOpen, onClose, user, onSave, isSaving = false }: RoleModalProps) => {
   const { data, isLoading } = useRoles();
-  const roles = useMemo(() => (data?.data ?? []) as RoleOption[], [data?.data]);
+  // ไม่ให้กำหนด role SUPER_ADMIN ผ่านหน้าจอนี้ (บริหารผ่าน script/db เท่านั้น)
+  const roles = useMemo(
+    () =>
+      ((data?.data ?? []) as RoleOption[]).filter(
+        (role) => role.name.trim().toLowerCase() !== "super_admin",
+      ),
+    [data?.data],
+  );
   const [selectedRoles, setSelectedRoles] = useState<number[]>(() => user?.role_ids ?? []);
 
   const handleRoleToggle = (roleId: number, checked: boolean) => {

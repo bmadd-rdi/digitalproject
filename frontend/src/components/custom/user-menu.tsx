@@ -14,10 +14,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions/auth.actions";
+import { useUserProfile } from "@/features/users/hooks/useUserProfile";
 
-export function UserMenu() {
+// สร้างตัวย่อชื่อ (initials) จากชื่อ-นามสกุล เช่นเดียวกับหน้า /profile
+function getInitials(firstName?: string | null, lastName?: string | null) {
+  return `${firstName?.charAt(0) ?? ""}${lastName?.charAt(0) ?? ""}` || "BMA";
+}
+
+export function UserMenu({ userId }: { userId: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { data: profile } = useUserProfile(userId);
+
+  const fullName = profile ? `${profile.firstName} ${profile.lastName}` : "...";
+  const email = profile?.email ?? "";
 
   const handleLogout = () => {
       // ใช้ startTransition เพื่อครอบการทำงานของ Server Action ใน Client Component
@@ -32,10 +42,10 @@ export function UserMenu() {
         {/* ใช้ Button ครอบเพื่อให้สามารถกดและมีเอฟเฟกต์โฮเวอร์ได้สวยงาม */}
         <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
           <Avatar className="h-10 w-10 border border-border">
-            {/* ใส่รูปภาพประจำตัวผู้ใช้ (ในโฟลเดอร์ public/pics มีรูป man.webp อยู่สามารถทดสอบใช้ได้ครับ) */}
-            <AvatarImage src="/pics/man.webp" alt="User Profile" />
-            <AvatarFallback className="bg-primary-container text-primary-dark font-bold">
-              BMA
+            {/* ปัจจุบันยังไม่มีรูปโปรไฟล์ในระบบ จึงแสดงตัวย่อชื่อ (initials) เช่นเดียวกับหน้า /profile */}
+            <AvatarImage src="" alt={fullName} />
+            <AvatarFallback className="bg-primary font-bold text-primary-foreground">
+              {getInitials(profile?.firstName, profile?.lastName)}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -45,9 +55,9 @@ export function UserMenu() {
         {/* หัวข้อแสดงข้อมูลผู้ใช้เบื้องต้น */}
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none text-foreground">นายสมชาย ใจดี</p>
+            <p className="text-sm font-medium leading-none text-foreground">{fullName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              somchay.j@bangkok.go.th
+              {email}
             </p>
           </div>
         </DropdownMenuLabel>

@@ -51,6 +51,8 @@ interface UserTableProps {
   users: User[];
   isLoading?: boolean;
   onToggleActive: (id: string | number) => void;
+  onVerify: (id: string | number) => void;
+  isSuperAdminUser: (user: User) => boolean;
   isUpdatingStatus?: boolean;
   onOpenRoleModal: (user: User) => void;
   onOpenPasswordModal: (user: User) => void;
@@ -64,6 +66,8 @@ export const UserTable = memo(function UserTable({
   users,
   isLoading = false,
   onToggleActive,
+  onVerify,
+  isSuperAdminUser,
   isUpdatingStatus = false,
   onOpenRoleModal,
   onOpenPasswordModal,
@@ -100,8 +104,8 @@ export const UserTable = memo(function UserTable({
   // ฟังก์ชันสร้างไอคอนเรียงลำดับ
   const getSortIcon = (field: string) => {
     if (sortField !== field) return <ArrowUpDown className="ml-2 w-4 h-4 text-slate-300" />;
-    return sortDirection === 'asc' 
-      ? <ArrowUp className="ml-2 w-4 h-4 text-primary" /> 
+    return sortDirection === 'asc'
+      ? <ArrowUp className="ml-2 w-4 h-4 text-primary" />
       : <ArrowDown className="ml-2 w-4 h-4 text-primary" />;
   };
 
@@ -222,17 +226,28 @@ export const UserTable = memo(function UserTable({
 
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <Switch
-                      checked={user.is_active}
-                      disabled={isUpdatingStatus}
-                      onCheckedChange={() => onToggleActive(user.user_id)}
-                      className="data-[state=checked]:bg-emerald-500"
-                    />
-                    <span
-                      className={`text-xs font-bold min-w-13.75 text-left ${user.is_active ? "text-emerald-600" : "text-rose-500"}`}
-                    >
-                      {user.is_active ? "Active" : "Suspended"}
-                    </span>
+                    {user.is_verified ? (
+                      <>
+                        <Switch
+                          checked={user.is_active}
+                          disabled={isUpdatingStatus}
+                          onCheckedChange={() => onToggleActive(user.user_id)}
+                          className="data-[state=checked]:bg-emerald-500"
+                        />
+                        <span
+                          className={`text-xs font-bold min-w-13.75 text-left ${user.is_active ? "text-emerald-600" : "text-rose-500"}`}
+                        >
+                          {user.is_active ? "Active" : "Suspended"}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        {/* is_verified = false: ยังไม่ยืนยันอีเมล → สลับสถานะไม่ได้ */}
+                        <span className="text-xs font-bold min-w-13.75 text-left text-amber-600">
+                          Pending Verification
+                        </span>
+                      </>
+                    )}
                   </div>
                 </TableCell>
 
@@ -265,22 +280,36 @@ export const UserTable = memo(function UserTable({
                         <Key className="w-4 h-4 text-amber-500 mr-2" />{" "}
                         จัดการรหัสผ่าน
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-rose-600 font-medium cursor-pointer"
-                        onClick={() => onToggleActive(user.user_id)}
-                      >
-                        {user.is_active ? (
-                          <>
-                            <UserX className="w-4 h-4 mr-2" /> ระงับการใช้งาน
-                          </>
-                        ) : (
-                          <>
-                            <UserCheck className="w-4 h-4 text-emerald-600 mr-2" />{" "}
-                            เปิดใช้งาน
-                          </>
-                        )}
-                      </DropdownMenuItem>
+                      {/* <DropdownMenuSeparator /> */}
+                      {!isSuperAdminUser(user) && (
+                        <>
+                          <DropdownMenuSeparator />
+                          {!user.is_verified ? (
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() => onVerify(user.user_id)}
+                            >
+                              <UserCheck className="w-4 h-4 text-emerald-600 mr-2" />{" "}
+                              ยืนยันตัวตน
+                            </DropdownMenuItem>
+                          ) : null}
+                          <DropdownMenuItem
+                            className="text-rose-600 font-medium cursor-pointer"
+                            onClick={() => onToggleActive(user.user_id)}
+                          >
+                            {user.is_active ? (
+                              <>
+                                <UserX className="w-4 h-4 mr-2" /> ระงับการใช้งาน
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="w-4 h-4 text-emerald-600 mr-2" />{" "}
+                                เปิดใช้งาน
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

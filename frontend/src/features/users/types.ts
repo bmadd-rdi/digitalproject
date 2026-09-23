@@ -14,6 +14,7 @@ export interface User {
   office_phone?: string;
   internal_extension?: string;
   is_active: boolean;
+  is_verified: boolean; // false = Pending Verification (ยังไม่ยืนยันอีเมล)
   last_login: string | null;
   created_at?: string;
 }

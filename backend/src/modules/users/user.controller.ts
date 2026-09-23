@@ -85,6 +85,27 @@ export const updateUserStatus = async (c: Context, userId: string, body: { isAct
   return c.json(user, 200);
 };
 
+// Admin ยืนยันตัวตนให้ผู้ใช้ (เปลี่ยน Pending Verification → Active/Suspended)
+export const verifyUser = async (c: Context, userId: string) => {
+  const actor = getUserContext(c);
+  checkPermission(actor, "update", "user_management");
+
+  // ห้ามดำเนินการกับบัญชี SUPER_ADMIN (เช่นเดียวกับการระงับการใช้งาน)
+  const target = await userService.getUserProfile(userId);
+  if (!target) {
+    throw new HTTPException(404, { message: "User not found" });
+  }
+  const targetIsSuperAdmin = (target.roles ?? []).some(
+    (role: { roleName: string }) => role.roleName.toLowerCase() === "super_admin",
+  );
+  if (targetIsSuperAdmin) {
+    throw new HTTPException(403, { message: "SUPER_ADMIN accounts cannot be modified" });
+  }
+
+  const user = await userService.verifyUser(userId);
+  return c.json(user, 200);
+};
+
 export const updateOwnProfile = async (
   c: Context,
   body: {

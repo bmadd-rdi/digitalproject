@@ -46,6 +46,14 @@ export async function updateUserStatusAction(userId: string, isActive: boolean) 
   });
 }
 
+// Admin ยืนยันตัวตนให้ผู้ใช้ (Pending Verification → Active/Suspended)
+export async function verifyUserAction(userId: string) {
+  return serverFetch<UserProfileResponse>(`/api/v1/users/${userId}/verify`, {
+    method: "PATCH",
+    body: JSON.stringify({}),
+  });
+}
+
 export async function updateOwnProfileAction(data: UpdateOwnProfileRequest) {
   return serverFetch<UserProfileResponse>("/api/v1/users/me", {
     method: "PATCH",

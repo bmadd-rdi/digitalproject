@@ -28,6 +28,8 @@ export const UserManagementView = ({ currentUserId }: { currentUserId?: string |
     isPasswordModalOpen, setIsPasswordModalOpen,
     tempPassword, setTempPassword,
     handleToggleActive,
+    handleVerify,
+    isSuperAdminUser,
     handleSaveRoles,
     isUpdatingStatus,
     isUpdatingRoles,
@@ -63,6 +65,8 @@ export const UserManagementView = ({ currentUserId }: { currentUserId?: string |
             users={users}
             isLoading={isLoading}
             onToggleActive={handleToggleActive}
+            onVerify={handleVerify}
+            isSuperAdminUser={isSuperAdminUser}
             isUpdatingStatus={isUpdatingStatus}
             onOpenRoleModal={openRoleModal}
             onOpenPasswordModal={openPasswordModal}

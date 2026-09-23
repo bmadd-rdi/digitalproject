@@ -52,6 +52,7 @@ function mapApiUser(user: ApiUser): User {
     roles: user.roles.map((role) => role.roleName),
     role_ids: user.roles.map((role) => role.roleId),
     is_active: user.isActive,
+    is_verified: user.isVerified,
     last_login: lastLogin && !Number.isNaN(lastLogin.getTime())
       ? new Intl.DateTimeFormat("th-TH", {
           dateStyle: "short",

@@ -379,6 +379,25 @@ export const updateUserStatus = async (userId: string, isActive: boolean) => {
   return getUserProfile(userId);
 };
 
+// Admin ยืนยันตัวตนให้ผู้ใช้แทน (force verify) — ล้าง verification token ด้วย
+export const verifyUser = async (userId: string) => {
+  const [updatedUser] = await db
+    .update(users)
+    .set({
+      isVerified: true,
+      verificationToken: null,
+      verificationExpires: null,
+    })
+    .where(eq(users.userId, userId))
+    .returning({ userId: users.userId });
+
+  if (!updatedUser) {
+    throw new HTTPException(404, { message: "User not found" });
+  }
+
+  return getUserProfile(userId);
+};
+
 export const updateOwnProfile = async (
   userId: string,
   data: {

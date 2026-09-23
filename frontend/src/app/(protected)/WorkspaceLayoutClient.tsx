@@ -42,9 +42,11 @@ function Breadcrumbs() {
 export default function WorkspaceLayoutClient({
   children,
   roles,
+  userId,
 }: {
   children: ReactNode;
   roles: readonly string[];
+  userId: string;
 }) {
   return (
     <RoleProvider roles={roles}>
@@ -58,7 +60,7 @@ export default function WorkspaceLayoutClient({
               <Breadcrumbs />
             </section>
             <div className="flex shrink-0 items-center gap-4">
-              <UserMenu />
+              <UserMenu userId={userId} />
             </div>
           </nav>
           <div data-testid="workspace-content-scroll" className="p-2 md:p-4">

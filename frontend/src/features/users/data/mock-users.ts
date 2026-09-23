@@ -12,6 +12,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองสารสนเทศภูมิศาสตร์",
     roles: ["ADMIN", "ANALYST", "USER"],
     is_active: true,
+    is_verified: true,
     last_login: "29 มิ.ย. 2569 14:20",
   },
   {
@@ -25,6 +26,7 @@ export const MOCK_USERS: User[] = [
     division_name: "ศูนย์ข้อมูลกลาง",
     roles: ["ANALYST"],
     is_active: true,
+    is_verified: true,
     last_login: "28 มิ.ย. 2569 09:15",
   },
   {
@@ -38,6 +40,7 @@ export const MOCK_USERS: User[] = [
     division_name: "ฝ่ายบริหารงานทั่วไป",
     roles: ["USER"],
     is_active: false,
+    is_verified: false,
     last_login: "15 พ.ค. 2569 11:30",
   },
   {
@@ -51,6 +54,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองแผนงานและประสานสาธารณูปโภค",
     roles: ["USER"],
     is_active: true,
+    is_verified: true,
     last_login: "29 มิ.ย. 2569 10:05",
   },
   {
@@ -64,6 +68,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองวิชาการ",
     roles: ["ANALYST"],
     is_active: true,
+    is_verified: true,
     last_login: "27 มิ.ย. 2569 16:45",
   },
   {
@@ -77,6 +82,7 @@ export const MOCK_USERS: User[] = [
     division_name: "ศูนย์เทคโนโลยีสารสนเทศ",
     roles: ["ADMIN"],
     is_active: true,
+    is_verified: true,
     last_login: "29 มิ.ย. 2569 15:30",
   },
   {
@@ -90,6 +96,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองระบบเทคโนโลยีจราจร",
     roles: ["ANALYST"],
     is_active: false,
+    is_verified: true,
     last_login: "01 มี.ค. 2569 08:20",
   },
   {
@@ -103,6 +110,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองนวัตกรรมและเทคโนโลยีเพื่อการศึกษา",
     roles: ["USER"],
     is_active: true,
+    is_verified: true,
     last_login: "29 มิ.ย. 2569 11:15",
   },
   {
@@ -116,6 +124,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองพัฒนาระบบดิจิทัล",
     roles: ["ANALYST"],
     is_active: true,
+    is_verified: true,
     last_login: "29 มิ.ย. 2569 13:40",
   },
   {
@@ -129,6 +138,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองระบบการคลัง",
     roles: ["USER"],
     is_active: true,
+    is_verified: true,
     last_login: "28 มิ.ย. 2569 14:00",
   },
   {
@@ -142,6 +152,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองสารสนเทศบุคคล",
     roles: ["USER"],
     is_active: false,
+    is_verified: true,
     last_login: "10 ม.ค. 2569 09:30",
   },
   {
@@ -155,6 +166,7 @@ export const MOCK_USERS: User[] = [
     division_name: "กองนโยบายและแผนงาน",
     roles: ["ANALYST"],
     is_active: true,
+    is_verified: true,
     last_login: "29 มิ.ย. 2569 08:45",
   }
 ];

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useGetUsers } from "./useGetUsers";
 import type { User } from "../types";
 import type { UserSortField, UserSortOrder } from "../api/users.api";
-import { updateUserRolesAction, updateUserStatusAction } from "../actions/user.actions";
+import { updateUserRolesAction, updateUserStatusAction, verifyUserAction } from "../actions/user.actions";
 import { refreshSessionAction } from "@/features/auth/actions/auth.actions";
 
 export type SortField = UserSortField;
@@ -79,6 +79,15 @@ export const useUserManagement = (options: { currentUserId?: string | null } = {
     onError: (error) => toast.error(error instanceof Error ? error.message : "ไม่สามารถอัปเดตสถานะผู้ใช้ได้"),
   });
 
+  const verifyMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string }) => verifyUserAction(userId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("ยืนยันตัวตนผู้ใช้เรียบร้อยแล้ว");
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "ไม่สามารถยืนยันตัวตนผู้ใช้ได้"),
+  });
+
   const rolesMutation = useMutation({
     mutationFn: ({ userId, roleIds }: { userId: string; roleIds: number[] }) =>
       updateUserRolesAction(userId, roleIds),
@@ -110,9 +119,24 @@ export const useUserManagement = (options: { currentUserId?: string | null } = {
   const handleToggleActive = useCallback((userId: string | number) => {
     const id = String(userId);
     const currentUser = users.find((user) => String(user.user_id) === id);
-    if (!currentUser || statusMutation.isPending) return;
+    // ผู้ใช้ที่ยังไม่ยืนยันอีเมล (is_verified = false) สลับสถานะ Active/Suspended ไม่ได้
+    if (!currentUser || !currentUser.is_verified || statusMutation.isPending) return;
     void statusMutation.mutateAsync({ userId: id, isActive: !currentUser.is_active });
   }, [statusMutation, users]);
+
+  // ยืนยันตัวตนให้ผู้ใช้ (ใช้ได้เฉพาะแถวที่ is_verified = false)
+  const handleVerify = useCallback((userId: string | number) => {
+    const id = String(userId);
+    const currentUser = users.find((user) => String(user.user_id) === id);
+    if (!currentUser || currentUser.is_verified || verifyMutation.isPending) return;
+    void verifyMutation.mutateAsync({ userId: id });
+  }, [verifyMutation, users]);
+
+  // SUPER_ADMIN ไม่แสดง action ยืนยันตัวตน/ระงับการใช้งาน
+  const isSuperAdminUser = useCallback(
+    (user: User) => user.roles.some((role) => role.trim().toLowerCase() === "super_admin"),
+    [],
+  );
 
   const openRoleModal = useCallback((user: User) => {
     setSelectedUser(user);
@@ -173,6 +197,8 @@ export const useUserManagement = (options: { currentUserId?: string | null } = {
     tempPassword,
     setTempPassword,
     handleToggleActive,
+    handleVerify,
+    isSuperAdminUser,
     handleSaveRoles,
     isUpdatingStatus: statusMutation.isPending,
     isUpdatingRoles: rolesMutation.isPending,

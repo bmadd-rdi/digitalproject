@@ -186,6 +186,24 @@ app.openapi(updateUserStatusRoute, (c) =>
   userController.updateUserStatus(c, c.req.valid('param').userId, c.req.valid('json')),
 );
 
+const verifyUserRoute = createRoute({
+  method: 'patch',
+  path: '/{userId}/verify',
+  tags: ['Users'],
+  middleware: [authMiddleware, requirePermission('update', 'user_management')],
+  request: {
+    params: z.object({ userId: z.string().uuid() }),
+  },
+  responses: {
+    200: { content: { 'application/json': { schema: UserSchema } }, description: 'User verified by admin' },
+    403: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Forbidden' },
+    404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'User not found' },
+  },
+});
+app.openapi(verifyUserRoute, (c) =>
+  userController.verifyUser(c, c.req.valid('param').userId),
+);
+
 const updateOwnProfileRoute = createRoute({
   method: 'patch',
   path: '/me',

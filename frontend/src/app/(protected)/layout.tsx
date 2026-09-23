@@ -14,7 +14,7 @@ export default async function WorkspaceLayout({
   if (!session?.userId) redirect("/login");
 
   return (
-    <WorkspaceLayoutClient roles={normalizeRoles(session.roles)}>
+    <WorkspaceLayoutClient roles={normalizeRoles(session.roles)} userId={session.userId}>
       {children}
     </WorkspaceLayoutClient>
   );

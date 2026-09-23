@@ -114,6 +114,22 @@ export function AppSidebar({ roles = [] }: { roles?: readonly string[] }) {
                   const Icon = icons[route.icon];
                   const isActive = activeRoute?.path === route.path;
 
+                  // เมนูที่ปิดใช้งาน (disabled): แสดงเป็นสีเทา กดเลือกไม่ได้
+                  if (route.disabled) {
+                    return (
+                      <SidebarMenuItem key={route.path}>
+                        <SidebarMenuButton
+                          disabled
+                          tooltip={route.label}
+                          className="rounded-full font-medium text-slate-400 group-data-[collapsible=icon]:justify-center!"
+                        >
+                          <Icon className="h-5 w-5 shrink-0 text-slate-400" />
+                          <span>{route.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  }
+
                   return (
                     <SidebarMenuItem key={route.path}>
                       <SidebarMenuButton
