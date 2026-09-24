@@ -36,6 +36,12 @@
    ```
 
 แบบ B - อัปเดตโค้ด/Image ใหม่ให้ Container
+1. เข้าโฟลเดอร์ digitalproject
+   > bash
+   ```
+   cd /projects/digitalproject
+   ```
+2. ทำการ build และ Up ในครั้งเดียว
    > bash
    ```
    docker compose up -d --build
