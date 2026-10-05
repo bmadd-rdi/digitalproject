@@ -30,8 +30,8 @@
 5. สร้างโฟลเดอร์สำหรับเก็บโปรเจกต์
    > bash
    ```
-   mkdir -p /digitalproject
-   cd /digitalproject
+   mkdir -p digitalproject
+   cd digitalproject/
    ```
 6. Clone โปรเจกต์
    > bash
