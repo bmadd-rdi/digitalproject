@@ -5,7 +5,7 @@
 4. เปิดโฟลเดอร์ database
    > bash
    ```
-   cd projects/digitalproject/database
+   cd digitalproject/database
    ```
 5. พิมพ์คำสั่งด้านล่างนี้ใน Terminal เพื่อเริ่มรัน PostgreSQL
    > bash
@@ -32,7 +32,7 @@
 
 
 วิธีตั้งค่าฐานข้อมูล PostgreSQL@Localhost
-1. ตรวจสอบไฟล์ .env ที่อยู่ /home/administrator/projects/digitalproject/backend/
+1. ตรวจสอบไฟล์ .env ที่อยู่ /home/administrator/digitalproject/backend/
 2. กำหนด DATABASE_URL=postgresql://postgres:mysecretpassword@host.docker.internal:5432/bma_db
 3. เปิดเบราว์เซอร์ไปที่: `http://localhost:8081/docs/`
 4. ไปที่หมวด **Auth** -> เลือก `POST /api/v1/auth/login`
