@@ -1,0 +1,22 @@
+# ===== Root-level ignores for digitalproject =====
+
+# Change logs (บันทึกงานของ agent) — ห้ามขึ้น GitHub
+logs/
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

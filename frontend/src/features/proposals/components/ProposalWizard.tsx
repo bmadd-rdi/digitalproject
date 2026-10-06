@@ -339,7 +339,12 @@ const WizardForm = ({
             {currentStep === 2 && <ProposalStep2 />}
             {currentStep === 3 && <ProposalStep3 projectId={projectId} />}
             {currentStep === 4 && <ProposalStep4 />}
-            {currentStep === 5 && <ProposalStep5 />}
+            {currentStep === 5 && (
+              <ProposalStep5
+                project={projectDetail}
+                beforeExport={() => flushDraftRef.current?.() ?? true}
+              />
+            )}
           </fieldset>
 
           <div className="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-center sm:justify-between border-t border-[#ededf4] gap-4">

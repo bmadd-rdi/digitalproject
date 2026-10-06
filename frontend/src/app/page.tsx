@@ -2,12 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ExternalLink,
+  Home as HomeIcon,
   Mail,
   MapPin,
   Phone,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { UserMenu } from "@/components/custom/user-menu";
+import { getUserSession } from "@/lib/session";
 import { HeroCarousel } from "@/features/landing/components/HeroCarousel";
 
 const usefulLinks = [
@@ -16,7 +19,10 @@ const usefulLinks = [
   "เงื่อนไขการให้บริการ",
 ];
 
-export default function Home() {
+export default async function Home() {
+  // ตรวจสอบเซสชันจากคุกกี้ token (Server Component) — ถ้า login อยู่จะแสดงเมนู Home/Profile
+  const session = await getUserSession();
+  const isAuthenticated = Boolean(session?.userId);
   return (
     <main className="min-h-screen bg-background text-foreground">
       <header className="fixed inset-x-0 top-0 z-50 px-4 py-3 sm:px-6">
@@ -38,25 +44,45 @@ export default function Home() {
           </Link>
 
           <div className="flex shrink-0 items-center gap-2">
-            <Button
-              asChild
-              variant="ghost"
-              className="h-9 px-3 text-xs sm:h-11 sm:px-6 sm:text-base rounded-full"
-            >
-              <Link href="/register">
-                <span className="text-foreground">ลงทะเบียน</span>
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="h-9 px-3 text-xs sm:h-11 sm:px-6 sm:text-base rounded-full"
+                >
+                  <Link href="/projects">
+                    <HomeIcon className="mr-1 h-4 w-4" />
+                    {/* <span className="text-foreground">Home</span> */}
+                  </Link>
+                </Button>
 
-            <Button
-              asChild
-              variant="default"
-              className="h-9 px-3 text-xs sm:h-11 sm:px-6 sm:text-base rounded-full"
-            >
-              <Link href="/login">
-                <span className="text-background">เข้าสู่ระบบ</span>
-              </Link>
-            </Button>
+                {/* เมนูโปรไฟล์แบบเดียวกับ nav ในหน้า /projects (avatar + dropdown) */}
+                <UserMenu userId={session!.userId} />
+              </>
+            ) : (
+              <>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="h-9 px-3 text-xs sm:h-11 sm:px-6 sm:text-base rounded-full"
+                >
+                  <Link href="/register">
+                    <span className="text-foreground">ลงทะเบียน</span>
+                  </Link>
+                </Button>
+
+                <Button
+                  asChild
+                  variant="default"
+                  className="h-9 px-3 text-xs sm:h-11 sm:px-6 sm:text-base rounded-full"
+                >
+                  <Link href="/login">
+                    <span className="text-background">เข้าสู่ระบบ</span>
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -66,7 +92,7 @@ export default function Home() {
         <div className="absolute inset-x-0 top-0 -z-20 h-full bg-[linear-gradient(90deg,rgba(0,115,75,0.05)_1px,transparent_1px),linear-gradient(180deg,rgba(0,115,75,0.04)_1px,transparent_1px)] bg-[size:56px_56px]" />
 
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-          
+
           <div className="max-w-3xl space-y-0 flex flex-col items-start text-left">
             <p className="mb-4 sm:mb-5 text-sm sm:text-xl font-bold uppercase tracking-[0.04em] text-primary">
               กองยุทธศาสตร์ดิจิทัล สํานักดิจิทัลกรุงเทพมหานคร

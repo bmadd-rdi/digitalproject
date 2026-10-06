@@ -353,6 +353,61 @@ export interface paths {
         };
         trace?: never;
     };
+    "/api/v1/users/{userId}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User verified by admin */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserProfileResponse"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                /** @description User not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
     "/api/v1/users/me": {
         parameters: {
             query?: never;
@@ -729,6 +784,54 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ดูประวัติการเข้าสู่ระบบของตนเอง
+         * @description คืนรายการประวัติการเข้าสู่ระบบล่าสุด 20 รายการของผู้ใช้ที่กำลังเข้าใช้งาน
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description สำเร็จ */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["LoginHistoryResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2227,48 +2330,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    /** @description Project UUID */
-                    projectId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["SubmittedProposalPatchRequest"];
-                };
-            };
-            responses: {
-                /** @description Updated submitted proposal */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            data?: unknown;
-                            message?: string;
-                            success?: boolean;
-                        };
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            message: string;
-                        };
-                    };
-                };
-            };
-        };
+        patch?: never;
         trace?: never;
     };
     "/api/v1/proposals/projects/{projectId}/submit": {
@@ -4315,6 +4377,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/projects/{id}/recall-analyst-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ดึงสถานะโครงการกลับหลัง Analyst อนุมัติไปแล้ว เพื่อให้ทบทวนใหม่ */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Recalled to analyst review */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": unknown;
+                    };
+                };
+                /** @description Unauthenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            dependencies?: string[];
+                        };
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            dependencies?: string[];
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            dependencies?: string[];
+                        };
+                    };
+                };
+                /** @description Workflow conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            dependencies?: string[];
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/internal/cloud-requests": {
         parameters: {
             query?: never;
@@ -4804,6 +4952,22 @@ export interface components {
         RefreshSessionResponse: {
             token: string;
         };
+        LoginHistoryResponse: {
+            items: components["schemas"]["LoginHistoryItem"][];
+        };
+        LoginHistoryItem: {
+            /** @description รหัสของรายการประวัติการเข้าสู่ระบบ */
+            id: string;
+            /**
+             * Format: date-time
+             * @description เวลาที่เข้าสู่ระบบ
+             */
+            loginAt: string;
+            /** @description IP ที่ใช้เข้าสู่ระบบ */
+            ipAddress: string | null;
+            /** @description User-Agent ของอุปกรณ์ */
+            userAgent: string | null;
+        };
         UploadDocumentRequest: {
             /**
              * Format: binary
@@ -4881,6 +5045,16 @@ export interface components {
              */
             latestApprovedBudget?: string | null;
             /**
+             * @description ปีเริ่มต้นงบประมาณ — ปีที่น้อยที่สุดใน proposal_budgets ของข้อเสนอที่ submit ล่าสุด
+             * @example 2569
+             */
+            budgetStartYear?: string | null;
+            /**
+             * @description ประเภทงบประมาณของแถว proposal_budgets ที่ตรงกับ budgetStartYear
+             * @example งบลงทุน
+             */
+            budgetType?: string | null;
+            /**
              * Format: uuid
              * @example null
              */
@@ -4943,6 +5117,16 @@ export interface components {
                 userId: string;
                 firstName: string;
                 lastName: string;
+                /**
+                 * @description ตำแหน่งของผู้สร้างโครงการ
+                 * @example นักวิเคราะห์นโยบาย
+                 */
+                position: string | null;
+                /**
+                 * @description ระดับของผู้สร้างโครงการ
+                 * @example ปฏิบัติการ
+                 */
+                level: string | null;
             } | null;
             /** @description ผู้วิเคราะห์โครงการ */
             analyst: {
@@ -5033,6 +5217,16 @@ export interface components {
                 userId: string;
                 firstName: string;
                 lastName: string;
+                /**
+                 * @description ตำแหน่งของผู้สร้างโครงการ
+                 * @example นักวิเคราะห์นโยบาย
+                 */
+                position: string | null;
+                /**
+                 * @description ระดับของผู้สร้างโครงการ
+                 * @example ปฏิบัติการ
+                 */
+                level: string | null;
             } | null;
             projectStatusId: number;
             createdAt: string;
@@ -5092,6 +5286,16 @@ export interface components {
                 userId: string;
                 firstName: string;
                 lastName: string;
+                /**
+                 * @description ตำแหน่งของผู้สร้างโครงการ
+                 * @example นักวิเคราะห์นโยบาย
+                 */
+                position: string | null;
+                /**
+                 * @description ระดับของผู้สร้างโครงการ
+                 * @example ปฏิบัติการ
+                 */
+                level: string | null;
             } | null;
             projectStatusId: number;
             assignedAt: string | unknown;
@@ -5208,8 +5412,6 @@ export interface components {
                 name: string;
             } | null;
         };
-        /** @description Submitted proposal versions are immutable; this request is retained only for compatibility and rejects all fields */
-        SubmittedProposalPatchRequest: Record<string, never>;
         /** @description Schema สำหรับข้อมูลแบบร่างโครงการ (Auto-Save) */
         DraftProposalRequest: {
             /** Format: uuid */

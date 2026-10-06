@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { getUserSession } from "@/lib/session";
 import { normalizeRoles } from "@/lib/route-config";
+import { SessionRefresh } from "@/features/auth/components/session-refresh";
 import WorkspaceLayoutClient from "./WorkspaceLayoutClient";
 
 export default async function WorkspaceLayout({
@@ -14,8 +15,11 @@ export default async function WorkspaceLayout({
   if (!session?.userId) redirect("/login");
 
   return (
-    <WorkspaceLayoutClient roles={normalizeRoles(session.roles)} userId={session.userId}>
-      {children}
-    </WorkspaceLayoutClient>
+    <>
+      <SessionRefresh />
+      <WorkspaceLayoutClient roles={normalizeRoles(session.roles)} userId={session.userId}>
+        {children}
+      </WorkspaceLayoutClient>
+    </>
   );
 }

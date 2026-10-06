@@ -5,14 +5,19 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-    
-    "lib": ["ESNext", "DOM"], 
-    
-    "types": ["@types/bun"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "types": [
+      "@types/bun"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   }
 }

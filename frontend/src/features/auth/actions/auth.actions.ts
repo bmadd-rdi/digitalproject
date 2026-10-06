@@ -79,13 +79,13 @@ export async function loginUserAction(data: LoginRequestDTO): Promise<AuthRespon
 
     // บันทึก JWT Token ลงใน HTTP-Only Cookie
     // โดย successData.token จะถูกบังคับให้มีอยู่จริงตาม Schema ของ Backend แน่นอน
+    // ไม่ตั้ง maxAge → เป็น session cookie (ปิดเบราว์เซอร์ = ต้อง login ใหม่)
     cookieStore.set('token', successData.token, {
       httpOnly: true,
       secure: cookieSecure,
       sameSite: cookieSameSite,
       domain: cookieDomain,
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 วัน
     });
 
     return { success: true, message: successData.message };
@@ -162,13 +162,13 @@ export async function refreshSessionAction(): Promise<{
     }
 
     const cookieStore = await cookies();
+    // ไม่ตั้ง maxAge → เป็น session cookie เหมือนตอน login
     cookieStore.set("token", result.token, {
       httpOnly: true,
       secure: cookieSecure,
       sameSite: cookieSameSite,
       domain: cookieDomain,
       path: "/",
-      maxAge: 60 * 60 * 24 * 7,
     });
 
     return { success: true, message: "Session refreshed." };
@@ -179,6 +179,55 @@ export async function refreshSessionAction(): Promise<{
       message: "Your role was updated. Please log out and log back in to apply it.",
     };
   }
+}
+
+// --- Sliding session: ต่ออายุ JWT เฉพาะตอนใกล้หมดอายุ ---
+// ค่าเกณฑ์: เหลืออายุ JWT น้อยกว่า 12 ชั่วโมงจึงค่อยยิง backend /auth/refresh
+const SESSION_REFRESH_THRESHOLD_SECONDS = 12 * 60 * 60;
+
+/** อ่านค่า `exp` (unix seconds) จาก payload ของ JWT โดยไม่ตรวจสอบ signature (ใช้ตัดสินใจเรื่องอายุเท่านั้น) */
+function readJwtExpiration(token: string): number | null {
+  const payload = token.split(".")[1];
+  if (!payload) return null;
+  try {
+    const decoded = JSON.parse(
+      Buffer.from(payload, "base64url").toString("utf8"),
+    ) as { exp?: number };
+    return typeof decoded.exp === "number" ? decoded.exp : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * ensureFreshSessionAction — ต่ออายุเซสชันแบบ sliding
+ * เรียก backend เฉพาะตอนที่ JWT เหลืออายุน้อยกว่า 12 ชั่วโมงและยังไม่หมดอายุ
+ * เพื่อไม่ให้ยิง `/auth/refresh` ทุก ๆ 10 นาทีที่ SessionRefresh ตั้งไว้
+ */
+export async function ensureFreshSessionAction(): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) {
+    return { success: false, message: "No active session." };
+  }
+
+  const exp = readJwtExpiration(token);
+  if (exp === null) {
+    return { success: false, message: "Unable to read the session token." };
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (exp <= now) {
+    return { success: false, message: "Session expired." };
+  }
+  if (exp - now >= SESSION_REFRESH_THRESHOLD_SECONDS) {
+    return { success: true, message: "Session still fresh." };
+  }
+
+  return refreshSessionAction();
 }
 
 export async function logoutAction() {
@@ -193,6 +242,6 @@ export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete("token");
 
-  // 3. Redirect กลับไปหน้า Login
-  redirect("/login");
+  // 3. Redirect กลับไปหน้าแรก (ตามงาน home-nav-logout-redirect)
+  redirect("/");
 }

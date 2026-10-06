@@ -28,6 +28,38 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useUserProfile } from "../hooks/useUserProfile";
+import { useLoginHistory } from "../hooks/useLoginHistory";
+
+/** ย่อ User-Agent ให้อ่านง่าย เช่น "Chrome • Windows" */
+function describeUserAgent(userAgent: string | null): string {
+  if (!userAgent) return "อุปกรณ์ไม่ทราบข้อมูล";
+
+  const browser = /Edg\//.test(userAgent)
+    ? "Edge"
+    : /OPR\/|Opera/.test(userAgent)
+      ? "Opera"
+      : /Chrome\//.test(userAgent)
+        ? "Chrome"
+        : /Firefox\//.test(userAgent)
+          ? "Firefox"
+          : /Safari\//.test(userAgent)
+            ? "Safari"
+            : "เบราว์เซอร์อื่น";
+
+  const os = /Windows/.test(userAgent)
+    ? "Windows"
+    : /Android/.test(userAgent)
+      ? "Android"
+      : /(iPhone|iPad|iOS)/.test(userAgent)
+        ? "iOS"
+        : /Mac OS X/.test(userAgent)
+          ? "macOS"
+          : /Linux/.test(userAgent)
+            ? "Linux"
+            : "";
+
+  return os ? `${browser} • ${os}` : browser;
+}
 
 interface InfoRowProps {
   icon: LucideIcon;
@@ -110,6 +142,11 @@ function ProfileSkeleton() {
 
 export function UserProfileTemplate({ currentUserId }: { currentUserId: string }) {
   const { data, isLoading, isError, refetch, isFetching } = useUserProfile(currentUserId);
+  const {
+    data: loginHistory,
+    isLoading: historyLoading,
+    isError: historyError,
+  } = useLoginHistory();
 
   if (isLoading) return <ProfileSkeleton />;
 
@@ -217,6 +254,47 @@ export function UserProfileTemplate({ currentUserId }: { currentUserId: string }
               />
               <InfoRow icon={ShieldCheck} label="สิทธิ์การใช้งาน" value={displayRoles.join(", ")} />
             </div>
+          </div>
+
+          <div className="min-w-0 rounded-md border bg-card p-5 shadow-sm sm:p-8">
+            <h3 className="mb-4 flex items-center gap-2 font-bold text-primary">
+              <History className="h-4 w-4" /> ประวัติเข้าใช้งาน
+            </h3>
+            {historyLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            ) : historyError || !loginHistory?.length ? (
+              <p className="text-sm text-muted-foreground">
+                {historyError
+                  ? "ไม่สามารถดึงประวัติเข้าใช้งานได้ในขณะนี้"
+                  : "ยังไม่มีประวัติเข้าใช้งาน"}
+              </p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {loginHistory.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-3"
+                  >
+                    <span className="text-sm font-medium text-foreground">
+                      {new Date(item.loginAt).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" })}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {item.ipAddress ?? "-"}
+                    </span>
+                    <span
+                      className="w-full truncate text-xs text-muted-foreground sm:w-auto sm:flex-1 sm:text-right"
+                      title={item.userAgent ?? ""}
+                    >
+                      {describeUserAgent(item.userAgent)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
       </div>

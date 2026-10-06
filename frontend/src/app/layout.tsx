@@ -2,9 +2,10 @@ import "./globals.css";
 import type { Metadata } from "next";
 // Import ฟอนต์ Noto Sans Thai
 import { Noto_Sans_Thai } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react"
 import { Providers } from "./Providers";
 import { Toaster } from "@/components/ui/sonner"
+import { CookieConsentBanner } from "@/features/consent/components/CookieConsentBanner";
+import { ConsentAnalytics } from "@/features/consent/components/ConsentAnalytics";
 
 // Font configuration
 const notoSansThai = Noto_Sans_Thai({
@@ -30,8 +31,9 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster />
+          <CookieConsentBanner />
         </Providers>
-        <Analytics />
+        <ConsentAnalytics />
       </body>
     </html>
   );

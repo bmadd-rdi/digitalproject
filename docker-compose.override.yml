@@ -1,0 +1,71 @@
+# =============================================================================
+# docker-compose.override.yml — โหมดพัฒนา (Develop / Live reload)
+# -----------------------------------------------------------------------------
+# ไฟล์นี้ถูก merge อัตโนมัติเมื่อสั่ง `docker compose up` ที่ root ของโปรเจกต์
+# (ไม่ต้องระบุ -f) ทำให้โค้ดใน ./frontend และ ./backend ถูก mount เข้า container
+# โดยตรง แก้ไฟล์บนเครื่องแล้วมีผลทันที (hot reload) โดยไม่ต้อง build image ใหม่
+#
+# หมายเหตุ:
+#   - ไฟล์นี้ใช้สำหรับ "เครื่องนักพัฒนา" เท่านั้น ห้ามใช้บน production
+#   - ถ้าต้องการรันแบบ production image (โค้ดฝังใน image) ให้ลบ/เปลี่ยนชื่อไฟล์นี้
+#     หรือใช้คำสั่ง: docker compose -f docker-compose.yml up -d
+#   - node_modules และ .next ใช้ anonymous volume แยก เพื่อไม่ให้ไฟล์จาก host
+#     (คนละ platform) มาทับของที่ติดตั้งอยู่ภายใน container
+# =============================================================================
+services:
+
+  # ----------------------------------------
+  # 1. Frontend (Next.js — next dev)
+  # ----------------------------------------
+  frontend:
+    # ในโหมด dev ต้องเขียนไฟล์ลง /app (.next) และ /usr/local/bin (corepack)
+    # ซึ่งในรันเนอร์อิมเมจเป็นของ root จึงต้องรันเป็น root เฉพาะ dev
+    user: root
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    # ยกเลิก limit แรมของ production เพื่อให้ next dev ทำงานได้ราบรื่น
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    volumes:
+      # โค้ดทั้งโฟลเดอร์ frontend เชื่อมตรงเข้า container
+      - ./frontend:/app
+      # กัน node_modules / .next ของใน container ไม่ให้ถูกทับด้วยของ host
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+    # ติดตั้ง dependencies (ถ้ายังไม่มี) แล้วสตาร์ท dev server + hot reload
+    command: >
+      sh -c "corepack enable &&
+             pnpm install --config.confirmModulesPurge=false &&
+             pnpm dev"
+
+  # ----------------------------------------
+  # 2. Backend (Bun / Hono — bun run dev)
+  # ----------------------------------------
+  backend:
+    user: root
+    environment:
+      - NODE_ENV=development
+      - PORT=8081
+      - UPLOAD_STORAGE_DIR=/app/uploads
+    volumes:
+      # โค้ดทั้งโฟลเดอร์ backend เชื่อมตรงเข้า container
+      - ./backend:/app
+      # กัน node_modules ของใน container ไม่ให้ถูกทับด้วยของ host
+      - backend_node_modules:/app/node_modules
+      # เก็บไฟล์อัปโหลดไว้ใน named volume เหมือน production
+      - bma_uploads:/app/uploads
+    # ติดตั้ง dependencies (ถ้ายังไม่มี) แล้วสตาร์ท bun --hot (hot reload)
+    command: >
+      sh -c "bun install --frozen-lockfile || bun install;
+             bun run dev"
+
+volumes:
+  frontend_node_modules:
+  frontend_next:
+  backend_node_modules:

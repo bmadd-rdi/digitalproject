@@ -3,6 +3,7 @@
 
 import { serverFetch } from "@/lib/server-fetch";
 import { schemas } from "@/types/api-schemas";
+import type { LoginHistoryItem } from "../types";
 import { z } from "zod";
 
 // ใช้ Type ที่ Generate มาจาก Backend Schema
@@ -59,4 +60,18 @@ export async function updateOwnProfileAction(data: UpdateOwnProfileRequest) {
     method: "PATCH",
     body: JSON.stringify(data),
   });
+}
+
+// ดึงประวัติการเข้าสู่ระบบของผู้ใช้ปัจจุบัน (ล่าสุด 20 รายการ)
+export async function getLoginHistoryAction(): Promise<LoginHistoryItem[]> {
+  try {
+    const response = await serverFetch<{ items: LoginHistoryItem[] }>(
+      "/api/v1/auth/login-history",
+      { method: "GET" },
+    );
+    return response.items ?? [];
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "ไม่สามารถดึงประวัติเข้าใช้งานได้";
+    throw new Error(errorMessage);
+  }
 }

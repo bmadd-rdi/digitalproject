@@ -184,6 +184,15 @@ export default function TestDocPage() {
     try {
       await generateProposalDocx(
         templateData as unknown as Parameters<typeof generateProposalDocx>[0],
+        {
+          // จำลอง project.owner (users.position / users.level) ที่ใช้เฉพาะตอนสร้างเอกสาร .docx
+          owner: {
+            firstName: "นายวิศวกร",
+            lastName: "เก่งกาจ",
+            position: "วิศวกรซอฟต์แวร์ปฏิบัติการ",
+            level: "ปฏิบัติการ",
+          },
+        },
       );
       console.log("Mock Data ที่ส่งไปทำ Word:", templateData);
     } catch (error) {

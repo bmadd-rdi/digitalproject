@@ -10,6 +10,7 @@ import {
   type UseFormWatch,
 } from "react-hook-form";
 import { ProposalStep5Values } from "../types";
+import type { ProjectDetail } from "@/features/projects/types/workspace";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -181,7 +182,14 @@ const CloudSystemItem = ({ nestIndex, control, register, errors, watch, removeSy
 // ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
-export const ProposalStep5 = () => {
+interface ProposalStep5Props {
+  /** ใช้ project.owner เติม position + level (users.level) ตอนสร้างเอกสาร .docx เท่านั้น */
+  project?: ProjectDetail | null;
+  /** บันทึกฉบับร่างก่อนสร้างเอกสาร — คืน false เพื่อยกเลิกการสร้างเอกสาร */
+  beforeExport?: () => boolean | Promise<boolean>;
+}
+
+export const ProposalStep5 = ({ project, beforeExport }: ProposalStep5Props) => {
   const { register, control, setValue, watch, getValues, formState: { errors } } = useFormContext<ProposalStep5Values>();
 
   const { fields: personnelFields, append: appendPersonnel, remove: removePersonnel } = useFieldArray({
@@ -410,6 +418,8 @@ export const ProposalStep5 = () => {
       <div className="flex justify-end mt-4 pt-6 border-t border-border">
         <ProposalExportButton
           proposal={getValues()}
+          owner={project?.owner}
+          beforeExport={beforeExport}
           label="สร้างแบบเสนอโครงการ (Word)"
           className="gap-2 border-primary/30 bg-primary-container/20 text-primary-dark hover:bg-primary-container/40"
         />

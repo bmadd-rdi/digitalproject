@@ -1,16 +1,15 @@
 services:
 
-
   # ----------------------------------------
   # 1. Frontend (Next.js)
   # ----------------------------------------
   frontend:
-    image: digitalproject-frontend:v2.3
+    image: digitalproject-frontend:v3.0.0
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://digitalproject.bangkok.go.th/api/v1}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8081/api/v1}
     container_name: digitalproject-frontend
     restart: always
     env_file:
@@ -24,7 +23,7 @@ services:
       # - BACKEND_URL=http://backend:8081
       # - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-/api/v1}
       # - BACKEND_URL=${BACKEND_URL:?BACKEND_URL is required}
-    # จำกัดทรัพยากร (Optional: ป้องกันไม่ให้ Next.js กินแรมเซิร์ฟเวอร์จนหมด)
+      # จำกัดทรัพยากร (Optional: ป้องกันไม่ให้ Next.js กินแรมเซิร์ฟเวอร์จนหมด)
     deploy:
       resources:
         limits:
@@ -41,7 +40,7 @@ services:
   # 2. Backend (Bun / Hono)
   # ----------------------------------------
   backend:
-    image: digitalproject-backend:v2.3
+    image: digitalproject-backend:v3.0.0
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -57,11 +56,11 @@ services:
       - PORT=8081
       - NODE_ENV=production
       # - UPLOAD_STORAGE_DIR=/app/uploads   # เพิ่มบรรทัดนี้เข้าไปครับ
-      # - PUBLIC_API_URL=https://digitalproject.bangkok.go.th/api/v1
-      # - FRONTEND_URL=https://digitalproject.bangkok.go.th
-      # - CORS_ORIGINS=https://digitalproject.bangkok.go.th
+      # - PUBLIC_API_URL=http://localhost:8081/api/v1
+      # - FRONTEND_URL=http://localhost:3000
+      # - CORS_ORIGINS=http://localhost:3000,https://digitalproject.bangkok.go.th
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health/live"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://backend:8081/health/live" ]
       interval: 5s
       timeout: 5s
       retries: 3

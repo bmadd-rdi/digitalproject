@@ -18,6 +18,14 @@ const CompactUserSchema = z.object({
   lastName: z.string(),
 });
 
+// owner ต้องการ "position" เพิ่ม เพื่อใช้เป็น "ผู้รับผิดชอบโครงการ" ในเอกสาร Word
+// แยก schema เฉพาะ owner เพื่อไม่ให้ analyst/reviewer/uploader ที่ไม่ได้ select
+// คอลัมน์นี้ต้องเพิ่ม field ตาม
+const CompactOwnerSchema = CompactUserSchema.extend({
+  position: z.string().nullable().openapi({ description: 'ตำแหน่งของผู้สร้างโครงการ', example: 'นักวิเคราะห์นโยบาย' }),
+  level: z.string().nullable().openapi({ description: 'ระดับของผู้สร้างโครงการ', example: 'ปฏิบัติการ' }),
+});
+
 const DivisionLookupSchema = z.object({
   id: z.number(),
   code: z.string().length(8),
@@ -62,6 +70,8 @@ export const ProjectSchema = z.object({
   finalEstimatedCost: z.string().nullable().openapi({ example: null }),
   latestSubmittedRequestedBudget: z.string().nullable().openapi({ example: '4500000.00' }),
   latestApprovedBudget: z.string().nullable().optional().openapi({ deprecated: true, description: 'Deprecated read-only alias of latestRequestedBudget' }),
+  budgetStartYear: z.string().nullable().optional().openapi({ description: 'ปีเริ่มต้นงบประมาณ — ปีที่น้อยที่สุดใน proposal_budgets ของข้อเสนอที่ submit ล่าสุด', example: '2569' }),
+  budgetType: z.string().nullable().optional().openapi({ description: 'ประเภทงบประมาณของแถว proposal_budgets ที่ตรงกับ budgetStartYear', example: 'งบลงทุน' }),
 
   analystId: z.string().uuid().nullable().openapi({ example: null }),
   assignedAnalystId: z.string().uuid().nullable().optional().openapi({ example: null }),
@@ -79,7 +89,7 @@ export const ProjectSchema = z.object({
   division: DivisionLookupSchema.nullable().openapi({ description: 'ข้อมูลส่วนราชการเจ้าของโครงการ' }),
   status: CompactLookupSchema.nullable().openapi({ description: 'สถานะโครงการ' }),
   projectType: CompactLookupSchema.nullable().openapi({ description: 'ประเภทโครงการ' }),
-  owner: CompactUserSchema.nullable().openapi({ description: 'ผู้สร้างโครงการ' }),
+  owner: CompactOwnerSchema.nullable().openapi({ description: 'ผู้สร้างโครงการ' }),
   analyst: CompactUserSchema.nullable().openapi({ description: 'ผู้วิเคราะห์โครงการ' }),
   attachments: z.array(z.object({
     id: z.string().uuid(),
@@ -186,7 +196,7 @@ export const AssignmentProjectSchema = z.object({
   projectName: z.string().nullable(),
   projectType: CompactLookupSchema.nullable(),
   division: DivisionLookupSchema.nullable(),
-  owner: CompactUserSchema.nullable(),
+  owner: CompactOwnerSchema.nullable(),
   projectStatusId: z.number().int(),
   createdAt: z.union([z.string(), z.date()]),
   analystId: z.string().uuid().nullable(),
@@ -235,7 +245,7 @@ export const AnalystAssignedProjectSchema = z.object({
   projectName: z.string().nullable(),
   projectType: CompactLookupSchema.nullable(),
   division: DivisionLookupSchema.nullable(),
-  owner: CompactUserSchema.nullable(),
+  owner: CompactOwnerSchema.nullable(),
   projectStatusId: z.number().int(),
   assignedAt: z.union([z.string(), z.date()]).nullable(),
   createdAt: z.union([z.string(), z.date()]),

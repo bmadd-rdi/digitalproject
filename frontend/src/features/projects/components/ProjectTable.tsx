@@ -122,6 +122,7 @@ export function ProjectTable({
     ? "sticky left-0 z-20 px-3 py-4 text-center shadow-[2px_0_4px_-3px_rgba(0,0,0,0.25)] sm:px-6"
     : "px-6 py-4 text-center sm:px-10";
   const hasStatusColumn = activeTab !== "drafts" || showDraftProgress;
+  const showBudgetYearAndType = activeTab !== "drafts";
   const columnCount = getProjectTableColumnCount({ activeTab, hideAnalystColumn, showActions, showDraftProgress });
 
   const renderActionsHeader = () => (
@@ -170,15 +171,20 @@ export function ProjectTable({
           <TableRow>
             {showActions && actionsFirst && renderActionsHeader()}
             <TableHead className="px-6 py-4 sm:px-10">วันที่นำเข้า</TableHead>
-            <TableHead className="w-full px-6 py-4 sm:px-10">ชื่อโครงการ</TableHead>
             <TableHead className="px-6 py-4 sm:px-10">หน่วยงาน</TableHead>
-            <TableHead className="px-6 py-4 sm:px-10">ส่วนราชการ</TableHead>
-            <TableHead className="px-6 py-4 sm:px-10">ประเภทโครงการ</TableHead>
-            <TableHead className="px-6 py-4 sm:px-10">งบประมาณ</TableHead>
-            {!hideAnalystColumn && <TableHead className="px-6 py-4 sm:px-10">ผู้วิเคราะห์</TableHead>}
+            <TableHead className="w-full px-6 py-4 sm:px-10">ชื่อโครงการ</TableHead>
             {hasStatusColumn && <TableHead className="min-w-50 px-6 py-4 sm:px-10">
               {activeTab === "drafts" ? "ความคืบหน้า" : "สถานะโครงการ"}
             </TableHead>}
+            
+            
+            
+            <TableHead className="px-6 py-4 sm:px-10">งบประมาณ</TableHead>
+            {showBudgetYearAndType && <TableHead className="px-6 py-4 sm:px-10">ปีเริ่มต้นงบประมาณ</TableHead>}
+            {showBudgetYearAndType && <TableHead className="px-6 py-4 sm:px-10">ประเภทงบประมาณ</TableHead>}
+            {!hideAnalystColumn && <TableHead className="px-6 py-4 sm:px-10">ผู้วิเคราะห์</TableHead>}
+            <TableHead className="px-6 py-4 sm:px-10">ประเภทโครงการ</TableHead>
+            
             {showActions && !actionsFirst && renderActionsHeader()}
           </TableRow>
         </TableHeader>
@@ -199,21 +205,13 @@ export function ProjectTable({
               >
                 {showActions && actionsFirst && renderActionsCell(project)}
                 <TableCell className="px-6 py-5 text-xs text-muted-foreground sm:px-10">{date}</TableCell>
+                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.division?.departmentName || "-"}</TableCell>
                 <TableCell className="px-6 py-5 sm:px-10">
                   <div className={`flex flex-col font-bold ${isReturned && activeTab !== "drafts" ? "text-red-700" : "text-[#191c20]"}`}>
                     <span className="mb-0.5 font-mono text-[10px] font-normal text-muted-foreground">{project.projectCode || "-"}</span>
                     <span className="cursor-pointer transition-colors duration-200 hover:text-primary">{project.projectName || "-"}</span>
                   </div>
                 </TableCell>
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.division?.name || "-"}</TableCell>
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.division?.departmentName || "-"}</TableCell>
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{getProjectTypeLabel(project.projectType?.name, statusLanguage)}</TableCell>
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.latestSubmittedRequestedBudget ? Number(project.latestSubmittedRequestedBudget).toLocaleString("th-TH") : "-"}</TableCell>
-                {!hideAnalystColumn && (
-                  <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">
-                    {project.analyst ? `${project.analyst.firstName} ${project.analyst.lastName}` : "-"}
-                  </TableCell>
-                )}
                 {hasStatusColumn && <TableCell className="px-6 py-5 sm:px-10">
                   {activeTab === "drafts" ? (
                     <div className="flex items-center gap-2">
@@ -224,6 +222,19 @@ export function ProjectTable({
                     <StatusBadge statusId={project.status?.id} statusName={project.status?.name} language={statusLanguage} />
                   )}
                 </TableCell>}
+                
+                
+                
+                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.latestSubmittedRequestedBudget ? Number(project.latestSubmittedRequestedBudget).toLocaleString("th-TH") : "-"}</TableCell>
+                {showBudgetYearAndType && <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.budgetStartYear || "-"}</TableCell>}
+                {showBudgetYearAndType && <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.budgetType || "-"}</TableCell>}
+                {!hideAnalystColumn && (
+                  <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">
+                    {project.analyst ? `${project.analyst.firstName} ${project.analyst.lastName}` : "-"}
+                  </TableCell>
+                )}
+                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{getProjectTypeLabel(project.projectType?.name, statusLanguage)}</TableCell>
+                
                 {showActions && !actionsFirst && renderActionsCell(project)}
               </TableRow>
             );

@@ -246,6 +246,10 @@ export const createUser = async (data: any, clock: Clock = systemClock) => {
         lastName: restData.lastName,
         email: restData.email,
         position: restData.position,
+        // ระดับปฏิบัติงาน (users.level) และตำแหน่งบริหาร ต้องถูกบันทึกจากการสมัครสมาชิกด้วย
+        // ไม่งั้นช่อง "ระดับปฏิบัติงาน (Level)" ในหน้า Register จะหายไปเฉยๆ
+        level: restData.level,
+        managementPosition: restData.managementPosition,
         divisionId: restData.divisionId, // เปลี่ยนมารับค่าเป็น ID ตัวเลขแทนข้อความธรรมดา
         mobilePhone: restData.mobilePhone,
         officePhone: restData.officePhone,

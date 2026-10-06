@@ -36,3 +36,14 @@ export const ResetPasswordRequestSchema = z.object({
 export const SuccessResponseSchema = z.object({
   message: z.string(),
 }).openapi('SuccessResponse');
+
+export const LoginHistoryItemSchema = z.object({
+  id: z.string().openapi({ description: 'รหัสของรายการประวัติการเข้าสู่ระบบ' }),
+  loginAt: z.date().openapi({ description: 'เวลาที่เข้าสู่ระบบ' }),
+  ipAddress: z.string().nullable().openapi({ description: 'IP ที่ใช้เข้าสู่ระบบ' }),
+  userAgent: z.string().nullable().openapi({ description: 'User-Agent ของอุปกรณ์' }),
+}).openapi('LoginHistoryItem');
+
+export const LoginHistoryResponseSchema = z.object({
+  items: z.array(LoginHistoryItemSchema),
+}).openapi('LoginHistoryResponse');

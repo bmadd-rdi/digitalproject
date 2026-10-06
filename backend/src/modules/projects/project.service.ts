@@ -130,6 +130,8 @@ const getBaseProjectQuery = () => {
         userId: users.userId,
         firstName: users.firstName,
         lastName: users.lastName,
+        position: users.position,
+        level: users.level,
       },
       analyst: {
         userId: analysts.userId,
@@ -142,6 +144,28 @@ const getBaseProjectQuery = () => {
         where p.project_id = ${projects.id}
           and p.status = 'submitted'
         order by p.submitted_at desc nulls last, p.updated_at desc, p.id desc
+        limit 1
+      )`,
+      // budgetStartYear/budgetType both come from the SAME proposal_budgets
+      // row (the earliest year) of the project's latest submitted proposal,
+      // so the pair is always consistent — never year from one row and
+      // budget_type from another.
+      budgetStartYear: sql<string | null>`(
+        select pb.year
+        from proposal_budgets pb
+        join proposals p on p.id = pb.proposal_id
+        where p.project_id = ${projects.id}
+          and p.status = 'submitted'
+        order by p.submitted_at desc nulls last, p.updated_at desc, p.id desc, pb.year asc
+        limit 1
+      )`,
+      budgetType: sql<string | null>`(
+        select pb.budget_type
+        from proposal_budgets pb
+        join proposals p on p.id = pb.proposal_id
+        where p.project_id = ${projects.id}
+          and p.status = 'submitted'
+        order by p.submitted_at desc nulls last, p.updated_at desc, p.id desc, pb.year asc
         limit 1
       )`,
     })
@@ -159,17 +183,19 @@ const mapJoinedProject = (row: any) => {
   return {
     ...row.project,
     latestSubmittedRequestedBudget: row.latestSubmittedRequestedBudget ?? null,
+    budgetStartYear: row.budgetStartYear ?? null,
+    budgetType: row.budgetType ?? null,
     latestApprovedBudget: row.project.latestRequestedBudget ?? null,
     assignedAnalystId: row.project.analystId ?? null,
     division: row.division?.id
       ? {
-          id: row.division.id,
-          code: row.division.code,
-          name: row.division.name,
-          departmentId: row.division.departmentId,
-          departmentCode: row.division.departmentCode,
-          departmentName: row.division.departmentName,
-        }
+        id: row.division.id,
+        code: row.division.code,
+        name: row.division.name,
+        departmentId: row.division.departmentId,
+        departmentCode: row.division.departmentCode,
+        departmentName: row.division.departmentName,
+      }
       : null,
     status: row.status?.id ? row.status : null,
     projectType: row.projectType?.id ? row.projectType : null,
@@ -546,8 +572,8 @@ export const findProjectById = async (id: string, user: UserContext) => {
     permissions: {
       canDelete: isSuperAdmin || (isOwner && project.projectStatusId === PROJECT_STATUS.DRAFT),
       canManageAttachments,
-    canEditProject,
-    canUpdateProject: canEditProject,
+      canEditProject,
+      canUpdateProject: canEditProject,
       canEditProposal,
       canSubmitProposal,
       canCancelSubmit,
@@ -555,15 +581,15 @@ export const findProjectById = async (id: string, user: UserContext) => {
     },
     latestReturnFeedback: latestReturnLog
       ? {
-          remark: latestReturnLog.remark ?? "",
-          reviewer: latestReturnLog.reviewer?.userId
-            ? latestReturnLog.reviewer
-            : null,
-          reviewerRole: reviewerRoleByStatus[latestReturnLog.newStatusId] ?? "Reviewer",
-          createdAt: latestReturnLog.createdAt,
-          oldStatusId: latestReturnLog.oldStatusId,
-          newStatusId: latestReturnLog.newStatusId,
-        }
+        remark: latestReturnLog.remark ?? "",
+        reviewer: latestReturnLog.reviewer?.userId
+          ? latestReturnLog.reviewer
+          : null,
+        reviewerRole: reviewerRoleByStatus[latestReturnLog.newStatusId] ?? "Reviewer",
+        createdAt: latestReturnLog.createdAt,
+        oldStatusId: latestReturnLog.oldStatusId,
+        newStatusId: latestReturnLog.newStatusId,
+      }
       : null,
   };
 };
@@ -830,7 +856,7 @@ export const reviewAnalystProject = async (
       }).where(and(eq(projects.id, id), eq(projects.projectStatusId, PROJECT_STATUS.IN_ANALYSIS)));
     }
     /************************************ JOJO ********************************************/
-    
+
     await applyProjectStatusTransition(tx, {
       projectId: id,
       userId: user.userId,
@@ -917,8 +943,8 @@ export const recallAnalystApproval = async (id: string, user: UserContext) => {
         eq(agendas.projectId, id),
         ne(meetings.meetingStatusId, MEETING_STATUS.CANCELLED),
         isNull(resolutions.id),
-      // ))
-      // .limit(1);
+        // ))
+        // .limit(1);
       ));
 
     // if (pendingAgenda) {
@@ -1161,7 +1187,7 @@ export const updateProject = async (
     throw new HTTPException(409, { message: "This project is no longer in an editable state" });
   }
   if (Object.prototype.hasOwnProperty.call(data as Record<string, unknown>, "projectName") &&
-      !isOwner && !isOwnerEditableStage) {
+    !isOwner && !isOwnerEditableStage) {
     throw new HTTPException(403, { message: "The project name is locked during review" });
   }
 

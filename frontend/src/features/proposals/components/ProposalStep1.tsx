@@ -25,9 +25,14 @@ export type ProposalStep1ContextValues = Pick<
 export function getProposalStep1ContextValues(project: ProjectDetail): ProposalStep1ContextValues {
   const agencyName = [project.division?.departmentName, project.division?.name]
     .filter((value): value is string => Boolean(value?.trim()))
-    .join(" - ");
+    .join(" ");
+  // หน้าฟอร์ม proposal/create แสดง "ผู้รับผิดชอบโครงการ" เฉพาะ ชื่อ-นามสกุล เท่านั้น
+  // ส่วน position/level (users.level) จะถูกเติมตอนสร้างเอกสาร project-proposal.docx
+  // ดูรายละเอียดใน features/proposals/utils/documentGenerator.ts
   const projectManager = project.owner
-    ? `${project.owner.firstName} ${project.owner.lastName}`.trim()
+    ? [project.owner.firstName, project.owner.lastName]
+      .filter((value): value is string => Boolean(value?.trim()))
+      .join(" ")
     : "";
 
   return {

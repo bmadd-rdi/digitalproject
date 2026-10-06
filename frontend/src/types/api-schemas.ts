@@ -120,6 +120,17 @@ const ResetPasswordRequest = z
   .object({ token: z.string().min(1), newPassword: z.string().min(8) })
   .passthrough();
 const RefreshSessionResponse = z.object({ token: z.string() }).passthrough();
+const LoginHistoryItem = z
+  .object({
+    id: z.string(),
+    loginAt: z.string().datetime({ offset: true }),
+    ipAddress: z.string().nullable(),
+    userAgent: z.string().nullable(),
+  })
+  .passthrough();
+const LoginHistoryResponse = z
+  .object({ items: z.array(LoginHistoryItem) })
+  .passthrough();
 const UploadDocumentRequest = z
   .object({
     file: z.instanceof(File),
@@ -154,6 +165,8 @@ const Project = z
     finalEstimatedCost: z.string().nullable(),
     latestSubmittedRequestedBudget: z.string().nullable(),
     latestApprovedBudget: z.string().nullish(),
+    budgetStartYear: z.string().nullish(),
+    budgetType: z.string().nullish(),
     analystId: z.string().uuid().nullable(),
     assignedAnalystId: z.string().uuid().nullish(),
     assignedBy: z.string().uuid().nullable(),
@@ -188,6 +201,8 @@ const Project = z
         userId: z.string().uuid(),
         firstName: z.string(),
         lastName: z.string(),
+        position: z.string().nullable(),
+        level: z.string().nullable(),
       })
       .passthrough()
       .nullable(),
@@ -308,6 +323,8 @@ const AssignmentProject = z
         userId: z.string().uuid(),
         firstName: z.string(),
         lastName: z.string(),
+        position: z.string().nullable(),
+        level: z.string().nullable(),
       })
       .passthrough()
       .nullable(),
@@ -380,6 +397,8 @@ const AnalystAssignedProject = z
         userId: z.string().uuid(),
         firstName: z.string(),
         lastName: z.string(),
+        position: z.string().nullable(),
+        level: z.string().nullable(),
       })
       .passthrough()
       .nullable(),
@@ -511,7 +530,6 @@ const DraftProposalRequest = z
     estimatedCostTotal: z.number().nullable(),
   })
   .partial();
-const SubmittedProposalPatchRequest = z.object({}).partial();
 const ProposalResponse = z.object({
   id: z.string().uuid(),
   status: z.string(),
@@ -1232,6 +1250,8 @@ export const schemas = {
   RecoveryEmailRequest,
   ResetPasswordRequest,
   RefreshSessionResponse,
+  LoginHistoryItem,
+  LoginHistoryResponse,
   UploadDocumentRequest,
   statusIds,
   Project,
@@ -1258,7 +1278,6 @@ export const schemas = {
   PublicProject,
   PaginatedPublicProjectResponse,
   DraftProposalRequest,
-  SubmittedProposalPatchRequest,
   ProposalResponse,
   ProposalDataResponse,
   SubmitProposalRequest,
@@ -1295,6 +1314,62 @@ export const schemas = {
 };
 
 const endpoints = makeApi([
+  {
+    method: "post",
+    path: "/api/v1/admin/projects/:id/recall-analyst-approval",
+    alias: "postApiv1adminprojectsIdrecallAnalystApproval",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.unknown().nullable(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthenticated`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+      {
+        status: 404,
+        description: `Not found`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+      {
+        status: 409,
+        description: `Workflow conflict`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+    ],
+  },
   {
     method: "post",
     path: "/api/v1/admin/projects/:id/reopen-rejected",
@@ -1486,6 +1561,21 @@ const endpoints = makeApi([
       {
         status: 500,
         description: `เกิดข้อผิดพลาด`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/v1/auth/login-history",
+    alias: "getApiv1authloginHistory",
+    description: `คืนรายการประวัติการเข้าสู่ระบบล่าสุด 20 รายการของผู้ใช้ที่กำลังเข้าใช้งาน`,
+    requestFormat: "json",
+    response: LoginHistoryResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
         schema: ErrorResponse,
       },
     ],
@@ -3530,39 +3620,6 @@ const endpoints = makeApi([
       .passthrough(),
   },
   {
-    method: "patch",
-    path: "/api/v1/proposals/projects/:projectId",
-    alias: "patchApiv1proposalsprojectsProjectId",
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: z.object({}).partial(),
-      },
-      {
-        name: "projectId",
-        type: "Path",
-        schema: z.string().uuid(),
-      },
-    ],
-    response: z
-      .object({
-        data: z.unknown().nullable(),
-        message: z.string(),
-        success: z.boolean(),
-      })
-      .partial()
-      .passthrough(),
-    errors: [
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.object({ message: z.string() }).passthrough(),
-      },
-    ],
-  },
-  {
     method: "get",
     path: "/api/v1/proposals/projects/:projectId",
     alias: "getApiv1proposalsprojectsProjectId",
@@ -4061,6 +4118,32 @@ const endpoints = makeApi([
         type: "Body",
         schema: z.object({ isActive: z.boolean() }),
       },
+      {
+        name: "userId",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: UserProfileResponse,
+    errors: [
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 404,
+        description: `User not found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "patch",
+    path: "/api/v1/users/:userId/verify",
+    alias: "patchApiv1usersUserIdverify",
+    requestFormat: "json",
+    parameters: [
       {
         name: "userId",
         type: "Path",

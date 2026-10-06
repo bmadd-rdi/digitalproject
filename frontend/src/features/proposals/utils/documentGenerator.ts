@@ -57,7 +57,52 @@ const getBlankImageBase64 = (): string => {
   return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 };
 
-export const generateProposalDocx = async (formData: ProposalDraftValues) => {
+// ข้อมูลผู้สร้างโครงการ (users) ที่ใช้เติม "ผู้รับผิดชอบโครงการ" เฉพาะตอนสร้างเอกสาร .docx เท่านั้น
+// level ดึงมาจากคอลัมน์ users.level ของฐานข้อมูล (ผ่าน API project.owner.level)
+export interface ProposalDocumentOwner {
+  firstName?: string | null;
+  lastName?: string | null;
+  position?: string | null;
+  level?: string | null;
+}
+
+export interface GenerateProposalDocxOptions {
+  owner?: ProposalDocumentOwner | null;
+}
+
+// ประกอบค่า "ผู้รับผิดชอบโครงการ" สำหรับลงเอกสาร Word:
+// firstName + " " + lastName + " " + position + level
+// ถ้าไม่มีข้อมูล owner ให้ fallback ไปใช้ค่าที่กรอกในฟอร์ม (ชื่อ-นามสกุล)
+export const buildDocumentProjectManager = (
+  formData: ProposalDraftValues,
+  owner?: ProposalDocumentOwner | null,
+): string => {
+  const trim = (value?: string | null) => value?.trim() ?? "";
+  const fullName = [trim(owner?.firstName), trim(owner?.lastName)]
+    .filter(Boolean)
+    .join(" ");
+  // ตำแหน่งต่อด้วยระดับ (users.level) แบบไม่มีช่องว่างคั่น เช่น "... นักวิชาการคอมพิวเตอร์ปฏิบัติการ"
+  const positionLevel = `${trim(owner?.position)}${trim(owner?.level)}`;
+  const ownerValue = [fullName, positionLevel].filter(Boolean).join(" ");
+
+  return ownerValue || (formData.projectManager ?? "").trim();
+};
+
+// จัดรูปแบบตัวเงินเป็น x,xxx,xxx.xx (ทศนิยม 2 ตำแหน่งเสมอ)
+export const formatBahtAmount = (value: unknown): string => {
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "0.00";
+
+  return amount.toLocaleString("th-TH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+export const generateProposalDocx = async (
+  formData: ProposalDraftValues,
+  options: GenerateProposalDocxOptions = {},
+) => {
   try {
     const response = await fetch("/templates/project-proposal.docx");
 
@@ -145,12 +190,19 @@ export const generateProposalDocx = async (formData: ProposalDraftValues) => {
 
     const finalTemplateData = {
       ...baseTemplateData,
-      totalBudgetFormatted: formData.totalBudget
-        ? new Intl.NumberFormat('th-TH').format(formData.totalBudget)
-        : "0.00",
+      // ผู้รับผิดชอบโครงการในเอกสาร Word เท่านั้น: firstName + " " + lastName + " " + position + level
+      // ค่าในฟอร์ม (หน้า proposal/create) จะมีเฉพาะชื่อ-นามสกุล
+      projectManager: buildDocumentProjectManager(formData, options.owner),
+      // ตัวเงินทุกช่องที่แทรกเข้าไปเป็นรูปแบบ x,xxx,xxx.xx (ทศนิยม 2 ตำแหน่ง)
+      totalBudget: formatBahtAmount(formData.totalBudget),
+      totalBudgetFormatted: formatBahtAmount(formData.totalBudget),
+      budgetsByYear: formData.budgetsByYear?.map((budget) => ({
+        ...budget,
+        amount: formatBahtAmount(budget.amount),
+      })) || [],
       budgets: formData.budgetsByYear?.map(b => ({
         year: b.year,
-        amount: new Intl.NumberFormat('th-TH').format(b.amount)
+        amount: formatBahtAmount(b.amount)
       })) || [],
       currentDate: new Date().toLocaleDateString('th-TH', {
         year: 'numeric', month: 'long', day: 'numeric'

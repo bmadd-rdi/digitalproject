@@ -204,6 +204,7 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
               {exportableProposal && (
                 <ProposalExportButton
                   proposal={exportableProposal as ProposalDraftValues}
+                  owner={project.owner}
                   className="gap-2 rounded-xl border-primary/30 text-primary hover:bg-primary/5"
                 />
               )}

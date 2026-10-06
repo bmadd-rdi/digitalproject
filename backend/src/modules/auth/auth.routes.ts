@@ -9,6 +9,7 @@ import {
   ResetPasswordRequestSchema,
   SuccessResponseSchema,
   RefreshSessionResponseSchema,
+  LoginHistoryResponseSchema,
 } from './auth.schema';
 import { ErrorSchema } from '../users/user.schema'; // อ้างอิงจาก ErrorSchema เดิมของคุณ
 import { authMiddleware } from '../../middlewares/auth.middleware';
@@ -115,6 +116,25 @@ const refreshSessionRoute = createRoute({
   },
 });
 
+const loginHistoryRoute = createRoute({
+  method: "get",
+  path: "/login-history",
+  tags: ["Auth"],
+  summary: "ดูประวัติการเข้าสู่ระบบของตนเอง",
+  description: "คืนรายการประวัติการเข้าสู่ระบบล่าสุด 20 รายการของผู้ใช้ที่กำลังเข้าใช้งาน",
+  middleware: [authMiddleware],
+  responses: {
+    200: {
+      content: { "application/json": { schema: LoginHistoryResponseSchema } },
+      description: "สำเร็จ",
+    },
+    401: {
+      content: { "application/json": { schema: ErrorSchema } },
+      description: "Unauthorized",
+    },
+  },
+});
+
 // การ Binding Routes กับ Controller
 app.openapi(loginRoute, (c) => authController.login(c, c.req.valid('json')));
 app.openapi(verifyRoute, (c) => authController.verifyEmail(c));
@@ -122,6 +142,7 @@ app.openapi(forgotUsernameRoute, (c) => authController.requestUsernameRecovery(c
 app.openapi(forgotPasswordRoute, (c) => authController.requestPasswordReset(c, c.req.valid("json")));
 app.openapi(resetPasswordRoute, (c) => authController.resetPassword(c, c.req.valid("json")));
 app.openapi(refreshSessionRoute, (c) => authController.refreshSession(c));
+app.openapi(loginHistoryRoute, (c) => authController.getLoginHistory(c));
 app.openapi(logoutRoute, (c) => authController.logout(c));
 
 export default app;

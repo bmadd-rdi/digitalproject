@@ -2,7 +2,7 @@
 import crypto from "crypto";
 import { Context } from "hono";
 import { db } from "@/db";
-import { and, eq, gt, or } from "drizzle-orm";
+import { and, desc, eq, gt, or } from "drizzle-orm";
 import { userLoginHistory, users } from "@/db/schema";
 import {
   LoginRequestSchema,
@@ -127,14 +127,13 @@ export const login = async (c: Context, body: LoginBody) => {
 
     const token = await issueUserToken(user, clock.now());
 
-    // 👇 เพิ่มการ Set Cookie ที่นี่ เพื่อให้สอดคล้องกับตอน Logout
+    // 👇 Set Cookie เป็น session cookie (ไม่มี maxAge) — ปิดเบราว์เซอร์แล้วต้องเข้าสู่ระบบใหม่
     setCookie(c, "token", token, {
       path: "/",
       secure: appEnv.COOKIE_SECURE,
       httpOnly: true,
       sameSite: appEnv.COOKIE_SAME_SITE,
       ...(appEnv.COOKIE_DOMAIN ? { domain: appEnv.COOKIE_DOMAIN } : {}),
-      maxAge: 60 * 60 * 24, // 1 วัน (ให้ตรงกับเวลา exp ของ JWT)
     });
 
     return c.json(
@@ -183,6 +182,31 @@ export const refreshSession = async (c: Context) => {
   }
 
   return c.json({ token: await issueUserToken(user, getAppServices(c).clock.now()) }, 200);
+};
+
+/**
+ * Returns the current user's recent login history (newest first). Used by the
+ * profile page so users can review where their account was accessed from.
+ */
+export const getLoginHistory = async (c: Context) => {
+  const actor = c.get("user") as UserContext | undefined;
+  if (!actor?.userId) {
+    throw new HTTPException(401, { message: "Unauthorized" });
+  }
+
+  const items = await db
+    .select({
+      id: userLoginHistory.id,
+      loginAt: userLoginHistory.loginAt,
+      ipAddress: userLoginHistory.ipAddress,
+      userAgent: userLoginHistory.userAgent,
+    })
+    .from(userLoginHistory)
+    .where(eq(userLoginHistory.userId, actor.userId))
+    .orderBy(desc(userLoginHistory.loginAt))
+    .limit(20);
+
+  return c.json({ items }, 200);
 };
 
 export const registerUser = async (c: Context) => {
