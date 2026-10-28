@@ -74,9 +74,8 @@ export function AppSidebar({ roles = [] }: { roles?: readonly string[] }) {
               />
             </div>
             <div
-              className={`flex flex-col whitespace-nowrap transition-all duration-300 ${
-                isCollapsed ? "hidden w-0 opacity-0" : "w-auto opacity-100"
-              }`}
+              className={`flex flex-col whitespace-nowrap transition-all duration-300 ${isCollapsed ? "hidden w-0 opacity-0" : "w-auto opacity-100"
+                }`}
             >
               <span className="text-lg font-black leading-tight text-primary">
                 BMA Digital
@@ -114,26 +113,40 @@ export function AppSidebar({ roles = [] }: { roles?: readonly string[] }) {
                   const Icon = icons[route.icon];
                   const isActive = activeRoute?.path === route.path;
 
+                  // เมนูที่ปิดใช้งาน (disabled): แสดงเป็นสีเทา กดเลือกไม่ได้
+                  if (route.disabled) {
+                    return (
+                      <SidebarMenuItem key={route.path}>
+                        <SidebarMenuButton
+                          disabled
+                          tooltip={route.label}
+                          className="rounded-full font-medium text-slate-400 group-data-[collapsible=icon]:justify-center!"
+                        >
+                          <Icon className="h-5 w-5 shrink-0 text-slate-400" />
+                          <span>{route.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  }
+
                   return (
                     <SidebarMenuItem key={route.path}>
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
                         tooltip={route.label}
-                        className={`rounded-full transition-colors group-data-[collapsible=icon]:justify-center! ${
-                          isActive
+                        className={`rounded-full transition-colors group-data-[collapsible=icon]:justify-center! ${isActive
                             ? "bg-[#00734b]/10 font-bold text-[#00734b]"
                             : "font-medium text-slate-600 hover:bg-[#00734b]/5"
-                        }`}
+                          }`}
                       >
                         <Link
                           href={route.path}
                           className="flex w-full items-center gap-2 group-data-[collapsible=icon]:justify-center"
                         >
                           <Icon
-                            className={`h-5 w-5 shrink-0 ${
-                              isActive ? "text-[#00734b]" : "text-slate-500"
-                            }`}
+                            className={`h-5 w-5 shrink-0 ${isActive ? "text-[#00734b]" : "text-slate-500"
+                              }`}
                           />
                           <span>{route.label}</span>
                         </Link>

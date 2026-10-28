@@ -14,24 +14,24 @@ export const COOKIE_CONSENT_MAX_AGE_SECONDS = 60 * 60 * 24 * 180;
 export const CONSENT_CHANGED_EVENT = "bma:consent-changed";
 
 export function readCookieConsent(): CookieConsentChoice | null {
-  if (typeof document === "undefined") return null;
+    if (typeof document === "undefined") return null;
 
-  const row = document.cookie
-    .split("; ")
-    .find((cookie) => cookie.startsWith(`${COOKIE_CONSENT_NAME}=`));
-  if (!row) return null;
+    const row = document.cookie
+        .split("; ")
+        .find((cookie) => cookie.startsWith(`${COOKIE_CONSENT_NAME}=`));
+    if (!row) return null;
 
-  const value = decodeURIComponent(row.slice(COOKIE_CONSENT_NAME.length + 1));
-  return value === "all" || value === "necessary" ? value : null;
+    const value = decodeURIComponent(row.slice(COOKIE_CONSENT_NAME.length + 1));
+    return value === "all" || value === "necessary" ? value : null;
 }
 
 export function writeCookieConsent(choice: CookieConsentChoice): void {
-  if (typeof document === "undefined") return;
+    if (typeof document === "undefined") return;
 
-  const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie =
-    `${COOKIE_CONSENT_NAME}=${encodeURIComponent(choice)}` +
-    `; path=/; max-age=${COOKIE_CONSENT_MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie =
+        `${COOKIE_CONSENT_NAME}=${encodeURIComponent(choice)}` +
+        `; path=/; max-age=${COOKIE_CONSENT_MAX_AGE_SECONDS}; SameSite=Lax${secure}`;
 
-  window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT));
+    window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT));
 }

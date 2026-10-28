@@ -27,20 +27,20 @@ export type UserListQuery = {
 // ฟังก์ชันช่วยจัดรูปแบบข้อมูล (Mapping Helper) แปลงข้อมูลที่ Join มาให้ตรงกับ Schema
 const mapUserToResponse = (user: any) => {
   // ดึงฟิลด์ที่เป็นความลับออก
-  const { 
-    password, 
-    resetPasswordToken, 
-    resetPasswordExpires, 
-    verificationToken, 
-    verificationExpires, 
+  const {
+    password,
+    resetPasswordToken,
+    resetPasswordExpires,
+    verificationToken,
+    verificationExpires,
     loginHistory,
-    ...safeUserData 
+    ...safeUserData
   } = user;
 
   return {
     ...safeUserData,
     lastLogin: loginHistory?.[0]?.loginAt ?? null,
-    
+
     // จัดรูปแบบข้อมูลแผนก (Division & Department)
     division: user.division ? {
       divisionId: user.division.divisionId,
@@ -103,11 +103,11 @@ export const getUsersPage = async (queryParams: UserListQuery) => {
   const conditions = [
     searchTerm
       ? or(
-          ilike(users.username, searchTerm),
-          ilike(users.email, searchTerm),
-          ilike(users.firstName, searchTerm),
-          ilike(users.lastName, searchTerm),
-        )
+        ilike(users.username, searchTerm),
+        ilike(users.email, searchTerm),
+        ilike(users.firstName, searchTerm),
+        ilike(users.lastName, searchTerm),
+      )
       : undefined,
     roleTerm ? ilike(roles.roleName, roleTerm) : undefined,
     status === "active" ? eq(users.isActive, true) : undefined,
@@ -215,7 +215,7 @@ export const getUserProfile = async (userId: string) => {
       }
     }
   });
-  
+
   if (!result) return null;
   return mapUserToResponse(result);
 };

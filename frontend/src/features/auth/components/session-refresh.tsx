@@ -13,26 +13,26 @@ const REFRESH_INTERVAL_MS = 10 * 60 * 1000; // ทุก 10 นาที
  * ทำงานคู่กับ ensureFreshSessionAction ที่จะยิง backend เฉพาะตอนใกล้หมดอายุ
  */
 export function SessionRefresh() {
-  useEffect(() => {
-    const tick = () => {
-      void ensureFreshSessionAction().catch(() => {
-        // ปล่อยเงียบ — ถ้า refresh ไม่ได้ ระบบจะพาไปหน้า login เมื่อ token หมดอายุจริง
-      });
-    };
+    useEffect(() => {
+        const tick = () => {
+            void ensureFreshSessionAction().catch(() => {
+                // ปล่อยเงียบ — ถ้า refresh ไม่ได้ ระบบจะพาไปหน้า login เมื่อ token หมดอายุจริง
+            });
+        };
 
-    tick();
-    const intervalId = window.setInterval(tick, REFRESH_INTERVAL_MS);
+        tick();
+        const intervalId = window.setInterval(tick, REFRESH_INTERVAL_MS);
 
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") tick();
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
+        const onVisibilityChange = () => {
+            if (document.visibilityState === "visible") tick();
+        };
+        document.addEventListener("visibilitychange", onVisibilityChange);
 
-    return () => {
-      window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-    };
-  }, []);
+        return () => {
+            window.clearInterval(intervalId);
+            document.removeEventListener("visibilitychange", onVisibilityChange);
+        };
+    }, []);
 
-  return null;
+    return null;
 }

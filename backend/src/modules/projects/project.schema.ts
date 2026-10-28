@@ -245,7 +245,7 @@ export const AnalystAssignedProjectSchema = z.object({
   projectName: z.string().nullable(),
   projectType: CompactLookupSchema.nullable(),
   division: DivisionLookupSchema.nullable(),
-  owner: CompactOwnerSchema.nullable(),
+  owner: CompactUserSchema.nullable(),
   projectStatusId: z.number().int(),
   assignedAt: z.union([z.string(), z.date()]).nullable(),
   createdAt: z.union([z.string(), z.date()]),
@@ -295,6 +295,32 @@ const ProjectStatusIdsSchema = z
   ])
   .optional();
 
+
+
+const IntIdListSchema = (max: number) => z
+  .union([
+    z.array(z.coerce.number().int().positive()).max(max),
+    z.coerce.number().int().positive(),
+    z.string().regex(/^\s*\d(?:\s*,\s*\d)*\s*$/),
+  ])
+  .optional();
+
+const StringListSchema = (max: number) => z
+  .union([
+    z.array(z.string().min(1)).max(max),
+    z.string().min(1),
+  ])
+  .optional();
+
+
+
+
+
+
+
+
+
+
 export const ProjectQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
@@ -302,6 +328,11 @@ export const ProjectQuerySchema = z.object({
   statusIds: ProjectStatusIdsSchema,
   status: z.enum(['draft', 'submitted', 'all_except_draft', 'all']).default('all'),
   ownership: z.enum(['mine', 'team_only', 'team_and_mine', 'all']).default('all'),
+  departmentIds: IntIdListSchema(50).openapi({ description: 'กรองตามหน่วยงาน (departments.department_id)' }),
+  projectTypeIds: IntIdListSchema(20).openapi({ description: 'กรองตามประเภทโครงการ' }),
+  analystIds: z.union([z.array(z.string().uuid()).max(50), z.string().uuid()]).optional()
+    .openapi({ description: 'กรองตามผู้วิเคราะห์ (userId)' }),
+  budgetTypes: StringListSchema(50).openapi({ description: 'กรองตามประเภทงบประมาณ (proposal_budgets.budget_type — free text)' }),
 }).openapi('ProjectQueryParams');
 
 export const PaginatedProjectResponseSchema = z.object({

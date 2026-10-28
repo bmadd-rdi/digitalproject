@@ -58,6 +58,33 @@ export const ProjectStatusResponseSchema = z.object({
   data: z.array(ProjectStatusItemSchema)
 }).openapi('ProjectStatusResponse');
 
+
+
+
+
+// budget_type on proposal_budgets is free text the owner types when filling
+// out the proposal form — there's no id-backed lookup table for it, so this
+// returns the distinct values as plain strings instead of {id, name} pairs.
+export const StringLookupResponseSchema = z.object({
+  data: z.array(z.string()),
+}).openapi('StringLookupResponse');
+
+
+// รายชื่อผู้วิเคราะห์สำหรับตัวกรองรายการโครงการ — คืนเฉพาะ userId กับชื่อที่แสดง
+// (ไม่รวม username/ตำแหน่ง/ภาระงาน ซึ่งยังอยู่หลังสิทธิ์ project_assign ที่
+// /users/analysts/workload) ใช้ id เป็น UUID จึงไม่ใช้ LookupItemSchema ที่ id เป็นตัวเลข
+export const AnalystLookupItemSchema = z.object({
+  userId: z.string().uuid(),
+  name: z.string(),
+}).openapi('AnalystLookupItem');
+
+export const AnalystLookupResponseSchema = z.object({
+  data: z.array(AnalystLookupItemSchema),
+}).openapi('AnalystLookupResponse');
+
+
+
+
 // --- Query Parameter Schemas ---
 export const DivisionQuerySchema = z.object({
   departmentId: z.coerce.number().optional().openapi({ description: 'ใช้กรองส่วนราชการตาม ID หน่วยงานหลัก' }),

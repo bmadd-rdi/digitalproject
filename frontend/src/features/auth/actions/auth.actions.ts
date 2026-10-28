@@ -27,7 +27,7 @@ type AuthResponse = {
 const cookieSecure = process.env.COOKIE_SECURE === "true";
 const cookieSameSite =
   process.env.COOKIE_SAME_SITE === "strict" ||
-  process.env.COOKIE_SAME_SITE === "none"
+    process.env.COOKIE_SAME_SITE === "none"
     ? process.env.COOKIE_SAME_SITE
     : "lax";
 const cookieDomain = process.env.COOKIE_DOMAIN || undefined;

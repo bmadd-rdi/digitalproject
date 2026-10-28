@@ -9,6 +9,8 @@ import {
   getProjectStatusesLookup,
   getProjectTypesLookup,
   getProjectAttachmentTypesLookup,
+  getBudgetTypesLookup,
+  getAnalystsLookup,
 } from "../lookups/lookup.service";
 
 export const lookupController = {
@@ -51,6 +53,16 @@ export const lookupController = {
 
   async getProjectAttachmentTypes(c: Context) {
     const result = await getProjectAttachmentTypesLookup();
+    return c.json({ data: result }, 200);
+  },
+
+    async getBudgetTypes(c: Context) {
+    const result = await getBudgetTypesLookup();
+    return c.json({ data: result }, 200);
+  },
+
+  async getAnalysts(c: Context) {
+    const result = await getAnalystsLookup();
     return c.json({ data: result }, 200);
   },
 };

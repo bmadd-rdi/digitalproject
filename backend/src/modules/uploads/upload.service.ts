@@ -4,7 +4,8 @@ import { db } from "../../db";
 import { projectAttachments, projects } from "../../db/schema/projects";
 import { divisions, projectAttachmentTypes } from "../../db/schema/lookups";
 import { users } from "../../db/schema/users";
-import { and, eq, isNull, like } from "drizzle-orm";
+// import { and, eq, isNull, like } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { PROJECT_STATUS, OWNER_EDITABLE_STATUS_IDS } from "../projects/project-workflow";
 import { isSameDepartmentUser } from "../projects/project-access.policy";
@@ -287,11 +288,22 @@ export class UploadService {
       throw new HTTPException(400, { message: "Invalid file name" });
     }
 
+    // fileName comes from sanitized uploads, which replace most non-ASCII
+    // characters (e.g. Thai filenames) with "_" — and "_" is itself a LIKE
+    // wildcard that matches any single character. Left unescaped, a filename
+    // with many underscores turns into an overly loose pattern that can
+    // match the wrong attachment. Escape both LIKE metacharacters ("_", "%")
+    // before building the pattern.
+    const escapedFileName = fileName.replace(/[\\%_]/g, (match) => `\\${match}`);
     const [attachment] = await db
       .select({ fileName: projectAttachments.fileName, fileType: projectAttachments.fileType })
       .from(projectAttachments)
       .innerJoin(projects, eq(projectAttachments.projectId, projects.id))
-      .where(and(like(projectAttachments.fileUrl, `%/uploads/files/${fileName}`), isNull(projects.deletedAt)))
+      // .where(and(like(projectAttachments.fileUrl, `%/uploads/files/${fileName}`), isNull(projects.deletedAt)))
+      .where(and(
+        sql`${projectAttachments.fileUrl} LIKE ${'%/uploads/files/' + escapedFileName} ESCAPE '\\'`,
+        isNull(projects.deletedAt),
+      ))
       .limit(1);
     if (!attachment) throw new HTTPException(404, { message: "Uploaded file not found" });
 

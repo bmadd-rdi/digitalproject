@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { CookieConsentBanner } from "@/features/consent/components/CookieConsentBanner";
 import { ConsentAnalytics } from "@/features/consent/components/ConsentAnalytics";
 
+
 // Font configuration
 const notoSansThai = Noto_Sans_Thai({
   subsets: ["thai", "latin"],

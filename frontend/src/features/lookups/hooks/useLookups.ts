@@ -5,6 +5,9 @@ import {
   getDepartmentsAction,
   getRolesAction,
   getDivisionsAction,
+  getProjectTypesAction,
+  getBudgetTypesAction,
+  getAnalystsLookupAction,
 } from "../actions/lookup.actions";
 
 // ตั้งค่า Stale Time ฝั่ง Client (เช่น 24 ชั่วโมง ให้สอดคล้องกับ Backend)
@@ -49,5 +52,31 @@ export function useDivisions(departmentId?: number) {
     queryFn: () => getDivisionsAction(departmentId),
     staleTime: STALE_TIME,
     enabled: !!departmentId, // จะทำงานก็ต่อเมื่อมีการเลือกหน่วยงานหลักแล้วเท่านั้น
+  });
+}
+
+export function useProjectTypes() {
+  return useQuery({
+    queryKey: ["lookups", "projectTypes"],
+    queryFn: () => getProjectTypesAction(),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useBudgetTypes() {
+  return useQuery({
+    queryKey: ["lookups", "budgetTypes"],
+    queryFn: () => getBudgetTypesAction(),
+    staleTime: STALE_TIME,
+  });
+}
+
+// รายชื่อผู้วิเคราะห์ (id + ชื่อ) — ต้องล็อกอิน, อายุสั้นกว่า lookup อื่นให้ตรงกับ cache ฝั่ง backend (5 นาที)
+export function useAnalystsLookup(enabled = true) {
+  return useQuery({
+    queryKey: ["lookups", "analysts"],
+    queryFn: () => getAnalystsLookupAction(),
+    staleTime: 1000 * 60 * 5,
+    enabled,
   });
 }

@@ -8,7 +8,10 @@ import {
   DivisionQuerySchema,
   ErrorSchema,
   ProjectAttachmentTypeLookupResponseSchema,
+  StringLookupResponseSchema,
+  AnalystLookupResponseSchema,
 } from "./lookup.schema";
+import { authMiddleware } from "../../middlewares/auth.middleware";
 
 const lookupsRouter = new OpenAPIHono();
 
@@ -151,6 +154,44 @@ const getProjectAttachmentTypesRoute = createRoute({
 });
 lookupsRouter.openapi(getProjectAttachmentTypesRoute, (c) => {
   return lookupController.getProjectAttachmentTypes(c);
+});
+
+
+const getBudgetTypesRoute = createRoute({
+  method: "get",
+  path: "/budget-types",
+  tags: ["Lookups"],
+  summary: "ดึงรายการประเภทงบประมาณ (distinct จาก proposal_budgets)",
+  responses: {
+    200: {
+      description: "รายการประเภทงบประมาณ",
+      content: { "application/json": { schema: StringLookupResponseSchema } },
+    },
+  },
+});
+lookupsRouter.openapi(getBudgetTypesRoute, (c) => {
+  return lookupController.getBudgetTypes(c);
+});
+
+const getAnalystsRoute = createRoute({
+  method: "get",
+  path: "/analysts",
+  tags: ["Lookups"],
+  middleware: [authMiddleware],
+  summary: "ดึงรายชื่อผู้วิเคราะห์ (เฉพาะ id และชื่อ) สำหรับตัวกรอง — ต้องล็อกอิน",
+  responses: {
+    200: {
+      description: "รายชื่อผู้วิเคราะห์ที่ยังใช้งานอยู่",
+      content: { "application/json": { schema: AnalystLookupResponseSchema } },
+    },
+    401: {
+      description: "ยังไม่ได้ล็อกอิน",
+      content: { "application/json": { schema: ErrorSchema } },
+    },
+  },
+});
+lookupsRouter.openapi(getAnalystsRoute, (c) => {
+  return lookupController.getAnalysts(c);
 });
 
 export default lookupsRouter;

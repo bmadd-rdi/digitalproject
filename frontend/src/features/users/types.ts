@@ -18,11 +18,3 @@ export interface User {
   last_login: string | null;
   created_at?: string;
 }
-
-/** รายการประวัติการเข้าสู่ระบบ 1 รายการ (จาก GET /api/v1/auth/login-history) */
-export interface LoginHistoryItem {
-  id: string;
-  loginAt: string;
-  ipAddress: string | null;
-  userAgent: string | null;
-}

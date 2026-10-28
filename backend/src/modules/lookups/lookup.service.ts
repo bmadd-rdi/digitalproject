@@ -1,7 +1,9 @@
 // src/modules/lookups/lookup.service.ts
 import { db } from "../../db";
 import { divisions, fourQuadrants, deputyGovernors, projectStatuses, projectTypes, projectAttachmentTypes, departments, roles } from "../../db/schema";
-import { asc } from "drizzle-orm";
+import { proposalBudgets } from "../../db/schema/proposals";
+import { users, roleUsers } from "../../db/schema/users";
+import { and, asc, eq, isNotNull, sql } from "drizzle-orm";
 import { appCache } from "../../shared/cache/memory-cache";
 import { getProjectAttachmentTypeLabel } from "./project-attachment-types";
 
@@ -131,5 +133,53 @@ export const getProjectAttachmentTypesLookup = async () => {
       }));
     },
     LOOKUP_TTL,
+  );
+};
+
+export const getBudgetTypesLookup = async () => {
+  return appCache.getOrSet(
+    "lookup:budgetTypes",
+    async () => {
+      const result = await db
+        .selectDistinct({ budgetType: proposalBudgets.budgetType })
+        .from(proposalBudgets)
+        .where(isNotNull(proposalBudgets.budgetType))
+        .orderBy(asc(proposalBudgets.budgetType));
+
+      return result.map((row) => row.budgetType).filter((value): value is string => Boolean(value?.trim()));
+    },
+    LOOKUP_TTL,
+  );
+};
+
+
+// อายุ cache สั้นกว่า lookup อื่น เพราะการกำหนด/ถอดบทบาทผู้วิเคราะห์เกิดขึ้นได้ตลอด
+const ANALYST_LOOKUP_TTL = 300;
+
+export const getAnalystsLookup = async () => {
+  return appCache.getOrSet(
+    "lookup:analysts",
+    async () => {
+      const rows = await db
+        .selectDistinct({
+          userId: users.userId,
+          firstName: users.firstName,
+          lastName: users.lastName,
+        })
+        .from(users)
+        .innerJoin(roleUsers, eq(roleUsers.userId, users.userId))
+        .innerJoin(roles, eq(roles.roleId, roleUsers.roleId))
+        .where(and(
+          eq(users.isActive, true),
+          sql`lower(${roles.roleName}) = 'analyst'`,
+        ))
+        .orderBy(asc(users.firstName), asc(users.lastName));
+
+      return rows.map((row) => ({
+        userId: row.userId,
+        name: `${row.firstName} ${row.lastName}`.trim(),
+      }));
+    },
+    ANALYST_LOOKUP_TTL,
   );
 };

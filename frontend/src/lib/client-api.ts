@@ -8,8 +8,7 @@ export const CLIENT_API_BASE = (() => {
   if (configuredApiUrl) {
     return trimTrailingSlash(configuredApiUrl);
   }
-  // Fallback for local development. This runs in the browser on the host, so it
-  // must use localhost (the published port `8081:8081` in docker-compose.yml).
-  // The Docker service name `backend` resolves only inside the container network.
-  return "http://localhost:8081/api/v1";
+  // return "/api/v1";
+  // 👇 แก้ไขบรรทัดนี้: ใส่ IP และ Port ของ Backend ลงไปตรงๆ
+  return "http://172.31.90.79:8081/api/v1";
 })();

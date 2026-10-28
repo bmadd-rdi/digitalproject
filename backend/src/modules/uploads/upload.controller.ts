@@ -61,11 +61,20 @@ export const getUploadedFile = async (c: Context) => {
   if (!fileName) throw new HTTPException(400, { message: "File name is required" });
   const result = await UploadService.getStoredDocument(fileName);
   const canRenderInline = result.contentType.startsWith("image/") || result.contentType === "application/pdf";
+  const disposition = canRenderInline ? "inline" : "attachment";
+  // HTTP header values must be ASCII — result.fileName is the user's
+  // original filename (often Thai), which throws a raw TypeError if used
+  // here directly. Provide both: an ASCII-safe fallback for old clients
+  // (filename=) and the real UTF-8 name per RFC 5987/6266 (filename*=),
+  // which every modern browser reads to show the correct name.
+  const asciiFallbackName = result.fileName.replace(/[^\x20-\x7E]/g, "_").replace(/"/g, "");
+  const encodedFileName = encodeURIComponent(result.fileName);
   return new Response(result.file, {
     status: 200,
     headers: {
       "Content-Type": result.contentType,
-      "Content-Disposition": `${canRenderInline ? "inline" : "attachment"}; filename="${result.fileName.replace(/"/g, "")}"`,
+      // "Content-Disposition": `${canRenderInline ? "inline" : "attachment"}; filename="${result.fileName.replace(/"/g, "")}"`,
+      "Content-Disposition": `${disposition}; filename="${asciiFallbackName}"; filename*=UTF-8''${encodedFileName}`,
       "Cache-Control": "private, max-age=3600",
     },
   });

@@ -17,6 +17,10 @@ type ProjectQuery = {
   statusIds?: number[];
   status?: "draft" | "submitted" | "all_except_draft" | "all";
   ownership?: "mine" | "team_only" | "team_and_mine" | "all";
+  departmentIds?: number[];
+  projectTypeIds?: number[];
+  analystIds?: string[];
+  budgetTypes?: string[];
 };
 
 // ฟังก์ชันแปลง TabType เป็น Query Parameters ที่ Backend เข้าใจ
@@ -35,7 +39,18 @@ const getQueryParamsForTab = (tab: TabType): ProjectQuery => {
   }
 };
 
-const fetchProjectsAPI = async (params: { page: number; limit: number; search: string; tab: TabType; statusIds: number[] }) => {
+// const fetchProjectsAPI = async (params: { page: number; limit: number; search: string; tab: TabType; statusIds: number[] }) => {
+  const fetchProjectsAPI = async (params: {
+  page: number;
+  limit: number;
+  search: string;
+  tab: TabType;
+  statusIds: number[];
+  departmentIds: number[];
+  projectTypeIds: number[];
+  analystIds: string[];
+  budgetTypes: string[];
+}) => {
   const tabConditions = getQueryParamsForTab(params.tab);
   const statusIds = [...params.statusIds].sort((a, b) => a - b);
 
@@ -48,6 +63,10 @@ const fetchProjectsAPI = async (params: { page: number; limit: number; search: s
     ...(tabConditions.ownership ? { ownership: tabConditions.ownership } : {}),
   });
   statusIds.forEach((statusId) => queryParams.append("statusIds", String(statusId)));
+  params.departmentIds.forEach((id) => queryParams.append("departmentIds", String(id)));
+  params.projectTypeIds.forEach((id) => queryParams.append("projectTypeIds", String(id)));
+  params.analystIds.forEach((id) => queryParams.append("analystIds", id));
+  params.budgetTypes.forEach((type) => queryParams.append("budgetTypes", type));
 
   // 👈 เรียกใช้งาน Server Action แทนการเรียก serverFetch ตรงๆ
   const result = await getProjectsAction(queryParams.toString());
@@ -72,18 +91,35 @@ export function useProjects(userRoles: UserRoleInput = []) {
   const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatusIds, setSelectedStatusIdsState] = useState<number[]>([]);
+  const [selectedDepartmentIds, setSelectedDepartmentIdsState] = useState<number[]>([]);
+  const [selectedProjectTypeIds, setSelectedProjectTypeIdsState] = useState<number[]>([]);
+  const [selectedAnalystIds, setSelectedAnalystIdsState] = useState<string[]>([]);
+  const [selectedBudgetTypes, setSelectedBudgetTypesState] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const normalizedStatusIds = [...selectedStatusIds].sort((a, b) => a - b);
+  const normalizedDepartmentIds = [...selectedDepartmentIds].sort((a, b) => a - b);
+  const normalizedProjectTypeIds = [...selectedProjectTypeIds].sort((a, b) => a - b);
+  const normalizedAnalystIds = [...selectedAnalystIds].sort();
+  const normalizedBudgetTypes = [...selectedBudgetTypes].sort();
+
   const { data: response, isLoading, isError, isFetching } = useQuery({
-    queryKey: ["projects", activeTab, currentPage, searchQuery, normalizedStatusIds],
+    // queryKey: ["projects", activeTab, currentPage, searchQuery, normalizedStatusIds],
+        queryKey: [
+      "projects", activeTab, currentPage, searchQuery, normalizedStatusIds,
+      normalizedDepartmentIds, normalizedProjectTypeIds, normalizedAnalystIds, normalizedBudgetTypes,
+    ],
     queryFn: () => fetchProjectsAPI({
       page: currentPage,
       limit: itemsPerPage,
       search: searchQuery,
       tab: activeTab,
       statusIds: normalizedStatusIds,
+      departmentIds: normalizedDepartmentIds,
+      projectTypeIds: normalizedProjectTypeIds,
+      analystIds: normalizedAnalystIds,
+      budgetTypes: normalizedBudgetTypes,
     }),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
@@ -98,6 +134,10 @@ export function useProjects(userRoles: UserRoleInput = []) {
     setCurrentPage(1);
     setSearchQuery("");
     setSelectedStatusIdsState([]);
+    setSelectedDepartmentIdsState([]);
+    setSelectedProjectTypeIdsState([]);
+    setSelectedAnalystIdsState([]);
+    setSelectedBudgetTypesState([]);
   };
 
   const handleSearch = (query: string) => {
@@ -112,6 +152,52 @@ export function useProjects(userRoles: UserRoleInput = []) {
 
   const clearStatusFilter = () => setSelectedStatusIds([]);
 
+
+
+
+
+    const setSelectedDepartmentIds = (departmentIds: number[]) => {
+    setSelectedDepartmentIdsState([...new Set(departmentIds)].sort((a, b) => a - b));
+    setCurrentPage(1);
+  };
+
+  const setSelectedProjectTypeIds = (projectTypeIds: number[]) => {
+    setSelectedProjectTypeIdsState([...new Set(projectTypeIds)].sort((a, b) => a - b));
+    setCurrentPage(1);
+  };
+
+  const setSelectedAnalystIds = (analystIds: string[]) => {
+    setSelectedAnalystIdsState([...new Set(analystIds)].sort());
+    setCurrentPage(1);
+  };
+
+  const setSelectedBudgetTypes = (budgetTypes: string[]) => {
+    setSelectedBudgetTypesState([...new Set(budgetTypes)].sort());
+    setCurrentPage(1);
+  };
+
+  // ล้างตัวกรองทั้งหมดในปุ่มเดียว — ใช้กับ filter panel รวม
+  const clearAllFilters = () => {
+    setSelectedStatusIdsState([]);
+    setSelectedDepartmentIdsState([]);
+    setSelectedProjectTypeIdsState([]);
+    setSelectedAnalystIdsState([]);
+    setSelectedBudgetTypesState([]);
+    setCurrentPage(1);
+  };
+
+  const activeFilterCount = [
+    normalizedStatusIds.length > 0,
+    normalizedDepartmentIds.length > 0,
+    normalizedProjectTypeIds.length > 0,
+    normalizedAnalystIds.length > 0,
+    normalizedBudgetTypes.length > 0,
+  ].filter(Boolean).length;
+
+
+
+
+
   return {
     activeTab,
     handleTabChange,
@@ -120,6 +206,16 @@ export function useProjects(userRoles: UserRoleInput = []) {
     selectedStatusIds: normalizedStatusIds,
     setSelectedStatusIds,
     clearStatusFilter,
+    selectedDepartmentIds: normalizedDepartmentIds,
+    setSelectedDepartmentIds,
+    selectedProjectTypeIds: normalizedProjectTypeIds,
+    setSelectedProjectTypeIds,
+    selectedAnalystIds: normalizedAnalystIds,
+    setSelectedAnalystIds,
+    selectedBudgetTypes: normalizedBudgetTypes,
+    setSelectedBudgetTypes,
+    clearAllFilters,
+    activeFilterCount,
     projectsData: response?.data || [],
     currentPage: response?.meta.currentPage || 1,
     totalPages: response?.meta.totalPages || 1,

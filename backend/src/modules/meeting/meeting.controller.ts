@@ -88,11 +88,19 @@ export const meetingController = {
   },
   async downloadFile(c: Context, meetingId: string, fileId: string) {
     const result = await meetingService.downloadFile(meetingId, fileId, getUserContext(c));
+    // HTTP header values must be ASCII — result.fileName is the user's
+    // original filename (often Thai), which throws a raw TypeError if used
+    // here directly. Provide both: an ASCII-safe fallback for old clients
+    // (filename=) and the real UTF-8 name per RFC 5987/6266 (filename*=),
+    // which every modern browser reads to show the correct name.
+    const asciiFallbackName = result.fileName.replace(/[^\x20-\x7E]/g, "_").replace(/"/g, "");
+    const encodedFileName = encodeURIComponent(result.fileName);
     return new Response(result.file, {
       status: 200,
       headers: {
         "Content-Type": result.contentType,
-        "Content-Disposition": `attachment; filename="${result.fileName.replace(/"/g, "")}"`,
+        // "Content-Disposition": `attachment; filename="${result.fileName.replace(/"/g, "")}"`,
+        "Content-Disposition": `attachment; filename="${asciiFallbackName}"; filename*=UTF-8''${encodedFileName}`,
         "Cache-Control": "private, no-store",
       },
     });

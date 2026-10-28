@@ -1,4 +1,21 @@
-แบบ A: แก้ไข code ก่อนค่อย Bulid
+ติดตั้ง pnpm
+1. เปิด VS Code กด Ctrl + Shift + p
+2. พิมพ์และเลือก WSL: Connect to WSL
+3. เลือกเมนู Terminal -> New Terminal บนเมนูบาร์ 
+4. Download pnpm
+   ```
+   curl -fsSL https://get.pnpm.io/install.sh | sh -
+   ```
+5. รีโหลดการตั้งค่า Terminal
+   ```
+   source ~/.bashrc
+   ```
+6. ตรวจสอบ
+   ```
+   pnpm -v
+   ```
+
+**แบบ A**: แก้ไข code ก่อนค่อย Bulid
 1. เข้าโฟลเดอร์หลักของ Frontend
     >bash
     ```
@@ -17,11 +34,12 @@
 4. ติดตั้งและอัปเดต Lockfile
     >bash
     ```
+    sudo chown -R $USER:$USER node_modules
     pnpm install
     ```
 5. ดำเนินการแก้ไข code ได้เลย
 
-แบบ B: แก้ไข code แล้วมีผลทันที (เชื่อมตรงเข้า Docker Container)
+**แบบ B**: แก้ไข code แล้วมีผลทันที (เชื่อมตรงเข้า Docker Container)
 
 โหมดนี้ใช้ไฟล์ `docker-compose.override.yml` ที่ root ของโปรเจกต์ ซึ่งจะทำการ
 mount โฟลเดอร์ `frontend/` และ `backend/` เข้า container โดยตรง แก้ code บนเครื่อง

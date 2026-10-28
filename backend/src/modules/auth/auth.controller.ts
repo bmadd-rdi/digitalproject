@@ -27,9 +27,9 @@ async function issueUserToken(user: any, now = new Date()) {
   const userRoles =
     user.roles && user.roles.length > 0
       ? user.roles
-          .map((userRole: any) => userRole.role?.roleName)
-          .filter(Boolean)
-          .map((roleName: string) => roleName.toLowerCase())
+        .map((userRole: any) => userRole.role?.roleName)
+        .filter(Boolean)
+        .map((roleName: string) => roleName.toLowerCase())
       : ["user"];
 
   return sign(
@@ -127,13 +127,14 @@ export const login = async (c: Context, body: LoginBody) => {
 
     const token = await issueUserToken(user, clock.now());
 
-    // 👇 Set Cookie เป็น session cookie (ไม่มี maxAge) — ปิดเบราว์เซอร์แล้วต้องเข้าสู่ระบบใหม่
+    // 👇 เพิ่มการ Set Cookie ที่นี่ เพื่อให้สอดคล้องกับตอน Logout
     setCookie(c, "token", token, {
       path: "/",
       secure: appEnv.COOKIE_SECURE,
       httpOnly: true,
       sameSite: appEnv.COOKIE_SAME_SITE,
       ...(appEnv.COOKIE_DOMAIN ? { domain: appEnv.COOKIE_DOMAIN } : {}),
+      maxAge: 60 * 60 * 24, // 1 วัน (ให้ตรงกับเวลา exp ของ JWT)
     });
 
     return c.json(

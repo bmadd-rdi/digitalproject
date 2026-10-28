@@ -247,6 +247,48 @@ const normalizeProjectStatusIds = (value: unknown): number[] | undefined => {
   return statusIds;
 };
 
+
+
+
+const normalizeIntIdList = (value: unknown, max = 50): number[] | undefined => {
+  if (value === undefined || value === null) return undefined;
+
+  const tokens = (Array.isArray(value) ? value : [value])
+    .flatMap((item) => String(item).split(","))
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (tokens.length === 0) return undefined;
+
+  const ids = [...new Set(tokens.map(Number))];
+  if (ids.length > max || ids.some((id) => !Number.isInteger(id) || id < 1)) {
+    throw new HTTPException(400, {
+      message: `Invalid id list — expected up to ${max} positive integers`,
+    });
+  }
+
+  return ids;
+};
+
+const normalizeStringList = (value: unknown, max = 50): string[] | undefined => {
+  if (value === undefined || value === null) return undefined;
+
+  const tokens = [...new Set(
+    (Array.isArray(value) ? value : [value])
+      .map((item) => String(item).trim())
+      .filter(Boolean),
+  )];
+
+  if (tokens.length === 0) return undefined;
+  if (tokens.length > max) {
+    throw new HTTPException(400, {
+      message: `Too many values — expected up to ${max}`,
+    });
+  }
+
+  return tokens;
+};
+
 const hasRole = (user: UserContext, role: string) =>
   normalizedUserRoles(user).includes(role);
 
@@ -353,8 +395,18 @@ const mapAnalystAssignedProject = (row: any) => {
 // };
 
 export const findAllProjects = async (user: UserContext, queryParams: ProjectQueryDTO) => {
-  const { page, limit, search, status, statusIds: rawStatusIds, ownership } = queryParams;
+  // const { page, limit, search, status, statusIds: rawStatusIds, ownership } = queryParams;
+
+  const {
+    page, limit, search, status, statusIds: rawStatusIds, ownership,
+    departmentIds: rawDepartmentIds, projectTypeIds: rawProjectTypeIds,
+    analystIds: rawAnalystIds, budgetTypes: rawBudgetTypes,
+  } = queryParams;
   const statusIds = normalizeProjectStatusIds(rawStatusIds);
+  const departmentIds = normalizeIntIdList(rawDepartmentIds, 50);
+  const projectTypeIds = normalizeIntIdList(rawProjectTypeIds, 20);
+  const analystIds = normalizeStringList(rawAnalystIds, 50);
+  const budgetTypes = normalizeStringList(rawBudgetTypes, 50);
   const offset = (page - 1) * limit;
 
   let query = getBaseProjectQuery();
@@ -407,19 +459,76 @@ export const findAllProjects = async (user: UserContext, queryParams: ProjectQue
     conditions.push(ne(projects.projectStatusId, 1));
   }
 
+
+     // ==========================================
+  // 3.5 ตัวกรองหน่วยงาน / ประเภทโครงการ / ผู้วิเคราะห์
+  // ==========================================
+  if (departmentIds && departmentIds.length > 0) {
+    conditions.push(inArray(divisions.departmentId, departmentIds));
+  }
+  if (projectTypeIds && projectTypeIds.length > 0) {
+    conditions.push(inArray(projects.projectTypeId, projectTypeIds));
+  }
+  if (analystIds && analystIds.length > 0) {
+    conditions.push(inArray(projects.analystId, analystIds));
+  }
+
+  // ==========================================
+  // 3.6 ตัวกรองประเภทงบประมาณ — budget_type อยู่ในตาราง proposal_budgets
+  // ไม่ใช่ projects โดยตรง เลยต้องใช้ correlated EXISTS แทน inArray ธรรมดา
+  // ==========================================
+  if (budgetTypes && budgetTypes.length > 0) {
+    const budgetTypeList = sql.join(budgetTypes.map((value) => sql`${value}`), sql`, `);
+    conditions.push(sql`exists (
+      select 1 from proposal_budgets pb
+      join proposals p on p.id = pb.proposal_id
+      where p.project_id = ${projects.id}
+        and p.status = 'submitted'
+        and pb.budget_type in (${budgetTypeList})
+    )`);
+  }
+
+
+
   // ==========================================
   // 4. ตัวกรองคำค้นหา (Search Filter)
   // ==========================================
   if (search) {
-    conditions.push(
-      or(
-        ilike(projects.projectName, `%${search}%`),
-        ilike(projects.projectNameOriginal, `%${search}%`),
-        ilike(projects.projectCode, `%${search}%`),
-        ilike(users.firstName, `%${search}%`),
-        ilike(users.lastName, `%${search}%`),
-      )!,
-    );
+    // conditions.push(
+    //   or(
+    //     ilike(projects.projectName, `%${search}%`),
+    //     ilike(projects.projectNameOriginal, `%${search}%`),
+    //     ilike(projects.projectCode, `%${search}%`),
+    //     ilike(users.firstName, `%${search}%`),
+    //     ilike(users.lastName, `%${search}%`),
+    //   )!,
+    // );
+    const searchConditions: SQL[] = [
+      ilike(projects.projectName, `%${search}%`),
+      ilike(projects.projectNameOriginal, `%${search}%`),
+      ilike(projects.projectCode, `%${search}%`),
+      ilike(users.firstName, `%${search}%`),
+      ilike(users.lastName, `%${search}%`),
+    ];
+
+    // งบประมาณในตารางแสดงเป็น "4,500,000" แต่ในฐานข้อมูลเป็น numeric (4500000.00)
+    // จึงตัดเครื่องหมายจุลภาค/ช่องว่างออกจากคำค้นก่อน และจะเทียบงบประมาณก็ต่อเมื่อ
+    // คำค้นเป็นตัวเลขล้วนเท่านั้น (ไม่ให้คำค้นที่เป็นข้อความไปปนกับตัวเลข)
+    const budgetSearchTerm = search.replace(/[,\s]/g, "");
+    if (/^\d(\.\d)?$/.test(budgetSearchTerm)) {
+      // ใช้ subquery เดียวกับคอลัมน์ latestSubmittedRequestedBudget
+      // เพื่อให้ผลค้นหาตรงกับตัวเลขที่ผู้ใช้เห็นในตาราง
+      searchConditions.push(sql`(
+        select p.requested_budget_total::text
+        from proposals p
+        where p.project_id = ${projects.id}
+          and p.status = 'submitted'
+        order by p.submitted_at desc nulls last, p.updated_at desc, p.id desc
+        limit 1
+      ) like ${`%${budgetSearchTerm}%`}`);
+    }
+
+    conditions.push(or(...searchConditions)!);
   }
 
   if (conditions.length > 0) {
