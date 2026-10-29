@@ -301,7 +301,8 @@ const IntIdListSchema = (max: number) => z
   .union([
     z.array(z.coerce.number().int().positive()).max(max),
     z.coerce.number().int().positive(),
-    z.string().regex(/^\s*\d(?:\s*,\s*\d)*\s*$/),
+    // z.string().regex(/^\s*\d(?:\s*,\s*\d)*\s*$/),
+    z.string().regex(/^\s*\d+(?:\s*,\s*\d+)*\s*$/),
   ])
   .optional();
 

@@ -515,7 +515,7 @@ export const findAllProjects = async (user: UserContext, queryParams: ProjectQue
     // จึงตัดเครื่องหมายจุลภาค/ช่องว่างออกจากคำค้นก่อน และจะเทียบงบประมาณก็ต่อเมื่อ
     // คำค้นเป็นตัวเลขล้วนเท่านั้น (ไม่ให้คำค้นที่เป็นข้อความไปปนกับตัวเลข)
     const budgetSearchTerm = search.replace(/[,\s]/g, "");
-    if (/^\d(\.\d)?$/.test(budgetSearchTerm)) {
+    if (/^\d+(\.\d+)?$/.test(budgetSearchTerm)) {
       // ใช้ subquery เดียวกับคอลัมน์ latestSubmittedRequestedBudget
       // เพื่อให้ผลค้นหาตรงกับตัวเลขที่ผู้ใช้เห็นในตาราง
       searchConditions.push(sql`(
