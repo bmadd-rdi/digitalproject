@@ -52,7 +52,7 @@ const CloudSystemItem = ({ nestIndex, control, register, errors, watch, removeSy
 
   return (
     <div className="border border-border p-5 rounded-lg bg-surface-container-lowest shadow-sm">
-      
+
       {/* ส่วน Header ของกล่อง (แสดงลำดับ และ ปุ่มลบ) */}
       <div className="flex justify-between items-center mb-5 border-b border-border/50 pb-3">
         <div className="flex items-center gap-2">
@@ -63,12 +63,12 @@ const CloudSystemItem = ({ nestIndex, control, register, errors, watch, removeSy
             รายละเอียดระบบงานที่ {nestIndex + 1}
           </h4>
         </div>
-        
-        <Button 
-          type="button" 
-          onClick={() => removeSystem(nestIndex)} 
-          variant="ghost" 
-          size="sm" 
+
+        <Button
+          type="button"
+          onClick={() => removeSystem(nestIndex)}
+          variant="ghost"
+          size="sm"
           className="text-status-orange hover:bg-red-100 hover:text-red-700"
         >
           <Trash2 className="w-4 h-4 mr-2" /> ลบระบบงานที่ {nestIndex + 1}
@@ -78,27 +78,27 @@ const CloudSystemItem = ({ nestIndex, control, register, errors, watch, removeSy
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div>
           <Label className="mb-2 block">ชื่อโครงการ/ระบบงาน <span className="text-status-orange">*</span></Label>
-          <Input 
-            {...register(`cloudRequests.${nestIndex}.systemName`)} 
-            placeholder="เช่น ระบบจัดการเอกสารอิเล็กทรอนิกส์" 
+          <Input
+            {...register(`cloudRequests.${nestIndex}.systemName`)}
+            placeholder="เช่น ระบบจัดการเอกสารอิเล็กทรอนิกส์"
             className={errors?.cloudRequests?.[nestIndex]?.systemName ? 'border-status-orange' : ''}
           />
           {errors?.cloudRequests?.[nestIndex]?.systemName && <p className="text-status-orange text-xs mt-1">{errors.cloudRequests[nestIndex].systemName.message}</p>}
         </div>
         <div>
           <Label className="mb-2 block">วันที่ต้องการขอใช้บริการ <span className="text-status-orange">*</span></Label>
-          <Input 
-            type="date" 
-            {...register(`cloudRequests.${nestIndex}.requestedServiceDate`)} 
+          <Input
+            type="date"
+            {...register(`cloudRequests.${nestIndex}.requestedServiceDate`)}
             className={errors?.cloudRequests?.[nestIndex]?.requestedServiceDate ? 'border-status-orange' : ''}
           />
           {errors?.cloudRequests?.[nestIndex]?.requestedServiceDate && <p className="text-status-orange text-xs mt-1">{errors.cloudRequests[nestIndex].requestedServiceDate.message}</p>}
         </div>
         <div>
           <Label className="mb-2 block">วันที่บันทึกคำขอ <span className="text-status-orange">*</span></Label>
-          <Input 
-            type="date" 
-            {...register(`cloudRequests.${nestIndex}.recordedRequestDate`)} 
+          <Input
+            type="date"
+            {...register(`cloudRequests.${nestIndex}.recordedRequestDate`)}
             className={errors?.cloudRequests?.[nestIndex]?.recordedRequestDate ? 'border-status-orange' : ''}
           />
           {errors?.cloudRequests?.[nestIndex]?.recordedRequestDate && <p className="text-status-orange text-xs mt-1">{errors.cloudRequests[nestIndex].recordedRequestDate.message}</p>}
@@ -107,11 +107,11 @@ const CloudSystemItem = ({ nestIndex, control, register, errors, watch, removeSy
 
       <div className="mb-2 flex justify-between items-center mt-8">
         <Label className="font-semibold text-foreground">รายละเอียด VM (Virtual Machine)</Label>
-        <Button 
-          type="button" 
-          onClick={() => appendVm({ vmDescription: "", osDatabase: "", vcpu: 0, ramGb: 0, gpuGb: 0, storageGb: 0, price: 0 })} 
-          size="sm" 
-          variant="outline" 
+        <Button
+          type="button"
+          onClick={() => appendVm({ vmDescription: "", osDatabase: "", vcpu: 0, ramGb: 0, gpuGb: 0, storageGb: 0, price: 0 })}
+          size="sm"
+          variant="outline"
           className="gap-2"
         >
           <Plus className="w-3 h-3" /> เพิ่ม VM ในระบบงานนี้
@@ -196,7 +196,7 @@ export const ProposalStep5 = () => {
 
   const watchedDurationDays = watch("durationDays");
   const isOverLimit = watchedDurationDays > 270;
-  
+
   const watchedCloudRequests = watch("cloudRequests") || [];
 
   // คำนวณผลรวมทั้งหมด (Grand Total)
@@ -214,25 +214,25 @@ export const ProposalStep5 = () => {
 
   return (
     <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full min-w-0 pb-10">
-      
+
       <div>
-        <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">5. ความพร้อมและประโยชน์ที่คาดว่าจะได้รับ</h2>
+        <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">จ. ความพร้อมและประโยชน์ที่คาดว่าจะได้รับ</h2>
       </div>
 
       {/* --- 1. ระยะเวลาดำเนินงาน --- */}
       <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
-        <Label className="text-lg font-bold text-foreground block mb-2">1. ระยะเวลาดำเนินงาน <span className="text-status-orange">*</span></Label>
+        <Label className="text-lg font-bold text-foreground block mb-2">9. ระยะเวลาดำเนินงาน <span className="text-status-orange">*</span></Label>
         <p className="text-sm text-muted-foreground mb-4">
           (โครงการปีเดียว งบประมาณรายจ่ายประจำปี หรืองบกลาง ระยะเวลาไม่เกิน 270 วัน)
         </p>
-        
+
         <div className="flex items-center gap-3">
           <div className="w-32">
-            <Input 
-              type="number" 
-              {...register("durationDays", { valueAsNumber: true })} 
+            <Input
+              type="number"
+              {...register("durationDays", { valueAsNumber: true })}
               className={`bg-surface text-center ${errors.durationDays ? 'border-status-orange' : ''}`}
-              placeholder="เช่น 180" 
+              placeholder="เช่น 180"
             />
           </div>
           <span className="text-md font-medium text-foreground">วัน</span>
@@ -248,17 +248,17 @@ export const ProposalStep5 = () => {
 
       {/* --- 2. ความพร้อมของหน่วยงาน --- */}
       <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
-        <Label className="text-lg font-bold text-foreground block mb-4">2. ความพร้อมของหน่วยงาน</Label>
+        <Label className="text-lg font-bold text-foreground block mb-4">10. ความพร้อมของหน่วยงาน</Label>
 
         {/* 2.1 ตารางบุคลากร ICT */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-3">
-            <Label className="text-md font-medium text-foreground">บุคลากร ICT ที่มีอยู่ในปัจจุบัน</Label>
+            <Label className="text-md font-medium text-foreground">10.1 บุคลากร ICT ที่มีอยู่ในปัจจุบัน</Label>
             <Button type="button" onClick={() => appendPersonnel({ position: "", level: "", count: 0 })} size="sm" className="rounded-full gap-2">
-              <Plus className="w-4 h-4"/> เพิ่มบุคลากร
+              <Plus className="w-4 h-4" /> เพิ่มบุคลากร
             </Button>
           </div>
-          
+
           <div className="overflow-x-auto border border-border rounded-md">
             <table className="w-full text-left min-w-150 text-sm">
               <thead className="bg-surface-container-low text-slate-gray">
@@ -293,31 +293,31 @@ export const ProposalStep5 = () => {
 
         {/* 2.2 ประเด็นความพร้อมด้านอื่นๆ */}
         <div>
-          <Label className="text-md font-medium text-foreground block mb-2">ประเด็นความพร้อมด้านอื่น ๆ (ถ้ามี)</Label>
-          <Textarea 
-            {...register("otherReadiness")} 
-            placeholder="อธิบายประเด็นความพร้อมด้านอื่นๆ..." 
-            className="min-h-37.5 bg-surface resize-y" 
+          <Label className="text-md font-medium text-foreground block mb-2">10.2 ประเด็นความพร้อมด้านอื่น ๆ (ถ้ามี)</Label>
+          <Textarea
+            {...register("otherReadiness")}
+            placeholder="อธิบายประเด็นความพร้อมด้านอื่นๆ..."
+            className="min-h-37.5 bg-surface resize-y"
           />
         </div>
       </div>
 
       {/* --- 3. ประโยชน์ที่คาดว่าจะได้รับ (ขยับขึ้นมา) --- */}
       <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
-        <Label className="text-lg font-bold text-foreground block mb-2">3. ประโยชน์ที่คาดว่าจะได้รับ <span className="text-status-orange">*</span></Label>
-        <Textarea 
-          {...register("expectedBenefits")} 
-          placeholder="อธิบายประโยชน์ที่คาดว่าจะได้รับจากโครงการนี้อย่างชัดเจน..." 
-          className={`min-h-50 bg-surface resize-y ${errors.expectedBenefits ? 'border-status-orange' : ''}`} 
+        <Label className="text-lg font-bold text-foreground block mb-2">11. ประโยชน์ที่คาดว่าจะได้รับ <span className="text-status-orange">*</span></Label>
+        <Textarea
+          {...register("expectedBenefits")}
+          placeholder="อธิบายประโยชน์ที่คาดว่าจะได้รับจากโครงการนี้อย่างชัดเจน..."
+          className={`min-h-50 bg-surface resize-y ${errors.expectedBenefits ? 'border-status-orange' : ''}`}
         />
         {errors.expectedBenefits && <p className="text-status-orange text-sm mt-2">{errors.expectedBenefits.message}</p>}
       </div>
 
       {/* --- 4. โครงการนี้อยู่ใน Roadmap ของหน่วยงานหรือไม่ (ขยับขึ้นมา) --- */}
       <div className="bg-surface p-6 rounded-xl border border-border shadow-sm mb-4">
-        <Label className="text-lg font-bold text-foreground block mb-4">4. โครงการนี้อยู่ใน Roadmap ของหน่วยงานหรือไม่ <span className="text-status-orange">*</span></Label>
-        <RadioGroup 
-          value={watch("isInRoadmap") !== undefined ? String(watch("isInRoadmap")) : undefined} 
+        <Label className="text-lg font-bold text-foreground block mb-4">12. โครงการนี้อยู่ใน Roadmap ของหน่วยงานหรือไม่ <span className="text-status-orange">*</span></Label>
+        <RadioGroup
+          value={watch("isInRoadmap") !== undefined ? String(watch("isInRoadmap")) : undefined}
           onValueChange={(val) => setValue("isInRoadmap", val === "true", { shouldValidate: true })}
           className="flex flex-col sm:flex-row gap-8 pl-2"
         >
@@ -338,12 +338,12 @@ export const ProposalStep5 = () => {
         <div className="flex justify-between items-center mb-6 border-b border-border pb-4">
           <div>
             <Label className="text-lg font-bold text-foreground flex items-center gap-2">
-              5. คำขอใช้บริการ Cloud / ระบบงาน
+              13. คำขอใช้บริการ Cloud / ระบบงาน
             </Label>
             <p className="text-sm text-muted-foreground mt-1">ระบุรายละเอียดระบบงานและ Virtual Machine (VM) ที่ต้องการขอรับบริการ</p>
           </div>
-          <Button 
-            type="button" 
+          <Button
+            type="button"
             onClick={() => {
               const today = new Date().toISOString().slice(0, 10);
               appendCloud({ systemName: "", requestedServiceDate: today, recordedRequestDate: today, vms: [] });
@@ -357,23 +357,23 @@ export const ProposalStep5 = () => {
         {cloudFields.length === 0 ? (
           <div className="text-center p-10 border-2 border-dashed border-border rounded-xl text-muted-foreground">
             {/* eslint-disable react/no-unescaped-entities */}
-            ยังไม่มีคำขอใช้บริการ Cloud <br/>
+            ยังไม่มีคำขอใช้บริการ Cloud <br />
             <span className="text-sm">กด "เพิ่มระบบงานใหม่" เพื่อระบุรายละเอียด</span>
           </div>
         ) : (
           <div className="flex flex-col gap-6">
             {cloudFields.map((field, index) => (
-              <CloudSystemItem 
-                key={field.id} 
-                nestIndex={index} 
-                control={control} 
-                register={register} 
-                errors={errors} 
-                watch={watch} 
-                removeSystem={removeCloud} 
+              <CloudSystemItem
+                key={field.id}
+                nestIndex={index}
+                control={control}
+                register={register}
+                errors={errors}
+                watch={watch}
+                removeSystem={removeCloud}
               />
             ))}
-            
+
             {/* สรุป Grand Total รวมทุกระบบงาน */}
             <div className="mt-4 bg-primary-container/10 border border-primary/20 p-5 rounded-lg">
               <h3 className="text-md font-bold text-primary-dark mb-4 flex items-center gap-2">
@@ -418,5 +418,3 @@ export const ProposalStep5 = () => {
     </div>
   );
 };
-
-

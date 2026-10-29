@@ -43,7 +43,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
       <Card className="rounded-2xl border-orange-200 bg-orange-50/50 shadow-sm">
         <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-8">
           <div>
-            <h3 className="text-lg font-extrabold text-foreground">เอกสารรายละเอียดโครงการอยู่ระหว่างการจัดทำ</h3>
+            <h3 className="text-lg font-extrabold text-foreground">เอกสารรายละเอียดประกอบการพิจารณาโครงการเสนอคณะกรรมการดิจิทัลกรุงเทพมหานคร</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               กรุณาดำเนินการกรอกข้อมูลให้ครบถ้วนเพื่อส่งโครงการเข้าสู่กระบวนการพิจารณา
             </p>
@@ -53,7 +53,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
             onClick={() => router.push(`/projects/${projectId}/proposal/create`)}
             className="h-11 w-full gap-2 font-bold md:w-auto"
           >
-            แก้ไขข้อเสนอ
+            แก้ไข
             <ArrowRight className="h-4 w-4" />
           </Button>
         </CardContent>

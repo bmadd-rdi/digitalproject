@@ -1,9 +1,14 @@
-// src/features/projects/components/ProjectStep2.tsx
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   useFormContext,
   Controller,
   useFieldArray,
   useWatch,
+  UseFormWatch,
+  UseFormSetValue,
+  FieldErrors,
 } from "react-hook-form";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
 import { ProposalStep2Values } from "../types";
@@ -15,13 +20,78 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AgencyComboBox } from "@/components/custom/DepartmentComboBox";
+import { FileUploadField, type SharedFileValue } from "@/features/projects/components/workspace/ui/FileUploadField";
+import type { ProjectAttachmentTypeName } from "@/features/projects/types/project-attachment-type";
 
-export const ProposalStep2 = () => {
+interface SingleFileUploadWithDescBoxProps {
+  projectId: string;
+  title: string;
+  docTypeName: ProjectAttachmentTypeName;
+  name: keyof ProposalStep2Values;
+  watch: UseFormWatch<ProposalStep2Values>;
+  setValue: UseFormSetValue<ProposalStep2Values>;
+  errors: FieldErrors<ProposalStep2Values>;
+  onUploadingChange?: (uploading: boolean) => void;
+}
+
+const SingleFileUploadWithDescBox = ({
+  projectId,
+  title,
+  docTypeName,
+  name,
+  watch,
+  setValue,
+  errors,
+  onUploadingChange,
+}: SingleFileUploadWithDescBoxProps) => {
+  const watchedFile = watch(name);
+  const value = (typeof watchedFile === "string"
+    ? { id: `${String(name)}-server`, name: "Uploaded image", url: watchedFile, file: watchedFile, type: "image", description: "" }
+    : watchedFile) as SharedFileValue | null | undefined;
+  const fieldError = errors[name] as { description?: { message?: string } } | undefined;
+  const urlField = `${String(name).replace("File", "Url")}` as keyof ProposalStep2Values;
+
+  return (
+    <FileUploadField
+      projectId={projectId}
+      docTypeName={docTypeName}
+      title={title}
+      accept="image/png,image/jpeg,image/webp"
+      value={value}
+      showDescription
+      descriptionRequired
+      descriptionError={fieldError?.description?.message as string | undefined}
+      onUploadingChange={onUploadingChange}
+      onChange={(uploaded) => {
+        if (!uploaded) {
+          setValue(name, null as never, { shouldValidate: true });
+          setValue(urlField, null as never, { shouldValidate: true });
+          return;
+        }
+        setValue(name, { ...uploaded, file: uploaded.url || uploaded.file || "" } as never, { shouldValidate: true });
+        if (uploaded.url) setValue(urlField, uploaded.url as never, { shouldValidate: true });
+      }}
+    />
+  );
+};
+
+export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: string; onUploadingChange?: (uploading: boolean) => void }) => {
+  const [uploadingCount, setUploadingCount] = useState(0);
   const {
     register,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useFormContext<ProposalStep2Values>();
+
+  useEffect(() => {
+    onUploadingChange?.(uploadingCount > 0);
+  }, [onUploadingChange, uploadingCount]);
+
+  const handleChildUploadingChange = (uploading: boolean) => {
+    setUploadingCount((count) => Math.max(0, count + (uploading ? 1 : -1)));
+  };
 
   const selectedProjectType = useWatch({
     control,
@@ -55,17 +125,17 @@ export const ProposalStep2 = () => {
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">2. สาระสำคัญและขอบเขต</h2>
-
+      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">ข. ข้อมูลโครงการ</h2>
+      {/* <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">ข. สาระสำคัญและขอบเขต</h2> */}
       <div className="grid grid-cols-1 gap-8">
 
         {/* ============================================================== */}
-        {/* --- ส่วนที่ 1: ข้อมูลพื้นฐาน --- */}
+        {/* --- ส่วนที่ ข1: ข้อมูลโครงการ --- */}
         {/* ============================================================== */}
 
         <div className="w-full">
           <Label htmlFor="background" className="text-sm font-medium text-foreground">
-            หลักการและเหตุผล / ความเป็นมา <span className="text-status-orange">*</span>
+            1. หลักการและเหตุผล / ความเป็นมา <span className="text-status-orange"></span>
           </Label>
           <RichTextarea
             id="background"
@@ -83,7 +153,7 @@ export const ProposalStep2 = () => {
 
         <div className="w-full">
           <Label htmlFor="objective" className="text-sm font-medium text-foreground">
-            วัตถุประสงค์ <span className="text-status-orange">*</span>
+            2. วัตถุประสงค์ <span className="text-status-orange"></span>
           </Label>
           <RichTextarea
             id="objective"
@@ -101,7 +171,7 @@ export const ProposalStep2 = () => {
 
         <div className="w-full">
           <Label htmlFor="target" className="text-sm font-medium text-foreground">
-            เป้าหมาย <span className="text-status-orange">*</span>
+            3. เป้าหมาย <span className="text-status-orange"></span>
           </Label>
           <RichTextarea
             id="target"
@@ -119,7 +189,7 @@ export const ProposalStep2 = () => {
 
         <div className="w-full">
           <Label htmlFor="scope" className="text-sm font-medium text-foreground">
-            ขอบเขตการดำเนินงาน <span className="text-status-orange">*</span>
+            4. ขอบเขตการดำเนินงาน <span className="text-status-orange"></span>
           </Label>
           <RichTextarea
             id="scope"
@@ -138,12 +208,12 @@ export const ProposalStep2 = () => {
         <div className="border-t border-border" />
 
         {/* ============================================================== */}
-        {/* --- ส่วนที่ 2: ลักษณะโครงการ และ โครงการที่เกี่ยวข้อง --- */}
+        {/* --- ส่วนที่ ข2: ลักษณะโครงการ และ โครงการที่เกี่ยวข้อง --- */}
         {/* ============================================================== */}
 
         <div>
           <Label className="text-sm font-medium text-foreground mb-3 block">
-            ลักษณะโครงการ <span className="text-status-orange">*</span>
+            5. ลักษณะโครงการ <span className="text-status-orange"></span>
           </Label>
           <Controller
             control={control}
@@ -207,7 +277,7 @@ export const ProposalStep2 = () => {
 
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
                         <div className="md:col-span-12">
-                          <Label className="text-xs text-slate-gray mb-1.5 block">โครงการที่เกี่ยวข้อง <span className="text-status-orange">*</span></Label>
+                          <Label className="text-xs text-slate-gray mb-1.5 block">โครงการที่เกี่ยวข้อง <span className="text-status-orange"></span></Label>
                           <Textarea
                             {...register(`relatedProjects.${index}.projectName`)}
                             placeholder="ระบุชื่อโครงการ"
@@ -216,7 +286,7 @@ export const ProposalStep2 = () => {
                           />
                         </div>
                         <div className="md:col-span-8">
-                          <Label className="text-xs text-slate-gray mb-1.5 block">หน่วยงาน <span className="text-status-orange">*</span></Label>
+                          <Label className="text-xs text-slate-gray mb-1.5 block">หน่วยงาน <span className="text-status-orange"></span></Label>
                           <Controller
                             control={control}
                             name={`relatedProjects.${index}.agency`}
@@ -228,7 +298,7 @@ export const ProposalStep2 = () => {
                           />
                         </div>
                         <div className="md:col-span-4 flex flex-col justify-between">
-                          <Label className="text-xs text-slate-gray block mb-1.5">ปีงบประมาณ <span className="text-status-orange">*</span></Label>
+                          <Label className="text-xs text-slate-gray block mb-1.5">ปีงบประมาณ <span className="text-status-orange"></span></Label>
                           <Input
                             {...register(`relatedProjects.${index}.fiscalYear`)}
                             placeholder="เช่น 2567"
@@ -236,7 +306,7 @@ export const ProposalStep2 = () => {
                           />
                         </div>
                         <div className="md:col-span-12">
-                          <Label className="text-xs text-slate-gray mb-1.5 block">เกี่ยวข้องโดย (อธิบายความสัมพันธ์) <span className="text-status-orange">*</span></Label>
+                          <Label className="text-xs text-slate-gray mb-1.5 block">เกี่ยวข้องโดย (อธิบายความสัมพันธ์) <span className="text-status-orange"></span></Label>
                           <Textarea
                             {...register(`relatedProjects.${index}.relationType`)}
                             placeholder="เช่น ทดแทนระบบเดิม..."
@@ -264,16 +334,16 @@ export const ProposalStep2 = () => {
         <div className="border-t border-border" />
 
         {/* ============================================================== */}
-        {/* --- ส่วนที่ 3: สภาพปัจจุบัน (Current Status) --- */}
+        {/* --- ส่วนที่ ข3: สภาพปัจจุบัน (Current Status) --- */}
         {/* ============================================================== */}
 
         <div className="flex flex-col space-y-8">
-          <h3 className="text-xl font-bold text-foreground">สภาพปัจจุบัน</h3>
+          <h3 className="text-xl font-bold text-foreground">6. สภาพปัจจุบัน</h3>
 
           <div className="space-y-6">
             <div className="w-full">
               <Label htmlFor="currentSystemStatus" className="text-sm font-medium text-foreground">
-                สถานภาพระบบงานคอมพิวเตอร์ปัจจุบัน <span className="text-status-orange">*</span>
+                6.1 สถานภาพระบบงานคอมพิวเตอร์ปัจจุบัน <span className="text-status-orange"></span>
               </Label>
               <Textarea
                 id="currentSystemStatus"
@@ -291,7 +361,7 @@ export const ProposalStep2 = () => {
 
             <div className="w-full">
               <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
-                สภาพปัญหาของผู้รับบริการ / เหตุผลความจำเป็น <span className="text-status-orange">*</span>
+                6.2 สภาพปัญหาของผู้รับบริการ / เหตุผลความจำเป็น <span className="text-status-orange"></span>
               </Label>
               <RichTextarea
                 id="currentProblems"
@@ -306,17 +376,32 @@ export const ProposalStep2 = () => {
                 </p>
               )}
             </div>
+            <div className="w-full">
+              <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
+                6.3 ภาพประกอบหรือไดอะแกรม (Diagram) <span className="text-status-orange"></span>
+              </Label>
+              <SingleFileUploadWithDescBox
+                projectId={projectId}
+                title="Current Diagram"
+                docTypeName="current_diagram"
+                name="currentDiagramFile"
+                watch={watch}
+                setValue={setValue}
+                errors={errors}
+                onUploadingChange={handleChildUploadingChange}
+              />
+            </div>
           </div>
 
           <div className="border-t border-border border-dashed" />
 
           {/* ============================================================== */}
-          {/* --- ส่วนที่ 4: ข้อมูลทรัพยากรที่มีอยู่ (Manpower & Equipment) --- */}
+          {/* --- ส่วนที่ ข4: ข้อมูลทรัพยากรที่มีอยู่ (Manpower & Equipment) --- */}
           {/* ============================================================== */}
 
           <div>
             <div className="mb-6">
-              <h4 className="text-base font-bold text-foreground">คอมพิวเตอร์และอุปกรณ์ที่มีอยู่ในปัจจุบันของส่วนราชการ</h4>
+              <h4 className="text-base font-bold text-foreground">6.3 คอมพิวเตอร์และอุปกรณ์ที่มีอยู่ในปัจจุบันของส่วนราชการ</h4>
               <p className="text-sm text-slate-gray">(เฉพาะกรณีโครงการที่มีการจัดหาครุภัณฑ์) (ให้ระบุรายการอุปกรณ์ของส่วนราชการที่มีอยู่ในปัจจุบัน สถานที่ติดตั้งของระบบ ส่วนที่รับผิดชอบ)</p>
             </div>
 
@@ -343,7 +428,7 @@ export const ProposalStep2 = () => {
                     return (
                       <div key={field.id} className="flex flex-wrap md:flex-nowrap gap-3 p-4 bg-surface-container-low rounded-xl items-end relative group">
                         <div className="w-full md:w-2/5">
-                          <Label className="text-xs text-slate-gray mb-1.5 block">ส่วนราชการ <span className="text-status-orange">*</span></Label>
+                          <Label className="text-xs text-slate-gray mb-1.5 block">ส่วนราชการ <span className="text-status-orange"></span></Label>
                           <Input
                             {...register(`manpower.${index}.agencyPart`)}
                             placeholder="ระบุส่วนราชการ"
@@ -411,7 +496,7 @@ export const ProposalStep2 = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                           <div className="md:col-span-12">
-                            <Label className="text-xs text-slate-gray mb-1.5 block">รายการครุภัณฑ์ <span className="text-status-orange">*</span></Label>
+                            <Label className="text-xs text-slate-gray mb-1.5 block">รายการครุภัณฑ์ <span className="text-status-orange"></span></Label>
                             <Textarea
                               {...register(`existingEquipment.${index}.itemName`)}
                               placeholder="ระบุรายการครุภัณฑ์..."
@@ -428,7 +513,7 @@ export const ProposalStep2 = () => {
                             <Input type="number" {...register(`existingEquipment.${index}.quantity`, { valueAsNumber: true })} placeholder="0" className="bg-surface" />
                           </div>
                           <div className="md:col-span-6">
-                            <Label className="text-xs text-slate-gray mb-1.5 block">ผู้ใช้งาน <span className="text-status-orange">*</span></Label>
+                            <Label className="text-xs text-slate-gray mb-1.5 block">ผู้ใช้งาน <span className="text-status-orange"></span></Label>
                             <Input
                               {...register(`existingEquipment.${index}.user`)}
                               placeholder="ระบุผู้ใช้งาน"
@@ -436,7 +521,7 @@ export const ProposalStep2 = () => {
                             />
                           </div>
                           <div className="md:col-span-6">
-                            <Label className="text-xs text-slate-gray mb-1.5 block">สถานที่ตั้ง <span className="text-status-orange">*</span></Label>
+                            <Label className="text-xs text-slate-gray mb-1.5 block">สถานที่ตั้ง <span className="text-status-orange"></span></Label>
                             <Input
                               {...register(`existingEquipment.${index}.location`)}
                               placeholder="ระบุสถานที่ตั้ง"

@@ -111,7 +111,7 @@ const WizardForm = ({
   const { mutate: initDraft } = useInitializeDraft(projectId);
   const canEditProposal = projectDetail?.permissions?.canEditProposal === true;
   // const isReadOnly = isProjectLoading || isDraftLoading || isProposalLoading || !projectDetail || !canEditProposal ||
-    // (mode === "submitted" && !existingProposal);
+  // (mode === "submitted" && !existingProposal);
   const isReadOnly = isProjectLoading || isDraftLoading || !projectDetail || !canEditProposal;
 
   // ── RHF setup ─────────────────────────────────────────────────────────────
@@ -159,6 +159,7 @@ const WizardForm = ({
       { field: "networkDiagram", docTypeName: "network_diagram" },
       { field: "useCaseDiagram", docTypeName: "use_case_diagram" },
       { field: "securityDiagram", docTypeName: "security_diagram" },
+      { field: "currentDiagram", docTypeName: "current_diagram" },
     ] as const;
 
     // Recreate the UI descriptor from either the saved draft URL or the
@@ -181,7 +182,7 @@ const WizardForm = ({
         ?.filter((attachment) => draftUrl
           ? attachment.fileUrl === draftUrl
           : attachment.docTypeName === docTypeName ||
-            (docTypeId !== undefined && attachment.docTypeId === docTypeId))
+          (docTypeId !== undefined && attachment.docTypeId === docTypeId))
         .sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         )[0];
@@ -209,14 +210,14 @@ const WizardForm = ({
 
     reset(hydratedDraft as Partial<ProposalFormValues>);
     // if (!existingDraft && mode === "draft" && !isReadOnly) {
-      // No draft yet — create one so we have a record to PATCH against.
+    // No draft yet — create one so we have a record to PATCH against.
     if (!existingDraft && !isReadOnly) {
-+      // No draft yet — create one so auto-save has a record to write to.
-      initDraft();
+      +      // No draft yet — create one so auto-save has a record to write to.
+        initDraft();
     }
     hasHydratedRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [existingDraft, existingProposal, getAttachmentTypeId, isDraftLoading, isProjectLoading, isProposalLoading, isReadOnly, mode, projectDetail]);
+    // }, [existingDraft, existingProposal, getAttachmentTypeId, isDraftLoading, isProjectLoading, isProposalLoading, isReadOnly, mode, projectDetail]);
   }, [existingDraft, getAttachmentTypeId, isDraftLoading, isProjectLoading, isReadOnly, projectDetail]);
   // ── Step validation helper ─────────────────────────────────────────────────
   const getCurrentSchema = (step: number) => {
@@ -327,16 +328,16 @@ const WizardForm = ({
         />
 
         {isReadOnly && (
-            <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-800">
-              This proposal is read-only while the project is being reviewed.
-            </div>
-          )}
+          <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-800">
+            This proposal is read-only while the project is being reviewed.
+          </div>
+        )}
 
         <form onSubmit={(event) => event.preventDefault()} className="mt-8">
 
           <fieldset disabled={isReadOnly}>
             {currentStep === 1 && <ProposalStep1 project={projectDetail} />}
-            {currentStep === 2 && <ProposalStep2 />}
+            {currentStep === 2 && <ProposalStep2 projectId={projectId} />}
             {currentStep === 3 && <ProposalStep3 projectId={projectId} />}
             {currentStep === 4 && <ProposalStep4 />}
             {currentStep === 5 && <ProposalStep5 />}
@@ -378,7 +379,7 @@ const WizardForm = ({
                   className="px-8 h-12 w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-dark text-white shadow-sm transition-transform active:scale-[0.99]"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  บันทึกฉบับร่าง
+                  บันทึกแบบร่าง
                 </Button>
               ))}
             </div>
@@ -393,7 +394,7 @@ const WizardForm = ({
             className="fixed bottom-5 right-5 z-40 h-11 rounded-full bg-[#00734b] px-5 font-bold text-white shadow-lg hover:bg-primary-dark"
           >
             <Save className="mr-2 h-4 w-4" />
-            {isSavingDraft ? "กำลังบันทึก..." : "Save"}
+            {isSavingDraft ? "กำลังบันทึก..." : "บันทึกแบบร่าง"}
           </Button>
         )}
 

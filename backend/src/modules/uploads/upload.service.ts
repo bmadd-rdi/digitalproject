@@ -71,7 +71,7 @@ function assertDocumentTypeMatchesFile(file: File, docTypeName: string) {
     allowedExtensions = new Set([".pdf"]);
     allowedMimeTypes = PDF_MIME_TYPES;
   } else if (
-    ["system_diagram", "network_diagram", "use_case_diagram", "security_diagram"].includes(docTypeName)
+    ["system_diagram", "network_diagram", "use_case_diagram", "security_diagram", "current_diagram"].includes(docTypeName)
   ) {
     allowedExtensions = new Set([".png", ".jpg", ".jpeg", ".webp"]);
     allowedMimeTypes = DIAGRAM_MIME_TYPES;

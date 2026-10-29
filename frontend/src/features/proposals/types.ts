@@ -69,12 +69,16 @@ export const proposalStep2Schema = z.object({
       remark: z.string().optional(),
     })
   ).optional().default([]),
+
+  // for diagram file, when user uploads a file, it will instantly be saved in the database (project_attachments table)
+  currentDiagramFile: z.object({ id: z.string(), file: z.any(), description: z.string().min(1, "กรุณาระบุคำอธิบายรูปภาพ (บังคับ)") }).optional().nullable(),
+  currentDiagramUrl: z.string().url().optional().nullable(),
 });
 
 // ---------------------------------------------------------------------------
 // Step 3: สถาปัตยกรรมองค์กร (Enterprise Architecture)
 // ---------------------------------------------------------------------------
-const imageWithDescriptionSchema = z.object({
+export const imageWithDescriptionSchema = z.object({
   id: z.string(),
   file: z.any(),
   description: z.string().min(1, "กรุณาระบุคำอธิบายรูปภาพ (บังคับ)"),

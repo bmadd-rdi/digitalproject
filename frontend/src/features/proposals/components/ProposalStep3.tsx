@@ -316,7 +316,7 @@ const LegacySingleFileUploadWithDescBox = ({
                 className={cn(
                   "bg-surface text-sm h-9",
                   fieldError?.description &&
-                    "border-status-orange focus-visible:ring-status-orange",
+                  "border-status-orange focus-visible:ring-status-orange",
                 )}
               />
               {fieldError?.description && (
@@ -404,14 +404,14 @@ export const ProposalStep3 = ({
   return (
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">
-        3. สถาปัตยกรรมองค์กร (EA)
+        ค. สถาปัตยกรรมองค์กร (EA)
       </h2>
 
       <EAStrategySection />
 
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-2">
-          <Label>ระเบียบ/กฎหมาย/ข้อบังคับที่เป็นอุปสรรภูมิ</Label>
+          <Label>ระเบียบ/กฎหมาย/ข้อบังคับที่เป็นอุปสรรภูมิ <span className="text-status-orange">(7.1.2)</span></Label>
           <RichTextarea
             {...register("obstacleLaws")}
             placeholder="ระบุรายละเอียด หรือพิมพ์ 'ไม่มี' (กด Tab เพื่อย่อหน้า)"
@@ -421,8 +421,7 @@ export const ProposalStep3 = ({
         </div>
         <div className="space-y-2">
           <Label>
-            สถาปัตยกรรมด้านระบบสารสนเทศ (Application Architecture){" "}
-            <span className="text-status-orange">*</span>
+            สถาปัตยกรรมด้านระบบสารสนเทศ (Application Architecture)<span className="text-status-orange">(7.2)</span>
           </Label>
           <RichTextarea
             {...register("appArchitecture")}
@@ -431,7 +430,7 @@ export const ProposalStep3 = ({
             className={cn(
               "resize-none",
               errors.appArchitecture &&
-                "border-status-orange focus-visible:ring-status-orange",
+              "border-status-orange focus-visible:ring-status-orange",
             )}
           />
           {errors.appArchitecture && (
@@ -443,6 +442,9 @@ export const ProposalStep3 = ({
         </div>
         <div className="space-y-2">
           <Label>
+            สถาปัตยกรรมการจัดการองค์กรด้านข้อมูล (Data Architecture)<span className="text-status-orange">(7.3)</span>
+          </Label>
+          <Label>
             หน่วยงานเจ้าของข้อมูล <span className="text-status-orange">*</span>
           </Label>
           <Input
@@ -450,7 +452,7 @@ export const ProposalStep3 = ({
             placeholder="ระบุชื่อหน่วยงาน"
             className={cn(
               errors.dataOwner &&
-                "border-status-orange focus-visible:ring-status-orange",
+              "border-status-orange focus-visible:ring-status-orange",
             )}
           />
           {errors.dataOwner && (
@@ -471,7 +473,7 @@ export const ProposalStep3 = ({
             className={cn(
               "resize-none",
               errors.dataExchangePlan &&
-                "border-status-orange focus-visible:ring-status-orange",
+              "border-status-orange focus-visible:ring-status-orange",
             )}
           />
           {errors.dataExchangePlan && (
@@ -487,7 +489,7 @@ export const ProposalStep3 = ({
       <div className="border-t border-border pt-6 mt-2">
         <div className="mb-4">
           <h3 className="text-base font-bold text-foreground">
-            แนบไฟล์แผนภาพรูปภาพ (Diagrams)
+            แผนผังหรือแผนภาพ (Diagrams)
           </h3>
           <p className="text-sm text-slate-gray">
             รองรับ 1 ไฟล์รูปภาพต่อหัวข้อ พร้อมบังคับระบุคำอธิบาย

@@ -34,6 +34,8 @@ const UI_ONLY_FIELDS = [
   "networkDiagramUrl",
   "useCaseDiagramUrl",
   "securityDiagramUrl",
+  "currentDiagramFile",
+  "currentDiagramUrl",
 ] as const;
 
 // The submitted-proposal API response contains persistence metadata and
@@ -78,6 +80,8 @@ const FORM_FIELD_KEYS = [
   "networkDiagramUrl",
   "useCaseDiagramUrl",
   "securityDiagramUrl",
+  "currentDiagramFile",
+  "currentDiagramUrl",
   "hardwareCosts",
   "softwareCosts",
   "personnelCoreCosts",
@@ -364,6 +368,8 @@ export const proposalSubmitPayloadSchema = proposalFormSchema.omit({
   networkDiagramUrl: true,
   useCaseDiagramUrl: true,
   securityDiagramUrl: true,
+  currentDiagramFile: true,
+  currentDiagramUrl: true,
 });
 
 export function toProposalSubmitPayload(source: Record<string, unknown>) {

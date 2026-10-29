@@ -6,6 +6,7 @@ export const PROJECT_ATTACHMENT_TYPE_NAMES = {
   networkDiagram: "network_diagram",
   useCaseDiagram: "use_case_diagram",
   securityDiagram: "security_diagram",
+  currentDiagram: "current_diagram",
   presentation: "presentation",
   report: "report",
   quotation: "quotation",

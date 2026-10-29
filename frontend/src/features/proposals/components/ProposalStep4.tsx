@@ -32,10 +32,14 @@ export const ProposalStep4 = () => {
   const watchedCourses = useWatch({ control, name: "trainingCourses" }) || [];
   const watchedOther = useWatch({ control, name: "otherCosts" }) || [];
 
+  // วงเงินงบประมาณทั้งโครงการ (จาก Step 1: budgetsByYear)
+  const watchedBudgets = (useWatch({ control: control as any, name: "budgetsByYear" }) || []) as Array<{ amount?: number }>;
+  const totalBudgetAll = watchedBudgets.reduce((sum, item) => sum + (Number(item?.amount) || 0), 0);
+
   // 2. คำนวณผลรวมแต่ละหมวด
   const totalHwCost = watchedHw.reduce((acc, row) => acc + ((row.quantity || 0) * (row.unitPrice || 0)), 0);
   const totalSwCost = watchedSw.reduce((acc, row) => acc + ((row.quantity || 0) * (row.unitPrice || 0)), 0);
-  
+
   // รวมบุคลากรทั้ง 3 ประเภท
   const totalCore = watchedCore.reduce((acc, row) => acc + (((row.baseSalary || 0) * (row.multiplier || 1)) * (row.personCount || 0) * (row.durationMonths || 0)), 0);
   const totalAsst = watchedAsst.reduce((acc, row) => acc + (((row.baseSalary || 0) * (row.multiplier || 1)) * (row.personCount || 0) * (row.durationMonths || 0)), 0);
@@ -52,16 +56,16 @@ export const ProposalStep4 = () => {
   const totalOtherIT = watchedOther
     .filter(row => row.costType === "IT")
     .reduce((acc, row) => acc + ((row.quantity || 0) * (row.unitPrice || 0)), 0);
-    
+
   const totalOtherNonIT = watchedOther
     .filter(row => row.costType === "NON_IT")
     .reduce((acc, row) => acc + ((row.quantity || 0) * (row.unitPrice || 0)), 0);
-    
+
   const totalOtherCost = totalOtherIT + totalOtherNonIT;
 
   // 3. คำนวณ Grand Total (ยอดรวมทั้งโครงการ)
   const grandTotal = totalHwCost + totalSwCost + totalPersonnelCost + totalTrainingCost + totalOtherCost;
-  
+
   // คำนวณยอดรวมเฉพาะส่วน IT (หัก Non-IT ออก)
   const grandTotalITOnly = grandTotal - totalOtherNonIT;
 
@@ -74,10 +78,10 @@ export const ProposalStep4 = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full min-w-0 pb-10">
-      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">4. รายการค่าใช้จ่ายตามโครงการ</h2>
-      
+      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">ง. รายการค่าใช้จ่ายตามโครงการ</h2>
+
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3", "item-4", "item-5"]} className="w-full space-y-4">
-        
+
         {/* --- หมวดที่ 1: ครุภัณฑ์ --- */}
         <AccordionItem value="item-1" className="border border-border rounded-lg bg-white px-4">
           <AccordionTrigger className="hover:no-underline py-4">
@@ -151,7 +155,7 @@ export const ProposalStep4 = () => {
           <Calculator className="w-5 h-5 text-slate-500" />
           <h3 className="font-bold text-slate-700 text-lg">สรุปงบประมาณโครงการ</h3>
         </div>
-        
+
         <div className="p-6">
           <table className="w-full text-sm">
             <tbody className="divide-y divide-slate-200/60">
@@ -171,7 +175,7 @@ export const ProposalStep4 = () => {
                 <td className="py-3 text-slate-600 font-medium">4. ค่าใช้จ่ายการฝึกอบรม</td>
                 <td className="py-3 text-right font-mono text-slate-800">{totalTrainingCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
-              
+
               {/* หมวดที่ 5 แยกบรรทัดให้เห็นชัดเจน */}
               <tr className="bg-slate-100/50">
                 <td className="py-3 text-slate-600 font-medium">5. ค่าใช้จ่ายอื่น ๆ</td>
@@ -190,11 +194,11 @@ export const ProposalStep4 = () => {
                 <td className="py-1.5 text-right font-mono text-orange-600 pb-3">{totalOtherNonIT.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
             </tbody>
-            
+
             {/* ยอดรวมย่อย (Sub-total เฉพาะ IT) */}
             <tfoot className="border-t-2 border-slate-200">
               <tr>
-                <td className="py-4 text-right font-bold text-slate-600 pr-4">รวมงบประมาณ (เฉพาะส่วน IT)</td>
+                <td className="py-4 text-right font-bold text-slate-600 pr-4">รวมทั้งสิน</td>
                 <td className="py-4 text-right font-mono font-bold text-lg text-primary">
                   {grandTotalITOnly.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
                 </td>
@@ -205,9 +209,19 @@ export const ProposalStep4 = () => {
       </div>
 
       {/* --- สรุปรวม Grand Total ไว้ล่างสุด (Sticky) --- */}
-      <div className="bg-primary-container text-primary p-6 rounded-xl text-right shadow-md flex justify-between items-center sticky bottom-4 z-10 border border-primary/20 backdrop-blur-sm bg-primary-container/95">
-        <span className="text-lg font-bold">รวมงบประมาณทั้งสิ้น (IT + Non-IT)</span>
-        <span className="text-3xl font-black font-mono tracking-tight">{grandTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })} <span className="text-xl">บาท</span></span>
+      <div className="bg-primary-container text-primary p-4 rounded-xl shadow-md sticky bottom-4 z-10 border border-primary/20 backdrop-blur-sm bg-primary-container/95 flex flex-col gap-2 text-right">
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-bold">รวมทั้งสิ้น:</span>
+          <span className="text-xl font-black font-mono tracking-tight">
+            {grandTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })} <span className="text-base font-normal">บาท</span>
+          </span>
+        </div>
+        <div className="flex justify-between items-center border-t border-primary/10 pt-2">
+          <span className="text-sm font-bold">งบประมาณที่ขอรับการจัดสรร:</span>
+          <span className="text-xl font-black font-mono tracking-tight">
+            {totalBudgetAll.toLocaleString('th-TH', { minimumFractionDigits: 2 })} <span className="text-base font-normal">บาท</span>
+          </span>
+        </div>
       </div>
 
     </div>

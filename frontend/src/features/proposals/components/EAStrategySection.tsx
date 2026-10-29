@@ -18,18 +18,18 @@ export const EAStrategySection = () => {
     <div className="space-y-4">
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">
-          ความสอดคล้องเชิงยุทธศาสตร์ <span className="text-status-orange">*</span>
+          ความสอดคล้องเชิงยุทธศาสตร์ <span className="text-status-orange">(7.1.1)</span>
         </h3>
         {errors.isBmaPlan && <p className="text-sm text-status-orange mb-3">{errors.isBmaPlan.message as string}</p>}
-        
+
         <div className="space-y-4">
-          
+
           {/* ข้อ 1 */}
           <div className="flex flex-row items-center space-x-3 rounded-md border border-border p-4 shadow-sm bg-surface">
-            <Checkbox 
-              id="isBmaPlan" 
-              checked={isBmaPlan} 
-              onCheckedChange={(checked) => setValue("isBmaPlan", checked as boolean, { shouldValidate: true })} 
+            <Checkbox
+              id="isBmaPlan"
+              checked={isBmaPlan}
+              onCheckedChange={(checked) => setValue("isBmaPlan", checked as boolean, { shouldValidate: true })}
             />
             <Label htmlFor="isBmaPlan" className="font-normal cursor-pointer text-sm flex-1">
               บรรจุในแผนปฏิบัติราชการ กทม.
@@ -39,9 +39,9 @@ export const EAStrategySection = () => {
           {/* ข้อ 2 */}
           <div className="flex flex-col rounded-md border border-border p-4 shadow-sm bg-surface overflow-hidden transition-all">
             <div className="flex flex-row items-center space-x-3">
-              <Checkbox 
-                id="isAgencyPlan" 
-                checked={isAgencyPlan} 
+              <Checkbox
+                id="isAgencyPlan"
+                checked={isAgencyPlan}
                 onCheckedChange={(checked) => {
                   setValue("isAgencyPlan", checked as boolean, { shouldValidate: true });
                   if (!checked) {
@@ -49,7 +49,7 @@ export const EAStrategySection = () => {
                     setValue("agencyIssue", "");
                     setValue("agencyKpi", "");
                   }
-                }} 
+                }}
               />
               <Label htmlFor="isAgencyPlan" className="font-normal cursor-pointer text-sm flex-1">
                 บรรจุในแผนปฏิบัติราชการประจำปีของหน่วยงาน
@@ -81,16 +81,16 @@ export const EAStrategySection = () => {
           {/* ข้อ 3 */}
           <div className="flex flex-col rounded-md border border-border p-4 shadow-sm bg-surface overflow-hidden transition-all">
             <div className="flex flex-row items-center space-x-3">
-              <Checkbox 
-                id="isGovernorPolicy" 
-                checked={isGovernorPolicy} 
+              <Checkbox
+                id="isGovernorPolicy"
+                checked={isGovernorPolicy}
                 onCheckedChange={(checked) => {
                   setValue("isGovernorPolicy", checked as boolean, { shouldValidate: true });
                   if (!checked) {
                     setValue("governorPolicyCode", "");
                     setValue("governorPolicyName", "");
                   }
-                }} 
+                }}
               />
               <Label htmlFor="isGovernorPolicy" className="font-normal cursor-pointer text-sm flex-1">
                 เป็นโครงการตามนโยบายผู้ว่าฯ กทม.
@@ -113,7 +113,7 @@ export const EAStrategySection = () => {
               </div>
             )}
           </div>
-          
+
         </div>
       </div>
     </div>

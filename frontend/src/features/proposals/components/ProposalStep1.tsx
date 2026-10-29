@@ -78,10 +78,10 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
 
       {/* --- ส่วนที่ 1: ข้อมูลโครงการ (Project Info) --- */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2 mb-8">1. ข้อมูลทั่วไป</h2>
+        <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2 mb-8">ก. ข้อมูลทั่วไป</h2>
         <div className="w-full">
           <Label htmlFor="projectName" className="text-sm font-medium text-foreground">
-            ชื่อโครงการ <span className="text-status-orange">*</span>
+            1. ชื่อโครงการ <span className="text-status-orange"></span>
           </Label>
           <Input
             id="projectName"
@@ -98,11 +98,11 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
 
       {/* --- ส่วนที่ 2: ส่วนราชการ (Agency Group) --- */}
       <div>
-        <h3 className="text-lg font-bold text-foreground mb-4">ส่วนราชการที่รับผิดชอบ</h3>
+        <h3 className="text-lg font-bold text-foreground mb-4">2. ส่วนราชการที่รับผิดชอบ</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
           <div>
             <Label htmlFor="agencyName" className="text-sm font-medium text-foreground">
-              ชื่อหน่วยงาน <span className="text-status-orange">*</span>
+              2.1 ชื่อหน่วยงาน <span className="text-status-orange"></span>
             </Label>
             <Input
               id="agencyName"
@@ -116,7 +116,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="headOfAgency" className="text-sm font-medium text-foreground">
-              หัวหน้าส่วนราชการ <span className="text-status-orange">*</span>
+              2.2 หัวหน้าส่วนราชการ <span className="text-status-orange"></span>
             </Label>
             <Input
               id="headOfAgency"
@@ -132,7 +132,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="dcioName" className="text-sm font-medium text-foreground">
-              ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO) <span className="text-status-orange">*</span>
+              2.3 ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO) <span className="text-status-orange"></span>
             </Label>
             <Input
               id="dcioName"
@@ -148,9 +148,20 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="projectManager" className="text-sm font-medium text-foreground">
-              ผู้รับผิดชอบโครงการ <span className="text-status-orange">*</span>
+              2.4 ชื่อ-สกุล ตำแหน่งผู้รับผิดชอบโครงการ <span className="text-status-orange"></span>
             </Label>
             <Input
+              id="projectManager"
+              {...register("projectManager")}
+              className={cn("mt-1.5", errors.projectManager && "border-status-orange focus-visible:ring-status-orange")}
+              placeholder="ex. นายสมชาย ใจดี"
+            />
+            {errors.projectManager && (
+              <p className="mt-1 text-sm text-status-orange flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" /> {errors.projectManager.message}
+              </p>
+            )}
+            {/*<Input
               id="projectManager"
               {...register("projectManager")}
               readOnly
@@ -159,7 +170,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
               aria-readonly="true"
               className={readOnlyContextClass}
               placeholder="ex. นายสมชาย ใจดี"
-            />
+            />*/}
           </div>
         </div>
       </div>
@@ -169,7 +180,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
       {/* --- ส่วนที่ 3: งบประมาณรายปี (Budget) --- */}
       <div>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-          <h3 className="text-lg font-bold text-foreground">งบประมาณรายปี</h3>
+          <h3 className="text-lg font-bold text-foreground">3. งบประมาณรายปี</h3>
           <Button
             type="button"
             variant="default"
@@ -189,7 +200,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
             return (
               <div key={field.id} className="flex flex-wrap sm:flex-nowrap gap-3 items-start bg-surface p-4 rounded-lg border border-border shadow-sm">
                 <div className="w-full sm:w-1/4">
-                  <Label className="text-xs text-slate-gray mb-1 block">ปี พ.ศ. <span className="text-status-orange">*</span></Label>
+                  <Label className="text-xs text-slate-gray mb-1 block">ปี พ.ศ. <span className="text-status-orange"></span></Label>
                   <Input
                     type="number"
                     {...register(`budgetsByYear.${index}.year`, { valueAsNumber: true })}
@@ -200,7 +211,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
                   {rowErr.year && <span className="text-[10px] text-status-orange mt-1 block">{rowErr.year.message}</span>}
                 </div>
                 <div className="w-full sm:flex-1">
-                  <Label className="text-xs text-slate-gray mb-1 block">จำนวนเงิน (บาท) <span className="text-status-orange">*</span></Label>
+                  <Label className="text-xs text-slate-gray mb-1 block">จำนวนเงิน (บาท) <span className="text-status-orange"></span></Label>
                   <Input
                     type="number"
                     {...register(`budgetsByYear.${index}.amount`, { valueAsNumber: true })}
@@ -255,7 +266,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           ${errors.totalBudget ? 'bg-orange-50/50 border-status-orange' : 'bg-primary-container/20 border-primary/20'}
         `}>
           <div className="text-md font-bold text-foreground">
-            รวมวงเงินงบประมาณทั้งโครงการ เป็นจำนวน{" "}
+            วงเงินงบประมาณทั้งโครงการ จำนวน{" "}
             <span className="text-2xl font-black text-primary mx-1">
               {calculatedTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
             </span>{" "}
