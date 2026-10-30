@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function TimelineTabContent() {
   return (
-    <Card className="rounded-md border-[#D1CDC7] shadow-sm bg-white">
+    <Card className="rounded-md border-border shadow-sm bg-card">
       <CardContent className="p-12 flex flex-col items-center justify-center text-center">
         <div className="w-14 h-14 bg-slate-50 rounded-md flex items-center justify-center mb-4 border border-slate-200">
           <History className="w-7 h-7 text-slate-300" />

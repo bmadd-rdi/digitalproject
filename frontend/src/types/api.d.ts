@@ -5673,7 +5673,7 @@ export interface components {
                     /** Format: uuid */
                     id?: string;
                     /** @enum {string} */
-                    itemName: "PARTIAL_MEAL" | "FULL_MEAL" | "SNACK" | "OTHER";
+                    itemName: "FULL_MEAL" | "LIGHT_MEAL" | "SNACK_AND_BEVERAGES" | "OTHER";
                     mealsCount: number | null;
                     ratePerMeal: number | null;
                     traineesCount: number | null;

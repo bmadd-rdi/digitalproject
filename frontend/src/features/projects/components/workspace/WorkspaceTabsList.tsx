@@ -3,15 +3,15 @@ import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function WorkspaceTabsList() {
   return (
-    <TabsList className="bg-white border border-[#D1CDC7] h-auto w-full sm:w-auto self-start shadow-sm mb-5 p-1 rounded-full inline-flex">
+    <TabsList className="bg-card border border-border h-auto w-full sm:w-auto self-start shadow-sm mb-5 p-1 rounded-full inline-flex">
       <TabsTrigger
         value="tab-proposal"
         id="tab-proposal"
         className="
           flex items-center gap-2 px-5 h-10 rounded-full font-bold text-sm text-slate-500
           transition-all duration-300 ease-out
-          hover:text-[#00734b]
-          data-[state=active]:bg-[#00734b] data-[state=active]:text-white 
+          hover:text-primary
+          data-[state=active]:bg-primary data-[state=active]:text-white 
           data-[state=active]:shadow-md data-[state=active]:scale-[1.05]
           group
         "
@@ -28,8 +28,8 @@ export function WorkspaceTabsList() {
         className="
           flex items-center gap-2 px-5 h-10 rounded-full font-bold text-sm text-slate-500
           transition-all duration-300 ease-out
-          hover:text-[#00734b]
-          data-[state=active]:bg-[#00734b] data-[state=active]:text-white 
+          hover:text-primary
+          data-[state=active]:bg-primary data-[state=active]:text-white 
           data-[state=active]:shadow-md data-[state=active]:scale-[1.05]
           group
         "
@@ -44,8 +44,8 @@ export function WorkspaceTabsList() {
         className="
           flex items-center gap-2 px-5 h-10 rounded-full font-bold text-sm text-slate-500
           transition-all duration-300 ease-out
-          hover:text-[#00734b]
-          data-[state=active]:bg-[#00734b] data-[state=active]:text-white 
+          hover:text-primary
+          data-[state=active]:bg-primary data-[state=active]:text-white 
           data-[state=active]:shadow-md data-[state=active]:scale-[1.05]
           group
         "

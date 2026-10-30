@@ -76,7 +76,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
     <Card className="rounded-2xl border-orange-200 bg-orange-50/50 shadow-sm">
       <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white text-orange-600 shadow-sm">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-card text-orange-600 shadow-sm">
             <Clock className="h-6 w-6" />
           </div>
           <div>

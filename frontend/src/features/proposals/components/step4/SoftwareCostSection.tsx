@@ -116,7 +116,7 @@ export function SoftwareCostSection() {
                       name={`softwareCosts.${index}.referenceType`}
                       render={({ field }) => (
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger className="h-9 text-sm bg-white">
+                          <SelectTrigger className="h-9 text-sm bg-card">
                             <SelectValue placeholder="เลือกที่มา..." />
                           </SelectTrigger>
                           <SelectContent>

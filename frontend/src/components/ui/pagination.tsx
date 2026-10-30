@@ -52,7 +52,7 @@ function PaginationLink({
       className={cn(
         "rounded-full transition-all duration-200 cursor-pointer",
         isActive 
-          ? "bg-[#00734b] text-white! hover:bg-primary-dark hover:text-white! shadow-sm font-bold" 
+          ? "bg-primary text-white! hover:bg-primary-dark hover:text-white! shadow-sm font-bold" 
           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium",
         className
       )}

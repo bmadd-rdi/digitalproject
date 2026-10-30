@@ -36,8 +36,8 @@ interface TrainingCourseItemProps {
 }
 
 const foodTypeLabels: Record<string, string> = {
-  LIGHT_MEAL: "ค่าอาหาร (ไม่ครบทุกมื้อ)",
   FULL_MEAL: "ค่าอาหาร (ครบทุกมื้อ)",
+  LIGHT_MEAL: "ค่าอาหาร (ไม่ครบทุกมื้อ)",
   SNACK_AND_BEVERAGES: "ค่าอาหารและเครื่องดื่ม",
   OTHER: "ค่าอาหารอื่น",
 };

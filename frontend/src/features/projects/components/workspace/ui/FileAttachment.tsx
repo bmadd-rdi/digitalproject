@@ -92,7 +92,7 @@ export function FileAttachment({
     <>
       <div
         className={cn(
-          "flex min-w-0 items-center gap-3 rounded-sm border border-slate-200 bg-white px-3 py-2.5 shadow-sm",
+          "flex min-w-0 items-center gap-3 rounded-sm border border-slate-200 bg-card px-3 py-2.5 shadow-sm",
           className,
         )}
       >

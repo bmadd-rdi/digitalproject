@@ -110,7 +110,7 @@ export const UserTable = memo(function UserTable({
   };
 
   return (
-    <div className={cn("h-full min-h-full border border-border rounded-md bg-white overflow-hidden shadow-sm", className)}>
+    <div className={cn("h-full min-h-full border border-border rounded-md bg-card overflow-hidden shadow-sm", className)}>
       <Table>
         <TableHeader className="bg-slate-50/70">
           <TableRow>

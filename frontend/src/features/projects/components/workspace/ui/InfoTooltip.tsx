@@ -18,14 +18,14 @@ export function InfoTooltip({ content }: InfoTooltipProps) {
         <TooltipTrigger asChild>
           <button
             type="button"
-            className="text-slate-400 hover:text-[#00734b] transition-colors focus:outline-none"
+            className="text-slate-400 hover:text-primary transition-colors focus:outline-none"
           >
             <Info className="w-4 h-4" />
           </button>
         </TooltipTrigger>
         <TooltipContent
           side="top"
-          className="bg-[#00734b] text-white p-3 rounded-md shadow-lg z-50 border-none [&_svg]:fill-[#00734b] [&_svg]:bg-[#00734b]"
+          className="bg-primary text-white p-3 rounded-md shadow-lg z-50 border-none [&_svg]:fill-primary [&_svg]:bg-primary"
         >
           {content}
         </TooltipContent>

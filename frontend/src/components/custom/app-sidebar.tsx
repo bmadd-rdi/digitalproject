@@ -136,8 +136,8 @@ export function AppSidebar({ roles = [] }: { roles?: readonly string[] }) {
                         isActive={isActive}
                         tooltip={route.label}
                         className={`rounded-full transition-colors group-data-[collapsible=icon]:justify-center! ${isActive
-                            ? "bg-[#00734b]/10 font-bold text-[#00734b]"
-                            : "font-medium text-slate-600 hover:bg-[#00734b]/5"
+                            ? "bg-primary/10 font-bold text-primary"
+                            : "font-medium text-slate-600 hover:bg-primary/5"
                           }`}
                       >
                         <Link
@@ -145,7 +145,7 @@ export function AppSidebar({ roles = [] }: { roles?: readonly string[] }) {
                           className="flex w-full items-center gap-2 group-data-[collapsible=icon]:justify-center"
                         >
                           <Icon
-                            className={`h-5 w-5 shrink-0 ${isActive ? "text-[#00734b]" : "text-slate-500"
+                            className={`h-5 w-5 shrink-0 ${isActive ? "text-primary" : "text-slate-500"
                               }`}
                           />
                           <span>{route.label}</span>

@@ -73,7 +73,7 @@ const PersonnelTable = ({
       </div>
 
       {/* 2.2 โครงสร้างตาราง (Table Grid) */}
-      <div className="border rounded-md bg-white shadow-sm overflow-hidden">
+      <div className="border rounded-md bg-card shadow-sm overflow-hidden">
         {/* ให้ความกว้างขั้นต่ำ (min-w) เพื่อดันให้เกิด Scrollbar แนวนอน ป้องกัน Input เบียดกันในจอเล็ก */}
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-[12px] min-w-225">
@@ -136,36 +136,36 @@ const PersonnelTable = ({
                     <td className="p-1.5">
                       <Input 
                         {...register(`${nameArray}.${index}.position`)} 
-                        className={cn("h-8 text-[12px] bg-white", rowErr.position && "border-orange-500 bg-orange-50")} 
+                        className={cn("h-8 text-[12px] bg-card", rowErr.position && "border-orange-500 bg-orange-50")} 
                         placeholder="ระบุตำแหน่ง..."
                       />
                     </td>
                     <td className="p-1.5">
-                      <Input {...register(`${nameArray}.${index}.degree`)} className="h-8 text-[12px] bg-white" placeholder="ป.ตรี / ป.โท" />
+                      <Input {...register(`${nameArray}.${index}.degree`)} className="h-8 text-[12px] bg-card" placeholder="ป.ตรี / ป.โท" />
                     </td>
                     {!isSupport && (
                       <td className="p-1.5 bg-blue-50/10">
-                        <Input {...register(`${nameArray}.${index}.fieldOfStudy` as never)} className="h-8 text-[12px] bg-white border-blue-200 focus-visible:ring-blue-500" placeholder="ระบุสาขา" />
+                        <Input {...register(`${nameArray}.${index}.fieldOfStudy` as never)} className="h-8 text-[12px] bg-card border-blue-200 focus-visible:ring-blue-500" placeholder="ระบุสาขา" />
                       </td>
                     )}
                     
                     {/* กลุ่ม: การคำนวณ (เน้นสีเขียว/ฟ้า) */}
                     <td className="p-1.5 border-l border-slate-100">
-                      <Input type="number" {...register(`${nameArray}.${index}.experienceYears`)} className="h-8 text-[12px] text-center bg-white" />
+                      <Input type="number" {...register(`${nameArray}.${index}.experienceYears`)} className="h-8 text-[12px] text-center bg-card" />
                     </td>
                     <td className="p-1.5 bg-emerald-50/20">
-                      <Input type="number" {...register(`${nameArray}.${index}.baseSalary`)} className="h-8 text-[12px] text-right font-mono bg-white border-emerald-200 focus-visible:ring-emerald-500" />
+                      <Input type="number" {...register(`${nameArray}.${index}.baseSalary`)} className="h-8 text-[12px] text-right font-mono bg-card border-emerald-200 focus-visible:ring-emerald-500" />
                     </td>
                     {!isSupport && (
                       <td className="p-1.5 bg-blue-50/10">
-                        <Input type="number" step="0.1" {...register(`${nameArray}.${index}.multiplier` as never)} className="h-8 text-[12px] text-center bg-white border-blue-200 focus-visible:ring-blue-500" />
+                        <Input type="number" step="0.1" {...register(`${nameArray}.${index}.multiplier` as never)} className="h-8 text-[12px] text-center bg-card border-blue-200 focus-visible:ring-blue-500" />
                       </td>
                     )}
                     <td className="p-1.5">
-                      <Input type="number" {...register(`${nameArray}.${index}.personCount`)} className="h-8 text-[12px] text-center bg-white" />
+                      <Input type="number" {...register(`${nameArray}.${index}.personCount`)} className="h-8 text-[12px] text-center bg-card" />
                     </td>
                     <td className="p-1.5">
-                      <Input type="number" {...register(`${nameArray}.${index}.durationMonths`)} className="h-8 text-[12px] text-center bg-white" />
+                      <Input type="number" {...register(`${nameArray}.${index}.durationMonths`)} className="h-8 text-[12px] text-center bg-card" />
                     </td>
                     
                     {/* ยอดรวมสุทธิรายแถว */}
@@ -264,7 +264,7 @@ export const PersonnelCostSection = () => {
             <p className="text-xs font-medium">กรุณาระบุหน้าที่ความรับผิดชอบตามตำแหน่งที่ระบุไว้ด้านบน</p>
           </div>
           
-          <div className="border rounded-md bg-white shadow-sm overflow-hidden">
+          <div className="border rounded-md bg-card shadow-sm overflow-hidden">
             <table className="w-full text-[13px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-600">
@@ -290,7 +290,7 @@ export const PersonnelCostSection = () => {
                           {...register(`personnelResponsibilities.${index}.responsibility`)}
                           placeholder="ระบุหน้าที่... เช่น พัฒนาส่วนงาน Frontend, ออกแบบฐานข้อมูล ฯลฯ"
                           className={cn(
-                            "min-h-20 text-sm bg-slate-50/30 focus:bg-white transition-colors",
+                            "min-h-20 text-sm bg-slate-50/30 focus:bg-card transition-colors",
                             error && "border-orange-500 focus-visible:ring-orange-500"
                           )}
                         />

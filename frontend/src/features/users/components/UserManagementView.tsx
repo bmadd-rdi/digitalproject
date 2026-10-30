@@ -58,7 +58,7 @@ export const UserManagementView = ({ currentUserId }: { currentUserId?: string |
         activeOnly={activeOnly} setActiveOnly={setActiveOnly}
       />
       
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-white shadow-sm">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border bg-card shadow-sm">
         <div className="min-h-0 flex-1 overflow-auto">
           <UserTable
             className="min-h-full rounded-none border-0 shadow-none"

@@ -52,7 +52,7 @@ export const PasswordModal = ({
                     กรุณาคัดลอกรหัสนี้ส่งให้ผู้ใช้ ระบบจะบังคับให้เปลี่ยนรหัสทันทีเมื่อล็อกอิน
                   </p>
                 </div>
-                <div className="bg-white px-4 py-2 border border-emerald-200 rounded-lg text-lg font-mono font-black text-slate-800 tracking-wider">
+                <div className="bg-card px-4 py-2 border border-emerald-200 rounded-lg text-lg font-mono font-black text-slate-800 tracking-wider">
                   {tempPassword}
                 </div>
               </div>

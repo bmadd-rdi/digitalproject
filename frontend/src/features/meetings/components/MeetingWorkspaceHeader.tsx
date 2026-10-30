@@ -102,7 +102,7 @@ export function MeetingWorkspaceHeader({ meeting, activeTab }: {
           </div>
         </CardContent>
       </Card>
-      <nav className="flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-full border bg-white p-1">
+      <nav className="flex w-fit max-w-full items-center gap-1 overflow-x-auto rounded-full border bg-card p-1">
         <Tab href={`/meetings/${meeting.meeting_id}/agendas`} active={activeTab === "agendas"} icon={<ListChecks className="size-4" />} label="วาระการประชุม" />
         <Tab href={`/meetings/${meeting.meeting_id}/resolutions`} active={activeTab === "resolutions"} icon={<FileSignature className="size-4" />} label="บันทึกมติ" />
       </nav>

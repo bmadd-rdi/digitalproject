@@ -18,7 +18,7 @@ export function ProjectPagination({ currentPage, totalPages, onPageChange }: Pro
   if (totalPages <= 1) return null;
 
   return (
-    <div className="border-t border-[#ededf4] p-4 bg-white shrink-0">
+    <div className="border-t border-border p-4 bg-card shrink-0">
       <Pagination>
         <PaginationContent>
           <PaginationItem>

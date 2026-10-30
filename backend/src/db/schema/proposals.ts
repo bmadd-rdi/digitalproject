@@ -1,12 +1,12 @@
 // src/db/schema/proposals.ts
-import { 
-  pgTable, 
-  text, 
-  varchar, 
-  integer, 
-  numeric, 
-  boolean, 
-  timestamp, 
+import {
+  pgTable,
+  text,
+  varchar,
+  integer,
+  numeric,
+  boolean,
+  timestamp,
   uuid,
   pgEnum,
   index,
@@ -22,8 +22,8 @@ export const projectTypeEnum = pgEnum("project_type", ["NEW", "REPLACEMENT", "CO
 
 // Workflow Status
 export const proposalStatusEnum = pgEnum("proposal_status", [
-  "draft", "submitted", "passed_1", "rejected_1", "fix_1", 
-  "admin_assigned", "passed_2", "rejected_2", "fix_2", 
+  "draft", "submitted", "passed_1", "rejected_1", "fix_1",
+  "admin_assigned", "passed_2", "rejected_2", "fix_2",
   "meeting_scheduled", "meeting_passed", "fix_3", "fix_4", "meeting_rejected"
 ]);
 
@@ -31,7 +31,7 @@ export const referenceTypeEnum = pgEnum("reference_type", ["MDES", "MARKET", "PR
 export const personnelTypeEnum = pgEnum("personnel_type", ["CORE", "ASST", "SUPP"]);
 export const locationTypeEnum = pgEnum("location_type", ["GOVERNMENT", "PRIVATE"]);
 export const costTypeEnum = pgEnum("cost_type", ["IT", "NON_IT"]);
-export const foodTypeEnum = pgEnum("food_type", ["PARTIAL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]);
+export const foodTypeEnum = pgEnum("food_type", ["FULL_MEAL", "LIGHT_MEAL", "SNACK_AND_BEVERAGES", "OTHER"]);
 
 // ---------------------------------------------------------------------------
 // MAIN TABLE: Proposal
@@ -39,11 +39,11 @@ export const foodTypeEnum = pgEnum("food_type", ["PARTIAL_MEAL", "FULL_MEAL", "S
 export const proposals = pgTable("proposals", {
   id: uuid("id").primaryKey(),
   status: proposalStatusEnum("status").default("draft").notNull(),
-  
+
   projectId: uuid("project_id").references(() => projects.id),
   userId: uuid("user_id").references(() => users.userId).notNull(),
   updatedBy: uuid("updated_by").references(() => users.userId),
-  version: integer("version").default(1), 
+  version: integer("version").default(1),
 
   // --- Step 1: ข้อมูลเบื้องต้น ---
   projectName: text("project_name"),
@@ -172,13 +172,13 @@ export const proposalSoftwareCosts = pgTable("proposal_software_costs", {
 export const proposalPersonnelCosts = pgTable("proposal_personnel_costs", {
   id: uuid("id").primaryKey(),
   proposalId: uuid("proposal_id").references(() => proposals.id, { onDelete: "cascade" }).notNull(),
-  personnelType: personnelTypeEnum("personnel_type").notNull(), 
+  personnelType: personnelTypeEnum("personnel_type").notNull(),
   position: varchar("position", { length: 255 }),
   degree: varchar("degree", { length: 255 }),
-  fieldOfStudy: varchar("field_of_study", { length: 255 }), 
+  fieldOfStudy: varchar("field_of_study", { length: 255 }),
   experienceYears: numeric("experience_years", { precision: 4, scale: 1 }),
   baseSalary: numeric("base_salary", { precision: 15, scale: 2 }),
-  multiplier: numeric("multiplier", { precision: 5, scale: 2 }), 
+  multiplier: numeric("multiplier", { precision: 5, scale: 2 }),
   personCount: integer("person_count"),
   durationMonths: integer("duration_months"),
 });
@@ -197,7 +197,7 @@ export const proposalOtherCosts = pgTable("proposal_other_costs", {
   quantity: integer("quantity"),
   unitPrice: numeric("unit_price", { precision: 15, scale: 2 }),
   remark: text("remark"),
-  costType: costTypeEnum("cost_type"), 
+  costType: costTypeEnum("cost_type"),
 });
 
 export const proposalIctPersonnel = pgTable("proposal_ict_personnel", {

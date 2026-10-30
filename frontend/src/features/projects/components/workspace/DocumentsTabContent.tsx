@@ -218,7 +218,7 @@ export function DocumentsTabContent({
                 </p>
               </div>
             </div>
-            <Badge variant="outline" className="w-fit border-amber-300 bg-white/70">
+            <Badge variant="outline" className="w-fit border-amber-300 bg-card/70">
               {documents.approvalDocuments.length > 0
                 ? `${documents.approvalDocuments.length} เวอร์ชัน`
                 : "ยังไม่มีเอกสาร"}
@@ -238,11 +238,11 @@ export function DocumentsTabContent({
             allowNewVersion
             uploadButtonLabel="อัปโหลดเวอร์ชันใหม่"
             showDescription
-            className="border-amber-200 bg-white/80"
+            className="border-amber-200 bg-card/80"
           />
 
           {documents.approvalDocumentHistory.length > 0 && (
-            <Accordion type="single" collapsible className="rounded-lg border border-amber-200 bg-white/70 px-3">
+            <Accordion type="single" collapsible className="rounded-lg border border-amber-200 bg-card/70 px-3">
               <AccordionItem value="approval-history" className="border-0">
                 <AccordionTrigger className="py-3 font-bold text-slate-800 hover:no-underline">
                   <span className="flex items-center gap-2">
@@ -284,7 +284,7 @@ export function DocumentsTabContent({
             อัปโหลดแล้ว {requiredDocuments.filter((document) => document.file).length} / {requiredDocuments.length}
           </Badge>
         </div>
-        <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
+        <Card className="rounded-md border-border bg-card shadow-sm">
           <CardContent className="grid gap-4 p-4 md:grid-cols-2">
             {requiredDocuments.map((field) => (
               <FileUploadField
@@ -308,7 +308,7 @@ export function DocumentsTabContent({
           <h2 className="text-lg font-extrabold text-slate-900">แผนภาพระบบ</h2>
           <p className="text-sm text-slate-500">รูปภาพจะถูกปรับขนาดและบีบอัดก่อนอัปโหลด</p>
         </div>
-        <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
+        <Card className="rounded-md border-border bg-card shadow-sm">
           <CardContent className="grid gap-4 p-4 md:grid-cols-2">
             {diagrams.map((field) => (
               <FileUploadField
@@ -346,7 +346,7 @@ export function DocumentsTabContent({
           canManage={canManage}
           showDescription
         />
-        <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
+        <Card className="rounded-md border-border bg-card shadow-sm">
           <CardContent className="space-y-3 p-4">
             {documents.additionalDocs.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center text-slate-400">

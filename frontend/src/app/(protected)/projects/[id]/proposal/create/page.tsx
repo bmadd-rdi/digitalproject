@@ -18,10 +18,10 @@ export default async function CreateProposalPage({
   return (
     <div className="min-h-full bg-[#f9f9ff] py-4 md:py-6">
       <div className="mx-auto w-full max-w-7xl px-4">
-        
+
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#191c20] tracking-tight">
-            จัดทำเอกสารรายละเอียดประกอบการพิจารณาโครงการเสนอคณะกรรมการดิจิทัลกรุงเทพมหานคร
+            เอกสารรายละเอียดประกอบการพิจารณาโครงการเสนอคณะกรรมการดิจิทัลกรุงเทพมหานคร
           </h1>
           <p className="text-[#3f4942] mt-1">
             รหัสอ้างอิงโครงการ: <span className="font-mono bg-white px-2 py-0.5 rounded border border-[#D1CDC7] text-xs">{projectId}</span>

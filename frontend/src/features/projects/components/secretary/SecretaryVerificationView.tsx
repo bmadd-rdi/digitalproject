@@ -47,8 +47,8 @@ export function SecretaryVerificationView() {
             <ClipboardCheck className="h-4 w-4" />
             งานตรวจสอบโครงการ
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#191c20]">รับหนังสือขอส่งโครงการ</h1>
-          <p className="mt-1 text-sm text-[#3f4942]">ตรวจสอบโครงการที่ส่งมาจากทุกส่วนราชการ</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">รับหนังสือขอส่งโครงการ</h1>
+          <p className="mt-1 text-sm text-muted-foreground">ตรวจสอบโครงการที่ส่งมาจากทุกส่วนราชการ</p>
         </div>
         <Button
           variant="outline"
@@ -61,10 +61,10 @@ export function SecretaryVerificationView() {
         </Button>
       </div>
 
-      <Card className="flex flex-1 flex-col overflow-hidden rounded-md border-[#D1CDC7] shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-[#ededf4] p-6 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+      <Card className="flex flex-1 flex-col overflow-hidden rounded-md border-border shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-border p-6 sm:flex-row sm:items-center sm:justify-between sm:px-10">
           <div>
-            <h2 className="text-lg font-extrabold text-[#191c20]">โครงการรอตรวจสอบโดยเลขานุการ</h2>
+            <h2 className="text-lg font-extrabold text-foreground">โครงการรอตรวจสอบโดยเลขานุการ</h2>
             <p className="mt-1 text-sm text-muted-foreground">{countLabel}</p>
           </div>
           <div className="relative w-full sm:max-w-md">

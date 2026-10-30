@@ -48,7 +48,7 @@ export function CookieConsentBanner() {
                 onClick={() => setSettingsOpen(true)}
                 aria-label="ตั้งค่าคุกกี้"
                 title="ตั้งค่าคุกกี้"
-                className="fixed bottom-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-primary shadow-md transition-colors hover:bg-muted"
+                className="fixed bottom-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-primary shadow-md transition-colors hover:bg-muted"
             >
                 <Cookie className="h-4 w-4" />
             </button>
@@ -62,7 +62,7 @@ export function CookieConsentBanner() {
             aria-label="การใช้คุกกี้"
             className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6"
         >
-            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-2xl border border-border bg-white p-5 shadow-xl sm:flex-row sm:items-center sm:justify-between">
+            <div className="mx-auto flex max-w-3xl flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-xl sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
                         <Cookie className="h-5 w-5 text-primary" />

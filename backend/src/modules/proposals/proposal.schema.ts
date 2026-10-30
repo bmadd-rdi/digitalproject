@@ -9,8 +9,8 @@ export const draftProposalSchema = z.object({
   projectId: z.string().uuid().optional(),
   currentStep: z.coerce.number().optional(),
   draftPayload: z.any().optional().openapi({
-      type: 'object',
-      description: 'ข้อมูลฟอร์มแบบร่างทั้งหมด (JSON)'
+    type: 'object',
+    description: 'ข้อมูลฟอร์มแบบร่างทั้งหมด (JSON)'
   }),
 
   // service (upsertDraft)
@@ -19,7 +19,7 @@ export const draftProposalSchema = z.object({
   requestedBudgetTotal: z.coerce.number().optional(),
   estimatedCostTotal: z.coerce.number().optional(),
 }).partial().strict().openapi('DraftProposalRequest', {
-// }).partial().passthrough().openapi('DraftProposalRequest', {
+  // }).partial().passthrough().openapi('DraftProposalRequest', {
   description: 'Schema สำหรับข้อมูลแบบร่างโครงการ (Auto-Save)'
 });
 
@@ -125,7 +125,7 @@ const speakerCostSchema = z.object({
 
 const foodCostSchema = z.object({
   id: z.string().uuid().optional(),
-  itemName: z.enum(["PARTIAL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]),
+  itemName: z.enum(["FULL_MEAL", "LIGHT_MEAL", "SNACK_AND_BEVERAGES", "OTHER"]),
   mealsCount: z.coerce.number().min(0),
   ratePerMeal: z.coerce.number().min(0),
   traineesCount: z.coerce.number().min(0),

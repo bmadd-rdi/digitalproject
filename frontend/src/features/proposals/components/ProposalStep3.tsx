@@ -445,7 +445,7 @@ export const ProposalStep3 = ({
             สถาปัตยกรรมการจัดการองค์กรด้านข้อมูล (Data Architecture)<span className="text-status-orange">(7.3)</span>
           </Label>
           <Label>
-            หน่วยงานเจ้าของข้อมูล <span className="text-status-orange">*</span>
+            หน่วยงานเจ้าของข้อมูล <span className="text-status-orange"></span>
           </Label>
           <Input
             {...register("dataOwner")}
@@ -464,7 +464,7 @@ export const ProposalStep3 = ({
         <div className="space-y-2">
           <Label>
             แนวทางการแลกเปลี่ยน/เชื่อมโยงข้อมูล{" "}
-            <span className="text-status-orange">*</span>
+            <span className="text-status-orange"></span>
           </Label>
           <RichTextarea
             {...register("dataExchangePlan")}

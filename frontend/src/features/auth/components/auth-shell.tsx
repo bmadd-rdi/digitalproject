@@ -19,7 +19,7 @@ export function AuthShell({
       <div className="absolute inset-x-0 top-24 -z-20 h-72 bg-surface-container-low/70" />
       <div className="absolute inset-x-0 top-0 -z-30 h-full bg-[linear-gradient(90deg,rgba(0,115,75,0.05)_1px,transparent_1px),linear-gradient(180deg,rgba(0,115,75,0.04)_1px,transparent_1px)] bg-size-[56px_56px]" />
       <div className="absolute -right-24 top-10 -z-20 size-80 rounded-full bg-primary/10 blur-3xl" />
-      <div className="absolute -left-24 bottom-10 -z-20 size-72 rounded-full bg-white/70 blur-3xl" />
+      <div className="absolute -left-24 bottom-10 -z-20 size-72 rounded-full bg-card/70 blur-3xl" />
 
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-7xl items-center justify-center py-4 sm:min-h-[calc(100vh-6rem)]">
         <section

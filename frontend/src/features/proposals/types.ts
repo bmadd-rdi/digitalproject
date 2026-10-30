@@ -155,7 +155,7 @@ export const hardwareCostSchema = z.object({
   quantity: z.coerce.number().min(1, "กรุณาระบุจำนวน"),
   unitPrice: z.coerce.number().min(0, "ห้ามติดลบ"),
 
-// ตัวแปรหลักสำหรับเก็บว่า User เลือกตัวเลือกไหน
+  // ตัวแปรหลักสำหรับเก็บว่า User เลือกตัวเลือกไหน
   referenceType: z.enum(["MDES", "MARKET", "PREVIOUS", "OTHER"], {
     message: "กรุณาเลือกที่มาของราคากลาง 1 รายการ",
   }),
@@ -273,7 +273,7 @@ const speakerCostSchema = z.object({
 });
 
 const foodCostSchema = z.object({
-  itemName: z.enum(["PARTIAL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]),
+  itemName: z.enum(["FULL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]),
   mealsCount: z.coerce.number().min(0),
   ratePerMeal: z.coerce.number().min(0),
   traineesCount: z.coerce.number().min(0),
@@ -292,9 +292,9 @@ const trainingCourseSchema = z.object({
 
   // ตารางค่าอาหาร (Fixed 3 รายการเสมอ แต่สร้าง schema ไว้รองรับการเก็บค่า)
   foodCosts: z.array(foodCostSchema).default([
-    { itemName: "PARTIAL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
     { itemName: "FULL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-    { itemName: "SNACK", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+    { itemName: "LIGHT_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+    { itemName: "SNACK_AND_BEVERAGES", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
   ]),
 }).superRefine((data, ctx) => {
   // ดักว่าถ้าติ๊ก "มีวิทยากร" ต้องกรอกเหตุผล

@@ -105,16 +105,16 @@ export function ResolutionForm({
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ── Header ── */}
-      <div className="p-5 border-b border-[#ededf4] bg-[#f9f9ff] space-y-3 shrink-0">
+      <div className="p-5 border-b border-border bg-card space-y-3 shrink-0">
         <div className="flex items-center gap-2.5">
-          <span className="font-mono text-xs text-muted-foreground bg-white px-2 py-0.5 rounded-md font-bold border">
+          <span className="font-mono text-xs text-muted-foreground bg-card px-2 py-0.5 rounded-md font-bold border">
             วาระที่ {agenda.agenda_number}
           </span>
           <Badge variant="outline" className="text-[10px] font-bold">
             {AGENDA_TYPE_LABELS[agenda.agenda_type]}
           </Badge>
         </div>
-        <h3 className="font-bold text-[#191c20] text-base leading-snug">
+        <h3 className="font-bold text-foreground text-base leading-snug">
           {agenda.title}
         </h3>
         {agenda.description && (
@@ -128,7 +128,7 @@ export function ResolutionForm({
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5 text-[#00734b] border-[#00734b]/30 hover:bg-[#00734b]/5 hover:text-[#00734b] rounded-lg text-xs"
+            className="gap-1.5 text-primary border-primary/30 hover:bg-primary/5 hover:text-primary rounded-lg text-xs"
             onClick={() => setSheetOpen(true)}
           >
             <Eye className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export function ResolutionForm({
           <div className="space-y-2">
             <label
               htmlFor="resolution-status"
-              className="text-sm font-bold text-[#191c20] flex items-center gap-1.5"
+              className="text-sm font-bold text-foreground flex items-center gap-1.5"
             >
               <FileSignature className="w-4 h-4 text-muted-foreground" />
               มติที่ประชุม
@@ -157,7 +157,7 @@ export function ResolutionForm({
                 )
               }
             >
-              <SelectTrigger id="resolution-status" className="bg-white">
+              <SelectTrigger id="resolution-status" className="bg-card">
                 <SelectValue placeholder="เลือกมติ..." />
               </SelectTrigger>
               <SelectContent>
@@ -197,7 +197,7 @@ export function ResolutionForm({
         <div className="space-y-2">
           <label
             htmlFor="resolution-comment"
-            className="text-sm font-bold text-[#191c20] flex items-center gap-1.5"
+            className="text-sm font-bold text-foreground flex items-center gap-1.5"
           >
             <FileText className="w-4 h-4 text-muted-foreground" />
             {isConsideration
@@ -213,7 +213,7 @@ export function ResolutionForm({
             }
             value={resolution?.comment ?? ""}
             onChange={(e) => onUpdateComment(e.target.value)}
-            className="min-h-[150px] bg-white resize-y leading-relaxed"
+            className="min-h-[150px] bg-card resize-y leading-relaxed"
           />
           {requiresRemark && !hasRequiredRemark && (
             <p className="text-xs text-red-600">กรุณาระบุเหตุผลสำหรับมติส่งกลับหรือไม่เห็นชอบ</p>
@@ -225,7 +225,7 @@ export function ResolutionForm({
       </div>
 
       {/* ── Footer ── */}
-      <div className="p-4 border-t border-[#ededf4] bg-[#f9f9ff] shrink-0 flex items-center justify-between">
+      <div className="p-4 border-t border-border bg-card shrink-0 flex items-center justify-between">
         {hasUnsavedChanges && (
           <span className="text-xs text-amber-600 font-medium flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
@@ -236,7 +236,7 @@ export function ResolutionForm({
         <Button
           onClick={onSave}
           disabled={isSaving || !hasUnsavedChanges || (requiresRemark && !hasRequiredRemark)}
-          className="gap-1.5 bg-[#00734b] hover:bg-[#005838] text-white rounded-lg"
+          className="gap-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg"
         >
           {isSaving ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -253,7 +253,7 @@ export function ResolutionForm({
           <SheetContent side="right" className="sm:max-w-lg overflow-y-auto">
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2 text-base">
-                <FolderOpen className="w-5 h-5 text-[#00734b]" />
+                <FolderOpen className="w-5 h-5 text-primary" />
                 รายละเอียดโครงการ
               </SheetTitle>
               <SheetDescription>
@@ -274,7 +274,7 @@ export function ResolutionForm({
 
               {/* Project Name */}
               <div>
-                <h4 className="font-bold text-lg text-[#191c20] leading-snug">
+                <h4 className="font-bold text-lg text-foreground leading-snug">
                   {agenda.project.name}
                 </h4>
               </div>
@@ -305,22 +305,22 @@ export function ResolutionForm({
 
               {/* Objective */}
               <div className="space-y-2">
-                <h5 className="text-sm font-bold text-[#191c20] flex items-center gap-1.5">
+                <h5 className="text-sm font-bold text-foreground flex items-center gap-1.5">
                   <Target className="w-4 h-4 text-muted-foreground" />
                   วัตถุประสงค์
                 </h5>
-                <p className="text-sm text-[#3f4942] leading-relaxed bg-slate-50 rounded-lg p-3 border">
+                <p className="text-sm text-muted-foreground leading-relaxed bg-slate-50 rounded-lg p-3 border">
                   {agenda.project.objective}
                 </p>
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <h5 className="text-sm font-bold text-[#191c20] flex items-center gap-1.5">
+                <h5 className="text-sm font-bold text-foreground flex items-center gap-1.5">
                   <FileText className="w-4 h-4 text-muted-foreground" />
                   รายละเอียดโครงการ
                 </h5>
-                <p className="text-sm text-[#3f4942] leading-relaxed bg-slate-50 rounded-lg p-3 border">
+                <p className="text-sm text-muted-foreground leading-relaxed bg-slate-50 rounded-lg p-3 border">
                   {agenda.project.description}
                 </p>
               </div>
@@ -350,7 +350,7 @@ function DetailRow({
       <div className="space-y-0.5">
         <p className="text-xs text-muted-foreground">{label}</p>
         <p
-          className={`text-sm font-semibold ${highlight ? "text-[#00734b]" : "text-[#191c20]"}`}
+          className={`text-sm font-semibold ${highlight ? "text-primary" : "text-foreground"}`}
         >
           {value}
         </p>

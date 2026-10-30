@@ -1,5 +1,5 @@
 CREATE TYPE "public"."cost_type" AS ENUM('IT', 'NON_IT');--> statement-breakpoint
-CREATE TYPE "public"."food_type" AS ENUM('PARTIAL_MEAL', 'FULL_MEAL', 'SNACK', 'OTHER');--> statement-breakpoint
+CREATE TYPE "public"."food_type" AS ENUM('FULL_MEAL', 'LIGHT_MEAL', 'SNACK_AND_BEVERAGES', 'OTHER');--> statement-breakpoint
 CREATE TYPE "public"."location_type" AS ENUM('GOVERNMENT', 'PRIVATE');--> statement-breakpoint
 CREATE TYPE "public"."personnel_type" AS ENUM('CORE', 'ASST', 'SUPP');--> statement-breakpoint
 CREATE TYPE "public"."project_type" AS ENUM('NEW', 'REPLACEMENT', 'CONTINUOUS');--> statement-breakpoint

@@ -88,7 +88,7 @@ export function CreateAgendaDialog({ meetingId, open, onOpenChange, availablePro
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Plus className="h-5 w-5 text-[#00734b]" />เพิ่มวาระการประชุม</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Plus className="h-5 w-5 text-primary" />เพิ่มวาระการประชุม</DialogTitle>
           <DialogDescription>เลือกประเภทวาระและเชื่อมโยงโครงการตามเงื่อนไขของวาระ</DialogDescription>
         </DialogHeader>
 
@@ -133,7 +133,7 @@ export function CreateAgendaDialog({ meetingId, open, onOpenChange, availablePro
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={createAgenda.isPending}><X className="mr-2 h-4 w-4" />ยกเลิก</Button>
-          <Button type="button" onClick={() => void submit()} disabled={createAgenda.isPending} className="bg-[#00734b] text-white hover:bg-[#005838]"><Save className="mr-2 h-4 w-4" />{createAgenda.isPending ? "กำลังบันทึก..." : "บันทึกวาระ"}</Button>
+          <Button type="button" onClick={() => void submit()} disabled={createAgenda.isPending} className="bg-primary text-white hover:bg-primary-dark"><Save className="mr-2 h-4 w-4" />{createAgenda.isPending ? "กำลังบันทึก..." : "บันทึกวาระ"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

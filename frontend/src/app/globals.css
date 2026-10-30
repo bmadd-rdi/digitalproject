@@ -54,6 +54,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   /* Inverse colors derived from Civic Horizon */
   --background: #2e3036; /* inverse-surface */
   --foreground: #f0f0f7; /* inverse-on-surface */

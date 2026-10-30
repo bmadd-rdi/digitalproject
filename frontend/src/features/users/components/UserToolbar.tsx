@@ -50,7 +50,7 @@ export const UserToolbar = ({
   const roles = (rolesResponse?.data ?? []) as LookupOption[];
 
   return (
-    <div className="bg-white p-4 rounded-md border border-border shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+    <div className="bg-card p-4 rounded-md border border-border shadow-sm flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
       <div className="flex flex-col sm:flex-row gap-3 flex-1">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />

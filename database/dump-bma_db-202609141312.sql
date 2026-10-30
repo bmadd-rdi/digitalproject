@@ -76,9 +76,9 @@ CREATE TYPE public.cost_type AS ENUM (
 --
 
 CREATE TYPE public.food_type AS ENUM (
-    'PARTIAL_MEAL',
     'FULL_MEAL',
-    'SNACK',
+    'LIGHT_MEAL',
+    'SNACK_AND_BEVERAGES',
     'OTHER'
 );
 

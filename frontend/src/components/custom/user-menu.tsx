@@ -1,8 +1,9 @@
 // src/components/custom/user-menu.tsx
 "use client";
 import { useTransition } from "react";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User, Settings, Sun, Moon, Monitor } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +11,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -24,17 +28,18 @@ function getInitials(firstName?: string | null, lastName?: string | null) {
 export function UserMenu({ userId }: { userId: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { theme, setTheme } = useTheme();
   const { data: profile } = useUserProfile(userId);
 
   const fullName = profile ? `${profile.firstName} ${profile.lastName}` : "...";
   const email = profile?.email ?? "";
 
   const handleLogout = () => {
-      // ใช้ startTransition เพื่อครอบการทำงานของ Server Action ใน Client Component
-      startTransition(async () => {
-        await logoutAction();
-      });
-    };
+    // ใช้ startTransition เพื่อครอบการทำงานของ Server Action ใน Client Component
+    startTransition(async () => {
+      await logoutAction();
+    });
+  };
 
   return (
     <DropdownMenu>
@@ -69,10 +74,37 @@ export function UserMenu({ userId }: { userId: string }) {
           <User className="mr-2 h-4 w-4 text-muted-foreground" />
           <span>โปรไฟล์ของฉัน</span>
         </DropdownMenuItem>
+        {/* 
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="cursor-pointer">
+            {theme === "dark" ? (
+              <Moon className="mr-2 h-4 w-4 text-muted-foreground" />
+            ) : theme === "light" ? (
+              <Sun className="mr-2 h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Monitor className="mr-2 h-4 w-4 text-muted-foreground" />
+            )}
+            <span>ธีม</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
+              <Sun className="mr-2 h-4 w-4" />
+              <span>สว่าง</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
+              <Moon className="mr-2 h-4 w-4" />
+              <span>มืด</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
+              <Monitor className="mr-2 h-4 w-4" />
+              <span>ตามค่าเครื่อง</span>
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub> */}
 
         <DropdownMenuItem onClick={() => router.push("/profile/edit")} className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span>ตั้งค่าระบบ</span>
+          <span>แก้ไขข้อมูลส่วนตัว</span>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

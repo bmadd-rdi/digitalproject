@@ -38,7 +38,7 @@ export const OtherCostSection = () => {
         </Button>
       </div>
 
-      <div className="border rounded-md bg-white shadow-sm overflow-hidden">
+      <div className="border rounded-md bg-card shadow-sm overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-[12px] min-w-200">
             <thead>
@@ -78,7 +78,7 @@ export const OtherCostSection = () => {
                     <td className="p-1.5">
                       <Input 
                         {...register(`otherCosts.${index}.itemName`)} 
-                        className={cn("h-8 text-[12px] bg-white", rowErr.itemName && "border-orange-500")} 
+                        className={cn("h-8 text-[12px] bg-card", rowErr.itemName && "border-orange-500")} 
                         placeholder="ระบุชื่อรายการ..."
                       />
                     </td>
@@ -91,7 +91,7 @@ export const OtherCostSection = () => {
                           onClick={() => setValue(`otherCosts.${index}.costType`, "IT", { shouldValidate: true })}
                           className={cn(
                             "flex-1 text-[11px] font-medium h-full rounded-sm transition-all",
-                            currentType === "IT" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                            currentType === "IT" ? "bg-card text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                           )}
                         >
                           IT
@@ -101,7 +101,7 @@ export const OtherCostSection = () => {
                           onClick={() => setValue(`otherCosts.${index}.costType`, "NON_IT", { shouldValidate: true })}
                           className={cn(
                             "flex-1 text-[11px] font-medium h-full rounded-sm transition-all",
-                            currentType === "NON_IT" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                            currentType === "NON_IT" ? "bg-card text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                           )}
                         >
                           Non-IT
@@ -112,10 +112,10 @@ export const OtherCostSection = () => {
                     </td>
 
                     <td className="p-1.5">
-                      <Input type="number" {...register(`otherCosts.${index}.quantity`)} className="h-8 text-[12px] text-center bg-white" />
+                      <Input type="number" {...register(`otherCosts.${index}.quantity`)} className="h-8 text-[12px] text-center bg-card" />
                     </td>
                     <td className="p-1.5 bg-emerald-50/20">
-                      <Input type="number" {...register(`otherCosts.${index}.unitPrice`)} className="h-8 text-[12px] text-right font-mono bg-white" />
+                      <Input type="number" {...register(`otherCosts.${index}.unitPrice`)} className="h-8 text-[12px] text-right font-mono bg-card" />
                     </td>
                     <td className="p-2 text-right font-bold text-emerald-700 bg-emerald-50/30 font-mono tracking-tight">
                       {rowTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -123,7 +123,7 @@ export const OtherCostSection = () => {
                     <td className="p-1.5">
                       <Input 
                         {...register(`otherCosts.${index}.remark`)} 
-                        className="h-8 text-[12px] bg-white" 
+                        className="h-8 text-[12px] bg-card" 
                         placeholder="หมายเหตุเพิ่มเติม..."
                       />
                     </td>

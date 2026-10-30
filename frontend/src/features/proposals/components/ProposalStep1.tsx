@@ -80,9 +80,9 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
       <div>
         <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2 mb-8">ก. ข้อมูลทั่วไป</h2>
         <div className="w-full">
-          <Label htmlFor="projectName" className="text-sm font-medium text-foreground">
+          <h3 className="text-lg font-bold text-foreground mb-4">
             1. ชื่อโครงการ <span className="text-status-orange"></span>
-          </Label>
+          </h3>
           <Input
             id="projectName"
             {...register("projectName")}
@@ -282,6 +282,10 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
         </div>
       </div>
 
+      <div className="border-t border-border" />
+      <div>
+        <h3 className="text-lg font-bold text-foreground mb-4">4. ประวัติการนำเสนอโครงการเข้ารับการพิจารณาของคณะกรรมการดิจิทัลกรุงเทพมหานคร</h3>
+      </div>
     </div>
   );
 };

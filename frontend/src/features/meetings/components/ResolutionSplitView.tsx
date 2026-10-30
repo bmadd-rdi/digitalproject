@@ -83,12 +83,12 @@ export function ResolutionSplitView({
   return (
     <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 min-h-0">
       {/* ── Left Panel: Agenda List ── */}
-      <div className="lg:w-[380px] lg:shrink-0 bg-white rounded-md lg:rounded-r-none border border-[#ededf4] shadow-[0px_4px_24px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden">
+      <div className="lg:w-[380px] lg:shrink-0 bg-card rounded-md lg:rounded-r-none border border-border shadow-[0px_4px_24px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden">
         {/* Panel Header */}
-        <div className="p-4 border-b border-[#ededf4] bg-[#f9f9ff] shrink-0 space-y-2">
+        <div className="p-4 border-b border-border bg-card shrink-0 space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-sm text-[#191c20] flex items-center gap-2">
-              <FileSignature className="w-4 h-4 text-[#00734b]" />
+            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+              <FileSignature className="w-4 h-4 text-primary" />
               วาระการประชุม
             </h3>
             <Badge variant="outline" className="text-[10px] font-bold">
@@ -99,7 +99,7 @@ export function ResolutionSplitView({
           {/* Progress bar */}
           <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#00734b] rounded-full transition-all duration-500"
+              className="h-full bg-primary rounded-full transition-all duration-500"
               style={{
                 width: `${completionStats.total > 0 ? (completionStats.completed / completionStats.total) * 100 : 0}%`,
               }}
@@ -120,11 +120,11 @@ export function ResolutionSplitView({
               <button
                 key={agenda.agenda_id}
                 id={`agenda-select-${agenda.agenda_id}`}
-                className={`w-full text-left px-4 py-3.5 border-b border-[#ededf4] transition-all
+                className={`w-full text-left px-4 py-3.5 border-b border-border transition-all
                   ${
                     isSelected
-                      ? "bg-[#00734b]/5 border-l-4 border-l-[#00734b]"
-                      : "hover:bg-[#f3f3fa]/60 border-l-4 border-l-transparent"
+                      ? "bg-primary/5 border-l-4 border-l-primary"
+                      : "hover:bg-muted/60 border-l-4 border-l-transparent"
                   }
                 `}
                 onClick={() => onSelectAgenda(agenda.agenda_id)}
@@ -133,7 +133,7 @@ export function ResolutionSplitView({
                   {/* Completion indicator */}
                   <span className="mt-0.5 shrink-0">
                     {isRecorded ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#00734b]" />
+                      <CheckCircle2 className="w-4 h-4 text-primary" />
                     ) : (
                       <Circle className="w-4 h-4 text-slate-300" />
                     )}
@@ -152,7 +152,7 @@ export function ResolutionSplitView({
 
                     <p
                       className={`text-sm font-semibold leading-snug truncate ${
-                        isSelected ? "text-[#00734b]" : "text-[#191c20]"
+                        isSelected ? "text-primary" : "text-foreground"
                       }`}
                     >
                       {agenda.title}
@@ -161,7 +161,7 @@ export function ResolutionSplitView({
                     {/* Sub-info row */}
                     <div className="flex items-center gap-2 flex-wrap">
                       {isConsideration && agenda.project && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-[#00734b]/5 px-1.5 py-0.5 rounded">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-primary/5 px-1.5 py-0.5 rounded">
                           <FolderOpen className="w-2.5 h-2.5" />
                           {agenda.project.project_code}
                         </span>
@@ -184,7 +184,7 @@ export function ResolutionSplitView({
       </div>
 
       {/* ── Right Panel: Resolution Form ── */}
-      <div className="flex-1 bg-white rounded-md lg:rounded-l-none border border-[#ededf4] lg:border-l-0 shadow-[0px_4px_24px_rgba(0,0,0,0.04)] flex flex-col min-h-[500px] lg:min-h-0 overflow-hidden">
+      <div className="flex-1 bg-card rounded-md lg:rounded-l-none border border-border lg:border-l-0 shadow-[0px_4px_24px_rgba(0,0,0,0.04)] flex flex-col min-h-[500px] lg:min-h-0 overflow-hidden">
         <ResolutionForm
           agenda={selectedAgenda}
           resolution={resolution}

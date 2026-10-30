@@ -2,9 +2,9 @@ type ProposalRow = Record<string, any>;
 import { sumProposalBudgets } from "./proposal-budget.util";
 
 const FOOD_DEFAULTS = [
-  { itemName: "PARTIAL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
   { itemName: "FULL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-  { itemName: "SNACK", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+  { itemName: "LIGHT_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+  { itemName: "SNACK_AND_BEVERAGES", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
 ];
 
 const PROJECT_TYPE_LABELS: Record<string, string> = {
@@ -19,9 +19,10 @@ const LOCATION_TYPE_LABELS: Record<string, string> = {
 };
 
 const FOOD_TYPE_LABELS: Record<string, string> = {
-  "ค่าอาหาร (ไม่ครบมื้อ)": "PARTIAL_MEAL",
-  "ค่าอาหารและเครื่องดื่ม": "FULL_MEAL",
-  "ค่าอาหารว่าง": "SNACK",
+  "ค่าอาหาร (ครบทุกมื้อ)": "FULL_MEAL",
+  "ค่าอาหาร (ไม่ครบมื้อ)": "LIGHT_MEAL",
+  "ค่าอาหารและเครื่องดื่ม": "SNACK_AND_BEVERAGES",
+  "ค่าอาหารอื่น": "OTHER",
 };
 
 function numberValue(value: unknown, fallback = 0) {

@@ -86,10 +86,10 @@ export function MeetingListTable({
   }, []);
 
   return (
-    <div className="bg-white rounded-md border border-[#D1CDC7] shadow-sm flex-1 flex flex-col overflow-hidden">
+    <div className="bg-card rounded-md border border-border shadow-sm flex-1 flex flex-col overflow-hidden">
       
       {/* ── Toolbar: Search + Filter (inside card, matching projects page) ── */}
-      <div className="p-6 px-6 sm:px-10 border-b border-[#ededf4] flex flex-col sm:flex-row gap-3 shrink-0">
+      <div className="p-6 px-6 sm:px-10 border-b border-border flex flex-col sm:flex-row gap-3 shrink-0">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -98,7 +98,7 @@ export function MeetingListTable({
             placeholder="ค้นหาชื่อการประชุม, ครั้งที่..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 h-11 text-sm border border-[#D1CDC7] rounded-full bg-surface focus:outline-none focus:ring-2 focus:ring-[#00734b]/20 focus:border-[#00734b] transition-all"
+            className="w-full pl-10 pr-4 h-11 text-sm border border-border rounded-full bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         </div>
         <Select
@@ -107,7 +107,7 @@ export function MeetingListTable({
         >
           <SelectTrigger
             id="meeting-status-filter"
-            className="w-auto sm:w-[180px] h-11 rounded-full border-[#D1CDC7] bg-white text-sm font-bold gap-2"
+            className="w-auto sm:w-[180px] h-11 rounded-full border-border bg-card text-sm font-bold gap-2"
           >
             <Filter className="w-4 h-4 shrink-0" />
             <SelectValue placeholder="กรองตามสถานะ" />
@@ -126,7 +126,7 @@ export function MeetingListTable({
       {/* ── Data Table ── */}
       <div className="flex-1 overflow-auto">
         <table className="w-full text-left text-sm whitespace-nowrap">
-          <thead className="bg-white sticky top-0 text-slate-400 font-bold z-10 border-b border-[#ededf4] text-[13px] uppercase tracking-wide">
+          <thead className="bg-card sticky top-0 text-slate-400 font-bold z-10 border-b border-border text-[13px] uppercase tracking-wide">
             <tr>
               <th className="px-6 sm:px-10 py-4 w-[120px]">ครั้งที่</th>
               <th className="px-6 sm:px-10 py-4 w-full">ชื่อการประชุม</th>
@@ -135,7 +135,7 @@ export function MeetingListTable({
               <th className="px-6 sm:px-10 py-4 text-right">จัดการ</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#ededf4]">
+          <tbody className="divide-y divide-border">
             {meetings.length === 0 ? (
               <tr>
                 <td colSpan={5} className="text-center py-16 text-muted-foreground">
@@ -170,7 +170,7 @@ export function MeetingListTable({
                     {/* ชื่อการประชุม */}
                     <td className="px-6 sm:px-10 py-5">
                       <div className="space-y-1.5">
-                        <p className="font-bold text-[#191c20] group-hover:text-[#00734b] transition-colors leading-snug">
+                        <p className="font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
                           {meeting.title}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -189,7 +189,7 @@ export function MeetingListTable({
                     </td>
 
                     {/* วันที่ */}
-                    <td className="px-6 sm:px-10 py-5 text-[#3f4942] text-xs">
+                    <td className="px-6 sm:px-10 py-5 text-muted-foreground text-xs">
                       <span className="flex items-center gap-1.5 font-medium whitespace-nowrap">
                         <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
                         {formatThaiDate(meeting.meeting_date)}
@@ -212,7 +212,7 @@ export function MeetingListTable({
                         <DropdownMenuTrigger asChild>
                           <button
                             id={`meeting-actions-${meeting.meeting_id}`}
-                            className="p-2 rounded-full text-muted-foreground hover:text-[#191c20] hover:bg-slate-200 transition-all opacity-0 group-hover:opacity-100"
+                            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-slate-200 transition-all opacity-0 group-hover:opacity-100"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <MoreVertical className="w-5 h-5" />
@@ -254,14 +254,14 @@ export function MeetingListTable({
       </div>
 
       {/* ── Footer ── */}
-      <div className="flex items-center justify-between gap-3 px-6 sm:px-10 py-3 border-t border-[#ededf4] text-xs text-muted-foreground shrink-0">
+      <div className="flex items-center justify-between gap-3 px-6 sm:px-10 py-3 border-t border-border text-xs text-muted-foreground shrink-0">
         <span>แสดง {meetings.length} จาก {pagination.total} รายการ</span>
         <div className="flex items-center gap-2">
           <span>หน้า {pagination.page} / {Math.max(pagination.totalPages, 1)}</span>
           <button
             type="button"
             aria-label="หน้าก่อนหน้า"
-            className="rounded-md border border-[#D1CDC7] p-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md border border-border p-1.5 disabled:cursor-not-allowed disabled:opacity-40"
             disabled={pagination.page <= 1}
             onClick={() => onPageChange(pagination.page - 1)}
           >
@@ -270,7 +270,7 @@ export function MeetingListTable({
           <button
             type="button"
             aria-label="หน้าถัดไป"
-            className="rounded-md border border-[#D1CDC7] p-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md border border-border p-1.5 disabled:cursor-not-allowed disabled:opacity-40"
             disabled={pagination.page >= pagination.totalPages || pagination.totalPages === 0}
             onClick={() => onPageChange(pagination.page + 1)}
           >

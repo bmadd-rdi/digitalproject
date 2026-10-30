@@ -156,7 +156,7 @@ export function FileUploadField({
   return (
     <section
       className={cn(
-        "rounded-md border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4",
+        "rounded-md border border-slate-200 bg-card p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4",
         className,
       )}
     >

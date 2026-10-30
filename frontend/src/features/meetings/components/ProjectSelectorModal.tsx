@@ -75,7 +75,7 @@ export function ProjectSelectorModal({
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
-            <FolderOpen className="w-5 h-5 text-[#00734b]" />
+            <FolderOpen className="w-5 h-5 text-primary" />
             เลือกโครงการเพื่อเชื่อมโยง
           </DialogTitle>
           <DialogDescription>
@@ -111,7 +111,7 @@ export function ProjectSelectorModal({
             filteredProjects.map((project) => (
               <div
                 key={project.project_id}
-                className="group flex items-start gap-4 p-4 rounded-md border border-[#ededf4] hover:border-[#00734b]/30 hover:bg-[#00734b]/5 transition-all cursor-pointer"
+                className="group flex items-start gap-4 p-4 rounded-md border border-border hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer"
                 onClick={() => handleSelect(project.project_id)}
               >
                 {/* Info */}
@@ -121,7 +121,7 @@ export function ProjectSelectorModal({
                       {project.project_code}
                     </span>
                   </div>
-                  <p className="font-bold text-sm text-[#191c20] group-hover:text-[#00734b] transition-colors leading-snug">
+                  <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors leading-snug">
                     {project.name}
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -140,7 +140,7 @@ export function ProjectSelectorModal({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[#00734b] hover:text-[#00734b] hover:bg-[#00734b]/10 rounded-lg"
+                  className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-primary hover:text-primary hover:bg-primary/10 rounded-lg"
                 >
                   <CheckCircle2 className="w-4 h-4 mr-1" />
                   เลือก

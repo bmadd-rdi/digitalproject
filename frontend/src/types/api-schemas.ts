@@ -801,9 +801,9 @@ const SubmitProposalRequest = z
                   .object({
                     id: z.string().uuid().optional(),
                     itemName: z.enum([
-                      "PARTIAL_MEAL",
                       "FULL_MEAL",
-                      "SNACK",
+                      "LIGHT_MEAL",
+                      "SNACK_AND_BEVERAGES",
                       "OTHER",
                     ]),
                     mealsCount: z.number().gte(0).nullable(),

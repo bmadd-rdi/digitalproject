@@ -167,7 +167,7 @@ export function ProjectTable({
   return (
     <div className="flex-1 overflow-auto" data-column-count={columnCount}>
       <Table>
-        <TableHeader className="sticky top-0 z-10 bg-white">
+        <TableHeader className="sticky top-0 z-10 bg-card">
           <TableRow>
             {showActions && actionsFirst && renderActionsHeader()}
             <TableHead className="px-6 py-4 sm:px-10">วันที่นำเข้า</TableHead>
@@ -205,9 +205,9 @@ export function ProjectTable({
               >
                 {showActions && actionsFirst && renderActionsCell(project)}
                 <TableCell className="px-6 py-5 text-xs text-muted-foreground sm:px-10">{date}</TableCell>
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.division?.departmentName || "-"}</TableCell>
+                <TableCell className="px-6 py-5 text-muted-foreground sm:px-10">{project.division?.departmentName || "-"}</TableCell>
                 <TableCell className="px-6 py-5 sm:px-10">
-                  <div className={`flex flex-col font-bold ${isReturned && activeTab !== "drafts" ? "text-red-700" : "text-[#191c20]"}`}>
+                  <div className={`flex flex-col font-bold ${isReturned && activeTab !== "drafts" ? "text-red-700" : "text-foreground"}`}>
                     <span className="mb-0.5 font-mono text-[10px] font-normal text-muted-foreground">{project.projectCode || "-"}</span>
                     <span className="cursor-pointer transition-colors duration-200 hover:text-primary">{project.projectName || "-"}</span>
                   </div>
@@ -215,7 +215,7 @@ export function ProjectTable({
                 {hasStatusColumn && <TableCell className="px-6 py-5 sm:px-10">
                   {activeTab === "drafts" ? (
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#00734b]/20 bg-[#00734b]/10 px-2.5 py-1 text-[11px] font-bold text-[#00734b]"><FileSpreadsheet className="h-3 w-3" /> แบบฟอร์ม {project.formProgress || "-"}</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary"><FileSpreadsheet className="h-3 w-3" /> แบบฟอร์ม {project.formProgress || "-"}</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-bold text-red-600"><FileText className="h-3 w-3" /> เอกสาร {project.docProgress || "-"}</span>
                     </div>
                   ) : (
@@ -225,15 +225,15 @@ export function ProjectTable({
                 
                 
                 
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.latestSubmittedRequestedBudget ? Number(project.latestSubmittedRequestedBudget).toLocaleString("th-TH") : "-"}</TableCell>
-                {showBudgetYearAndType && <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.budgetStartYear || "-"}</TableCell>}
-                {showBudgetYearAndType && <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{project.budgetType || "-"}</TableCell>}
+                <TableCell className="px-6 py-5 text-muted-foreground sm:px-10">{project.latestSubmittedRequestedBudget ? Number(project.latestSubmittedRequestedBudget).toLocaleString("th-TH") : "-"}</TableCell>
+                {showBudgetYearAndType && <TableCell className="px-6 py-5 text-muted-foreground sm:px-10">{project.budgetStartYear || "-"}</TableCell>}
+                {showBudgetYearAndType && <TableCell className="px-6 py-5 text-muted-foreground sm:px-10">{project.budgetType || "-"}</TableCell>}
                 {!hideAnalystColumn && (
-                  <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">
+                  <TableCell className="px-6 py-5 text-muted-foreground sm:px-10">
                     {project.analyst ? `${project.analyst.firstName} ${project.analyst.lastName}` : "-"}
                   </TableCell>
                 )}
-                <TableCell className="px-6 py-5 text-[#3f4942] sm:px-10">{getProjectTypeLabel(project.projectType?.name, statusLanguage)}</TableCell>
+                <TableCell className="px-6 py-5 text-muted-foreground sm:px-10">{getProjectTypeLabel(project.projectType?.name, statusLanguage)}</TableCell>
                 
                 {showActions && !actionsFirst && renderActionsCell(project)}
               </TableRow>

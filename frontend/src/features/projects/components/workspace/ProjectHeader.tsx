@@ -142,13 +142,13 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
     <div className="mb-6 space-y-4">
       <button
         onClick={() => router.push("/projects")}
-        className="flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-[#00734b]"
+        className="flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
         กลับไปหน้ารวมโครงการ
       </button>
 
-      <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
+      <Card className="rounded-md border-border bg-card shadow-sm">
         <CardContent className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0 flex-1 space-y-4">
@@ -164,36 +164,36 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
                 </span>
               </div>
 
-              <h1 className="break-words text-xl font-extrabold leading-snug tracking-tight text-[#191c20] sm:text-2xl md:text-3xl">
+              <h1 className="break-words text-xl font-extrabold leading-snug tracking-tight text-foreground sm:text-2xl md:text-3xl">
                 {project.projectName || "ไม่ระบุชื่อโครงการ"}
               </h1>
 
               <div className="grid grid-cols-1 gap-6 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">หน่วยงานที่รับผิดชอบ</p>
-                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[#191c20]">
-                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><Building2 className="h-4 w-4 text-[#00734b]" /></div>
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><Building2 className="h-4 w-4 text-primary" /></div>
                     <span className="break-words" title={agencyName}>{agencyName}</span>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">ผู้บริหารที่กำกับดูแล</p>
-                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[#191c20]">
-                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><Briefcase className="h-4 w-4 text-[#00734b]" /></div>
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><Briefcase className="h-4 w-4 text-primary" /></div>
                     <span className="break-words" title={deputyGovernorName}>{deputyGovernorName}</span>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">กรอบยุทธศาสตร์ 4 ด้าน</p>
-                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[#191c20]">
-                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><Target className="h-4 w-4 text-[#00734b]" /></div>
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><Target className="h-4 w-4 text-primary" /></div>
                     <span className="break-words" title={fourQuadrantsName}>{fourQuadrantsName}</span>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">ปีงบประมาณ</p>
-                  <div className="flex items-center gap-2 text-sm font-medium text-[#191c20]">
-                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><CalendarDays className="h-4 w-4 text-[#00734b]" /></div>
+                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><CalendarDays className="h-4 w-4 text-primary" /></div>
                     {fiscalYear}
                   </div>
                 </div>
