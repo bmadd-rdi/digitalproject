@@ -84,13 +84,11 @@ export const getFourQuadrantsLookup = async () => {
 };
 
 export const getDeputyGovernorsLookup = async () => {
-  return appCache.getOrSet(
-    "lookup:deputyGovernors",
-    async () => {
-       console.log("Fetching deputyGovernors from DB...");
-      return await db.select().from(deputyGovernors);    },
-    LOOKUP_TTL
-  );
+  console.log("Fetching deputyGovernors from DB...");
+  return await db
+    .select({ id: deputyGovernors.id, name: deputyGovernors.name })
+    .from(deputyGovernors)
+    .where(eq(deputyGovernors.activate, true));
 };
 
 export const getProjectStatusesLookup = async () => {

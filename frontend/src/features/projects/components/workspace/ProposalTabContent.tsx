@@ -80,7 +80,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
             <Clock className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-lg font-extrabold text-foreground">ยังไม่มีเอกสารข้อเสนอ</h3>
+            <h3 className="text-lg font-extrabold text-foreground">เอกสารรายละเอียดประกอบการพิจารณาโครงการเสนอคณะกรรมการดิจิทัลกรุงเทพมหานคร</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               เริ่มสร้างแบบร่างเพื่อกรอกรายละเอียดโครงการทั้ง 5 ขั้นตอน
             </p>

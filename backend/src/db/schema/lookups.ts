@@ -1,5 +1,5 @@
 // src/db/schema/lookups.ts
-import { index, integer, pgTable, serial, varchar } from "drizzle-orm/pg-core";
+import { index, integer, pgTable, serial, varchar, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
@@ -69,6 +69,7 @@ export const fourQuadrants = pgTable("four_quadrants", {
 export const deputyGovernors = pgTable("deputy_governors", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(), // ชื่อรองผู้ว่าฯ
+  activate: boolean("activate").default(true).notNull(), // สถานะการใช้งาน (true = ใช้งาน)
 });
 
 // ---------------------------------------------------------------------------
