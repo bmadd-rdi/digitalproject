@@ -1,4 +1,4 @@
-// src/modules/lookups/lookup.actions.ts
+// src/features/lookups/actions/lookup.actions.ts
 "use server";
 
 import { serverFetch } from "@/lib/server-fetch";
@@ -11,6 +11,8 @@ type DivisionResponse = z.infer<typeof schemas.DivisionResponse>;
 // strings. Typed inline so this doesn't depend on the generated api-schemas.ts
 // being regenerated after the backend schema change.
 type StringLookupResponse = { data: string[] };
+// นโยบายผู้ว่าฯ: id = policy_id, code = policy_code (เช่น P001), name = ชื่อนโยบาย
+type PolicyLookupResponse = { data: { id: number; code: string; name: string }[] };
 
 export async function getFourQuadrantsAction() {
   return serverFetch<LookupResponse>("/api/v1/lookups/four-quadrants", { skipToken: true });
@@ -33,23 +35,16 @@ export async function getDivisionsAction(departmentId?: number) {
   return serverFetch<DivisionResponse>(`/api/v1/lookups/divisions${query}`, { skipToken: true });
 }
 
-// +
-// +export async function getProjectTypesAction() {
-// +  return serverFetch<LookupResponse>("/api/v1/lookups/project-types", { skipToken: true });
-// +}
-// +
-// +export async function getBudgetTypesAction() {
-// +  return serverFetch<z.infer<typeof schemas.StringLookupResponse>>("/api/v1/lookups/budget-types", { skipToken: true });
-// +}
-
-
-
 export async function getProjectTypesAction() {
   return serverFetch<LookupResponse>("/api/v1/lookups/project-types", { skipToken: true });
 }
 
 export async function getBudgetTypesAction() {
   return serverFetch<StringLookupResponse>("/api/v1/lookups/budget-types", { skipToken: true });
+}
+
+export async function getGovernorPoliciesAction() {
+  return serverFetch<PolicyLookupResponse>("/api/v1/lookups/governor-policies", { skipToken: true });
 }
 
 // รายชื่อผู้วิเคราะห์ต้องล็อกอิน — จึงไม่ใส่ skipToken เพื่อให้ส่ง session token ไปด้วย

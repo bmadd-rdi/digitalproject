@@ -11,6 +11,7 @@ import {
   getProjectAttachmentTypesLookup,
   getBudgetTypesLookup,
   getAnalystsLookup,
+  getGovernorPoliciesLookup,
 } from "../lookups/lookup.service";
 
 export const lookupController = {
@@ -56,13 +57,18 @@ export const lookupController = {
     return c.json({ data: result }, 200);
   },
 
-    async getBudgetTypes(c: Context) {
+  async getBudgetTypes(c: Context) {
     const result = await getBudgetTypesLookup();
     return c.json({ data: result }, 200);
   },
 
   async getAnalysts(c: Context) {
     const result = await getAnalystsLookup();
+    return c.json({ data: result }, 200);
+  },
+
+  async getGovernorPolicies(c: Context) {
+    const result = await getGovernorPoliciesLookup();
     return c.json({ data: result }, 200);
   },
 };

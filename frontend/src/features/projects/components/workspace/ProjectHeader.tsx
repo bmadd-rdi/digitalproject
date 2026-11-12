@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ProjectDetail } from "../../types/workspace";
 import { useFourQuadrants, useDeputyGovernors } from "@/features/lookups/hooks/useLookups";
+import { useProjectAttachmentTypes } from "../../hooks/useProjectAttachmentTypes";
 import { useProposalState } from "@/features/proposals/hooks/useProposalState";
 import { useGetDraft } from "@/features/proposals/hooks/useProposalDraftQuery";
 import { useSubmitProposal } from "@/features/proposals/hooks/useProposalMutations";
@@ -47,7 +48,91 @@ interface ProjectHeaderProps {
   proposal?: HeaderProposal;
 }
 
+// รูปแผนภาพถูกเก็บใน project_attachments (ไม่อยู่ใน proposal/draft) จึงต้องนำมารวมกับข้อมูลโครงการก่อนสร้าง Word
+// (ใช้หลักเดียวกับ ProposalWizard ตอนโหลดฟอร์ม: ใช้ URL ที่บันทึกใน proposal ก่อน ไม่มีค่อยใช้ไฟล์ล่าสุดตามประเภทเอกสาร)
+const DIAGRAM_ATTACHMENTS = [
+  { field: "systemDiagram", docTypeName: "system_diagram" },
+  { field: "networkDiagram", docTypeName: "network_diagram" },
+  { field: "useCaseDiagram", docTypeName: "use_case_diagram" },
+  { field: "securityDiagram", docTypeName: "security_diagram" },
+  { field: "currentDiagram", docTypeName: "current_diagram" },
+  { field: "erDiagram", docTypeName: "er_diagram" },
+  { field: "dataFlowDiagram", docTypeName: "data_flow_diagram" },
+] as const;
+
+type AttachmentLike = {
+  id?: string | number;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  docTypeName?: string | null;
+  description?: string | null;
+  createdAt?: string | Date | null;
+};
+
+function withDiagramAttachments(
+  proposal: Record<string, unknown>,
+  attachments: AttachmentLike[] | undefined,
+): Record<string, unknown> {
+  const merged: Record<string, unknown> = { ...proposal };
+  for (const { field, docTypeName } of DIAGRAM_ATTACHMENTS) {
+    const fileKey = `${field}File`;
+    const urlKey = `${field}Url`;
+    const current = merged[fileKey];
+    const currentRecord = current && typeof current === "object" ? (current as Record<string, unknown>) : undefined;
+    const savedUrl = (typeof merged[urlKey] === "string" && merged[urlKey]) ||
+      (typeof current === "string" && current) ||
+      (typeof currentRecord?.file === "string" && currentRecord.file) ||
+      (typeof currentRecord?.url === "string" && currentRecord.url) ||
+      undefined;
+
+    const latest = (attachments ?? [])
+      .filter((a) => (savedUrl ? a.fileUrl === savedUrl : a.docTypeName === docTypeName))
+      .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())[0];
+
+    const url = (savedUrl as string | undefined) ?? latest?.fileUrl ?? undefined;
+    if (!url) continue;
+
+    merged[urlKey] = url;
+    merged[fileKey] = {
+      ...(currentRecord ?? {}),
+      id: latest?.id ?? `${field}-server`,
+      file: url,
+      description:
+        typeof currentRecord?.description === "string" && currentRecord.description
+          ? currentRecord.description
+          : latest?.description ?? "",
+    };
+  }
+  return merged;
+}
+
+// เอกสารแนบที่ต้องมีก่อนส่งโครงการ (backend ตรวจซ้ำอีกชั้นเสมอ)
+const REQUIRED_SUBMIT_ATTACHMENTS = [
+  { docTypeName: "approval_document", label: "เอกสารประกอบการพิจารณา (พร้อมลายเซ็นรับรอง)" },
+  { docTypeName: "bma_agency_plan", label: "แผนปฏิบัติราชการกรุงเทพมหานครหรือหน่วยงาน" },
+  { docTypeName: "project_document", label: "เอกสารโครงการ (พร้อมลายเซ็นรับรอง)" },
+] as const;
+
 const fallbackError = "ระบบไม่สามารถดำเนินการได้ กรุณาลองใหม่อีกครั้ง";
+
+// พาผู้ใช้ไปแท็บไฟล์แนบ แล้วเลื่อนไปยังช่องอัปโหลดแรกที่ยังขาด พร้อมไฮไลต์กรอบสั้นๆ
+function goToMissingAttachment(docTypeName: string) {
+  window.dispatchEvent(new CustomEvent("workspace:goto-tab", { detail: { tab: "tab-documents" } }));
+  let attempts = 0;
+  const timer = window.setInterval(() => {
+    attempts += 1;
+    // เนื้อหาแท็บอาจยังไม่ถูกสร้างทันที จึงลองหาซ้ำสั้นๆ
+    const el = document.getElementById(`required-attachment-${docTypeName}`);
+    if (el) {
+      window.clearInterval(timer);
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-red-400", "ring-offset-2");
+      window.setTimeout(() => el.classList.remove("ring-2", "ring-red-400", "ring-offset-2"), 3000);
+    } else if (attempts >= 15) {
+      window.clearInterval(timer);
+    }
+  }, 100);
+}
 
 export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
   const router = useRouter();
@@ -80,6 +165,8 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
     ? proposalState.data
     : null;
 
+  const { data: attachmentTypesRes } = useProjectAttachmentTypes();
+
   const { data: quadrantsRes } = useFourQuadrants();
   const { data: governorsRes } = useDeputyGovernors();
   const quadrants = quadrantsRes?.data || [];
@@ -104,6 +191,27 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
     if (!currentDraft) {
       toast.error("ยังไม่สามารถส่งโครงการได้", { description: "กำลังโหลดแบบร่างอยู่ กรุณารอสักครู่" });
       return;
+    }
+
+    // ตรวจเอกสารแนบบังคับ (ข้ามการตรวจถ้ายังโหลดรายการประเภทเอกสารไม่เสร็จ เพราะ backend จะตรวจให้)
+    const attachmentTypes = attachmentTypesRes?.data ?? [];
+    if (attachmentTypes.length > 0) {
+      const uploadedNames = new Set(
+        ((project as unknown as { attachments?: AttachmentLike[] }).attachments ?? []).map((attachment) => {
+          const direct = attachment.docTypeName?.trim();
+          if (direct) return direct;
+          const docTypeId = (attachment as { docTypeId?: number }).docTypeId;
+          return attachmentTypes.find((type) => type.id === docTypeId)?.name ?? "";
+        }),
+      );
+      const missing = REQUIRED_SUBMIT_ATTACHMENTS.filter((item) => !uploadedNames.has(item.docTypeName));
+      if (missing.length > 0) {
+        toast.error("ยังไม่สามารถส่งโครงการได้", {
+          description: `กรุณาอัปโหลดในแท็บไฟล์แนบก่อน: ${missing.map((item) => item.label).join(", ")}`,
+        });
+        goToMissingAttachment(missing[0].docTypeName);
+        return;
+      }
     }
     setSubmitConfirmOpen(true);
   };
@@ -142,13 +250,13 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
     <div className="mb-6 space-y-4">
       <button
         onClick={() => router.push("/projects")}
-        className="flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-primary"
+        className="flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-[#00734b]"
       >
         <ArrowLeft className="h-4 w-4" />
         กลับไปหน้ารวมโครงการ
       </button>
 
-      <Card className="rounded-md border-border bg-card shadow-sm">
+      <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
         <CardContent className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
             <div className="min-w-0 flex-1 space-y-4">
@@ -164,36 +272,36 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
                 </span>
               </div>
 
-              <h1 className="break-words text-xl font-extrabold leading-snug tracking-tight text-foreground sm:text-2xl md:text-3xl">
+              <h1 className="break-words text-xl font-extrabold leading-snug tracking-tight text-[#191c20] sm:text-2xl md:text-3xl">
                 {project.projectName || "ไม่ระบุชื่อโครงการ"}
               </h1>
 
               <div className="grid grid-cols-1 gap-6 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">หน่วยงานที่รับผิดชอบ</p>
-                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
-                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><Building2 className="h-4 w-4 text-primary" /></div>
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[#191c20]">
+                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><Building2 className="h-4 w-4 text-[#00734b]" /></div>
                     <span className="break-words" title={agencyName}>{agencyName}</span>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">ผู้บริหารที่กำกับดูแล</p>
-                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
-                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><Briefcase className="h-4 w-4 text-primary" /></div>
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[#191c20]">
+                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><Briefcase className="h-4 w-4 text-[#00734b]" /></div>
                     <span className="break-words" title={deputyGovernorName}>{deputyGovernorName}</span>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">กรอบยุทธศาสตร์ 4 ด้าน</p>
-                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
-                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><Target className="h-4 w-4 text-primary" /></div>
+                  <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[#191c20]">
+                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><Target className="h-4 w-4 text-[#00734b]" /></div>
                     <span className="break-words" title={fourQuadrantsName}>{fourQuadrantsName}</span>
                   </div>
                 </div>
                 <div className="min-w-0 space-y-1">
                   <p className="text-[11px] font-bold tracking-widest text-slate-400">ปีงบประมาณ</p>
-                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                    <div className="shrink-0 rounded-md bg-primary/10 p-1.5"><CalendarDays className="h-4 w-4 text-primary" /></div>
+                  <div className="flex items-center gap-2 text-sm font-medium text-[#191c20]">
+                    <div className="shrink-0 rounded-md bg-[#00734b]/10 p-1.5"><CalendarDays className="h-4 w-4 text-[#00734b]" /></div>
                     {fiscalYear}
                   </div>
                 </div>
@@ -203,7 +311,11 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
             <div className="flex w-full shrink-0 flex-col items-stretch gap-2 xl:w-auto xl:self-start">
               {exportableProposal && (
                 <ProposalExportButton
-                  proposal={exportableProposal as ProposalDraftValues}
+                  proposal={withDiagramAttachments(
+                    exportableProposal as unknown as Record<string, unknown>,
+                    (project as unknown as { attachments?: AttachmentLike[] }).attachments,
+                  ) as unknown as ProposalDraftValues}
+                  agencyNameFallback={agencyName}
                   className="gap-2 rounded-xl border-primary/30 text-primary hover:bg-primary/5"
                 />
               )}

@@ -10,6 +10,7 @@ import {
   ProjectAttachmentTypeLookupResponseSchema,
   StringLookupResponseSchema,
   AnalystLookupResponseSchema,
+  PolicyLookupResponseSchema,
 } from "./lookup.schema";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 
@@ -156,7 +157,6 @@ lookupsRouter.openapi(getProjectAttachmentTypesRoute, (c) => {
   return lookupController.getProjectAttachmentTypes(c);
 });
 
-
 const getBudgetTypesRoute = createRoute({
   method: "get",
   path: "/budget-types",
@@ -192,6 +192,22 @@ const getAnalystsRoute = createRoute({
 });
 lookupsRouter.openapi(getAnalystsRoute, (c) => {
   return lookupController.getAnalysts(c);
+});
+
+const getGovernorPoliciesRoute = createRoute({
+  method: "get",
+  path: "/governor-policies",
+  tags: ["Lookups"],
+  summary: "ดึงรายการนโยบายผู้ว่าฯ (จากตาราง policy_governor)",
+  responses: {
+    200: {
+      description: "รายการนโยบายผู้ว่าฯ (id, code เช่น P001, name)",
+      content: { "application/json": { schema: PolicyLookupResponseSchema } },
+    },
+  },
+});
+lookupsRouter.openapi(getGovernorPoliciesRoute, (c) => {
+  return lookupController.getGovernorPolicies(c);
 });
 
 export default lookupsRouter;

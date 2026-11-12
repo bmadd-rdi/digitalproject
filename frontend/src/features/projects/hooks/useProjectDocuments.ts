@@ -69,6 +69,8 @@ export function useProjectDocuments(
   const [onePage, setOnePage] = useState<DocumentFile | null>(null);
   const [bmaDcUsage, setBmaDcUsage] = useState<DocumentFile | null>(null);
   const [approvalDoc, setApprovalDoc] = useState<DocumentFile | null>(null);
+  const [projectDocument, setProjectDocument] = useState<DocumentFile | null>(null);
+  const [bmaAgencyPlan, setBmaAgencyPlan] = useState<DocumentFile | null>(null);
   const [systemDiagram, setSystemDiagram] = useState<DocumentFile | null>(null);
   const [networkDiagram, setNetworkDiagram] = useState<DocumentFile | null>(null);
   const [useCaseDiagram, setUseCaseDiagram] = useState<DocumentFile | null>(null);
@@ -121,6 +123,8 @@ export function useProjectDocuments(
     setOnePage(get("one_page_summary"));
     setBmaDcUsage(get("bma_dc_usage"));
     setApprovalDoc(get("approval_document"));
+    setProjectDocument(get("project_document"));
+    setBmaAgencyPlan(get("bma_agency_plan"));
     setSystemDiagram(get("system_diagram"));
     setNetworkDiagram(get("network_diagram"));
     setUseCaseDiagram(get("use_case_diagram"));
@@ -141,10 +145,10 @@ export function useProjectDocuments(
   const addAdditionalDocument = (file: DocumentFile) => setAdditionalDocs((prev) => [...prev, file]);
 
   return {
-    presentation, quotation, onePage, bmaDcUsage, approvalDoc, systemDiagram, networkDiagram, useCaseDiagram, securityDiagram,
+    presentation, quotation, onePage, bmaDcUsage, approvalDoc, projectDocument, bmaAgencyPlan, systemDiagram, networkDiagram, useCaseDiagram, securityDiagram,
     additionalDocs, mandatoryUploadedCount, diagramsUploadedCount, setPresentation, setQuotation, setOnePage,
     setBmaDcUsage,
-    setApprovalDoc, setSystemDiagram, setNetworkDiagram, setUseCaseDiagram, setSecurityDiagram, removeFile,
+    setApprovalDoc, setProjectDocument, setBmaAgencyPlan, setSystemDiagram, setNetworkDiagram, setUseCaseDiagram, setSecurityDiagram, removeFile,
     removeAdditionalDoc, addAdditionalDocument,
     unclassifiedDocs: resolvedAttachments
       .filter(({ typeName }) => typeName === null)

@@ -65,6 +65,16 @@ export const fourQuadrants = pgTable("four_quadrants", {
   name: varchar("name", { length: 255 }).notNull(), // เช่น "Q1: ลดรายจ่าย", "Q2: เพิ่มรายได้"
 });
 
+// ตาราง Lookup สำหรับ นโยบายผู้ว่าฯ — สร้างและนำเข้าข้อมูลด้วย migration-policy-governor.sql
+// ใช้กับ dropdown "นโยบายผู้ว่าฯ" ในข้อเสนอโครงการ:
+//   policy_code (เช่น "P001") -> governorPolicyCode, policy_name -> governorPolicyName
+// policy_id เป็นเลขรันภายในตาราง ส่วนรหัสที่ผู้ใช้รู้จักคือ policy_code
+export const policyGovernors = pgTable("policy_governor", {
+  id: serial("policy_id").primaryKey(),
+  policyCode: varchar("policy_code", { length: 20 }).unique().notNull(),
+  policyName: varchar("policy_name", { length: 255 }).notNull(),
+});
+
 // ตาราง Lookup สำหรับ รองผู้ว่าฯ ที่ดูแล
 export const deputyGovernors = pgTable("deputy_governors", {
   id: serial("id").primaryKey(),
@@ -78,30 +88,30 @@ export const deputyGovernors = pgTable("deputy_governors", {
 export const meetingStatuses = pgTable("meeting_statuses", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 64 }).unique(),
-  name: varchar("name", { length: 255 }).notNull().unique(), 
+  name: varchar("name", { length: 255 }).notNull().unique(),
 });
 
 export const meetingTypes = pgTable("meeting_types", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 64 }).unique(),
-  name: varchar("name", { length: 255 }).notNull().unique(), 
+  name: varchar("name", { length: 255 }).notNull().unique(),
 });
 
 export const meetingAttachmentTypes = pgTable("meeting_attachment_types", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 64 }).unique(),
-  name: varchar("name", { length: 255 }).notNull().unique(), 
+  name: varchar("name", { length: 255 }).notNull().unique(),
 });
 
 export const agendaTypes = pgTable("agenda_types", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 64 }).unique(),
-  name: varchar("name", { length: 255 }).notNull().unique(), 
+  name: varchar("name", { length: 255 }).notNull().unique(),
 });
 
 export const resolutionStatuses = pgTable("resolution_statuses", {
   id: serial("id").primaryKey(),
   code: varchar("code", { length: 64 }).unique(),
-  name: varchar("name", { length: 255 }).notNull().unique(), 
+  name: varchar("name", { length: 255 }).notNull().unique(),
   // สถานะแนะนำ: 1=Approved, 2=Need Revision, 3=Rejected, 4=Acknowledged
 });

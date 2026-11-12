@@ -35,15 +35,25 @@ export const createUser = async (c: Context, body: any) => {
     const { emailService, clock } = getAppServices(c);
     const newUser = await userService.createUser(body, clock);
 
-    const emailResult = await emailService.sendVerificationEmail(
-      newUser.email,
-      newUser.verificationToken!,
-      newUser.firstName,
-    );
-
-    if (!emailResult.success) {
-      console.error("User verification email was not delivered", emailResult.error);
-    }
+    // ส่งอีเมลแบบไม่รอผล: การสมัครบันทึกลงฐานข้อมูลสำเร็จแล้ว จึงตอบผู้ใช้ทันที
+    // ไม่ให้หน้า Register ค้าง/ถูก gateway ตัด (504) เมื่อเมลเซิร์ฟเวอร์ช้าหรือล่ม
+    // หากส่งไม่สำเร็จจะบันทึก log ไว้ (พร้อม email ผู้รับ) เพื่อให้แอดมินยืนยันบัญชีแทนได้
+    void emailService
+      .sendVerificationEmail(newUser.email, newUser.verificationToken!, newUser.firstName)
+      .then((emailResult) => {
+        if (!emailResult.success) {
+          console.error(
+            `[${new Date().toISOString()}] User verification email was not delivered to ${newUser.email}`,
+            emailResult.error,
+          );
+        }
+      })
+      .catch((err) => {
+        console.error(
+          `[${new Date().toISOString()}] User verification email threw for ${newUser.email}`,
+          err,
+        );
+      });
 
     const publicUser = await userService.getUserProfile(newUser.userId);
 

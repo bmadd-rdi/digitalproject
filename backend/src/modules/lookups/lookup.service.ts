@@ -3,6 +3,7 @@ import { db } from "../../db";
 import { divisions, fourQuadrants, deputyGovernors, projectStatuses, projectTypes, projectAttachmentTypes, departments, roles } from "../../db/schema";
 import { proposalBudgets } from "../../db/schema/proposals";
 import { users, roleUsers } from "../../db/schema/users";
+import { policyGovernors } from "../../db/schema/lookups";
 import { and, asc, eq, isNotNull, sql } from "drizzle-orm";
 import { appCache } from "../../shared/cache/memory-cache";
 import { getProjectAttachmentTypeLabel } from "./project-attachment-types";
@@ -84,11 +85,13 @@ export const getFourQuadrantsLookup = async () => {
 };
 
 export const getDeputyGovernorsLookup = async () => {
-  console.log("Fetching deputyGovernors from DB...");
-  return await db
-    .select({ id: deputyGovernors.id, name: deputyGovernors.name })
-    .from(deputyGovernors)
-    .where(eq(deputyGovernors.activate, true));
+  return appCache.getOrSet(
+    "lookup:deputyGovernors",
+    async () => {
+       console.log("Fetching deputyGovernors from DB...");
+      return await db.select().from(deputyGovernors);    },
+    LOOKUP_TTL
+  );
 };
 
 export const getProjectStatusesLookup = async () => {
@@ -150,7 +153,6 @@ export const getBudgetTypesLookup = async () => {
   );
 };
 
-
 // อายุ cache สั้นกว่า lookup อื่น เพราะการกำหนด/ถอดบทบาทผู้วิเคราะห์เกิดขึ้นได้ตลอด
 const ANALYST_LOOKUP_TTL = 300;
 
@@ -179,5 +181,21 @@ export const getAnalystsLookup = async () => {
       }));
     },
     ANALYST_LOOKUP_TTL,
+  );
+};
+
+// นโยบายผู้ว่าฯ เปลี่ยนไม่บ่อยแต่แก้ได้ที่ตารางโดยตรง จึงใช้ cache 1 ชั่วโมง (สั้นกว่า lookup ทั่วไป 24 ชม.)
+const POLICY_LOOKUP_TTL = 3600;
+
+export const getGovernorPoliciesLookup = async () => {
+  return appCache.getOrSet(
+    "lookup:governorPolicies",
+    async () => {
+      return await db
+        .select({ id: policyGovernors.id, code: policyGovernors.policyCode, name: policyGovernors.policyName })
+        .from(policyGovernors)
+        .orderBy(asc(policyGovernors.id));
+    },
+    POLICY_LOOKUP_TTL,
   );
 };

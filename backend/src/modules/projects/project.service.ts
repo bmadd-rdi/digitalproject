@@ -986,13 +986,15 @@ export const reviewAnalystProject = async (
 
 const getSecretaryProjectType = async (projectTypeId: number) => {
   const [projectType] = await db
-    .select({ id: projectTypes.id, name: projectTypes.typeName })
+    .select({ id: projectTypes.id, name: projectTypes.typeName, code: projectTypes.code })
     .from(projectTypes)
     .where(eq(projectTypes.id, projectTypeId))
     .limit(1);
 
-  const normalizedName = projectType?.name.trim().toLowerCase();
-  if (!projectType || !["hardware", "software"].includes(normalizedName)) {
+  // Match on the stable `code` column, not the display name (the name is now the
+  // committee name and can be edited without breaking approval).
+  const normalizedCode = projectType?.code?.trim().toUpperCase() ?? "";
+  if (!projectType || !["HARDWARE", "SOFTWARE"].includes(normalizedCode)) {
     throw new HTTPException(400, {
       message: "Secretary approval requires a Hardware or Software project type",
     });

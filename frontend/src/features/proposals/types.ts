@@ -2,15 +2,60 @@
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
+// ส่วนที่ 4 ของ Step 1: ประวัติการนำเสนอเข้าคณะกรรมการดิจิทัล กทม.
+// ใช้ซ้ำทั้งตอนกด "ถัดไป" (step schema) และตอนส่งโครงการ (submit schema)
+// ---------------------------------------------------------------------------
+export const PREV_RESOLUTION_VALUES = [
+  "APPROVED",
+  "APPROVED_WITH_CONDITIONS",
+  "UNDER_REVIEW",
+  "NOT_APPROVED",
+  "RETURNED",
+] as const;
+
+export function refineProposalHistory(
+  data: {
+    projectEverPassed?: string;
+    prevYear?: string;
+    prevProjectNameMode?: string;
+    prevProject?: string;
+    prevResolution?: string;
+  },
+  ctx: z.RefinementCtx,
+) {
+  if (data.projectEverPassed !== "EVER") return;
+
+  const year = Number(data.prevYear);
+  if (!/^\d{4}$/.test(data.prevYear ?? "") || year < 2500 || year > 2600) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุปี พ.ศ. ที่เคยนำเสนอ (เช่น 2567)", path: ["prevYear"] });
+  }
+  if (data.prevProjectNameMode === "DIFFERENT" && !data.prevProject?.trim()) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุชื่อโครงการที่เคยเสนอ", path: ["prevProject"] });
+  }
+  if (!data.prevResolution) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาเลือกมติที่ประชุม", path: ["prevResolution"] });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Step 1: ข้อมูลเบื้องต้นและภาพรวม (General Information)
 // ---------------------------------------------------------------------------
 export const proposalStep1Schema = z.object({
   projectName: z.string().min(5, "กรุณาระบุชื่อโครงการอย่างน้อย 5 ตัวอักษร"),
-  agencyName: z.string().min(2, "กรุณาระบุชื่อหน่วยงาน"),
+  // agencyName is a derived text snapshot ("หน่วยงาน - ส่วนราชการ"); the user picks the ids.
+  agencyName: z.string().min(2, "กรุณาเลือกหน่วยงานและส่วนราชการ"),
+  departmentId: z.coerce.number().int().min(1, "กรุณาเลือกหน่วยงาน"),
+  divisionId: z.coerce.number().int().min(1, "กรุณาเลือกส่วนราชการ"),
   headOfAgency: z.string().min(2, "กรุณาระบุหัวหน้าส่วนราชการ"),
   dcioName: z.string().min(2, "กรุณาระบุ DCIO"),
   projectManager: z.string().min(2, "กรุณาระบุผู้รับผิดชอบโครงการ"),
   totalBudget: z.coerce.number().min(1, "กรุณาเพิ่มรายการงบประมาณรายปีและระบุจำนวนเงิน"),
+  // ส่วนที่ 4: ประวัติการนำเสนอเข้าคณะกรรมการดิจิทัล กทม.
+  projectEverPassed: z.enum(["NEVER", "EVER"]).default("NEVER"),
+  prevYear: z.string().optional(),
+  prevProjectNameMode: z.enum(["SAME", "DIFFERENT"]).default("SAME"),
+  prevProject: z.string().optional(),
+  prevResolution: z.enum(PREV_RESOLUTION_VALUES).optional().or(z.literal("")),
   // ตารางงบประมาณรายปี
   budgetsByYear: z.array(
     z.object({
@@ -23,7 +68,7 @@ export const proposalStep1Schema = z.object({
       budgetType: z.string().min(1, "ระบุประเภทงบประมาณ"),
     })
   ).optional().default([]),
-});
+}).superRefine((data, ctx) => refineProposalHistory(data, ctx));
 
 // ---------------------------------------------------------------------------
 // Step 2: สาระสำคัญและขอบเขตโครงการ (Context & Scope)
@@ -87,6 +132,9 @@ export const imageWithDescriptionSchema = z.object({
 export const proposalStep3Schema = z.object({
   // ข้อ 1
   isBmaPlan: z.boolean().default(false),
+  bmaPlanStrategy: z.string().optional(),
+  bmaPlanIssue: z.string().optional(),
+  bmaPlanKpi: z.string().optional(),
 
   // ข้อ 2
   isAgencyPlan: z.boolean().default(false),
@@ -101,8 +149,9 @@ export const proposalStep3Schema = z.object({
 
   obstacleLaws: z.string().optional(),
   appArchitecture: z.string().min(5, "กรุณาอธิบายด้านระบบสารสนเทศ"),
-  dataOwner: z.string().min(2, "กรุณาระบุหน่วยงานเจ้าของข้อมูล"),
-  dataExchangePlan: z.string().min(5, "กรุณาอธิบายแนวทางการแลกเปลี่ยนข้อมูล"),
+  // Optional: may be left blank
+  dataOwner: z.string().optional().default(""),
+  dataExchangePlan: z.string().optional().default(""),
 
   // for this 4 files, when user uploads a file, it will instantly be saved in the database (projetc_attachments table)
   systemDiagramFile: imageWithDescriptionSchema.optional().nullable(),
@@ -113,6 +162,11 @@ export const proposalStep3Schema = z.object({
   networkDiagramUrl: z.string().url().optional().nullable(),
   useCaseDiagramUrl: z.string().url().optional().nullable(),
   securityDiagramUrl: z.string().url().optional().nullable(),
+  // 7.3 Data Architecture: เก็บใน project_attachments เหมือนแผนภาพข้างต้น (ไม่บังคับอัปโหลด)
+  erDiagramFile: imageWithDescriptionSchema.optional().nullable(),
+  dataFlowDiagramFile: imageWithDescriptionSchema.optional().nullable(),
+  erDiagramUrl: z.string().url().optional().nullable(),
+  dataFlowDiagramUrl: z.string().url().optional().nullable(),
 }).superRefine((data, ctx) => {
   // ตรวจสอบว่าต้องเลือกอย่างน้อย 1 ข้อ
   if (!data.isBmaPlan && !data.isAgencyPlan && !data.isGovernorPolicy) {
@@ -121,6 +175,19 @@ export const proposalStep3Schema = z.object({
       message: "กรุณาเลือกความสอดคล้องเชิงยุทธศาสตร์อย่างน้อย 1 ข้อ",
       path: ["isBmaPlan"], // ชี้ error ไปที่ข้อแรกให้แสดงผล
     });
+  }
+
+  // ดักจับถ้าติ๊กข้อ 1 (แผน กทม.) แต่ไม่กรอกข้อมูล — เหมือนข้อ 2
+  if (data.isBmaPlan) {
+    if (!data.bmaPlanStrategy?.trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุแผนงาน", path: ["bmaPlanStrategy"] });
+    }
+    if (!data.bmaPlanIssue?.trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุประเด็น", path: ["bmaPlanIssue"] });
+    }
+    if (!data.bmaPlanKpi?.trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุตัวชี้วัด", path: ["bmaPlanKpi"] });
+    }
   }
 
   // ดักจับถ้าติ๊กข้อ 2 แต่ไม่กรอกข้อมูล
@@ -138,11 +205,12 @@ export const proposalStep3Schema = z.object({
 
   // ดักจับถ้าติ๊กข้อ 3 แต่ไม่กรอกข้อมูล
   if (data.isGovernorPolicy) {
+    // เลือกจาก dropdown ครั้งเดียวเติมทั้งรหัสและชื่อ จึงแจ้งข้อความเดียวถ้ายังไม่เลือก
+    // (ไม่แจ้งซ้ำสองบรรทัด) และแจ้งเรื่องชื่อแยกเฉพาะข้อมูลเดิมที่มีรหัสแต่ชื่อว่าง
     if (!data.governorPolicyCode?.trim()) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุรหัสนโยบาย", path: ["governorPolicyCode"] });
-    }
-    if (!data.governorPolicyName?.trim()) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุนโยบาย", path: ["governorPolicyName"] });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาเลือกนโยบายผู้ว่าฯ", path: ["governorPolicyCode"] });
+    } else if (!data.governorPolicyName?.trim()) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "กรุณาระบุชื่อนโยบาย", path: ["governorPolicyName"] });
     }
   }
 });
@@ -273,7 +341,7 @@ const speakerCostSchema = z.object({
 });
 
 const foodCostSchema = z.object({
-  itemName: z.enum(["FULL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]),
+  itemName: z.enum(["PARTIAL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]),
   mealsCount: z.coerce.number().min(0),
   ratePerMeal: z.coerce.number().min(0),
   traineesCount: z.coerce.number().min(0),
@@ -292,9 +360,9 @@ const trainingCourseSchema = z.object({
 
   // ตารางค่าอาหาร (Fixed 3 รายการเสมอ แต่สร้าง schema ไว้รองรับการเก็บค่า)
   foodCosts: z.array(foodCostSchema).default([
+    { itemName: "PARTIAL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
     { itemName: "FULL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-    { itemName: "LIGHT_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-    { itemName: "SNACK_AND_BEVERAGES", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+    { itemName: "SNACK", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
   ]),
 }).superRefine((data, ctx) => {
   // ดักว่าถ้าติ๊ก "มีวิทยากร" ต้องกรอกเหตุผล

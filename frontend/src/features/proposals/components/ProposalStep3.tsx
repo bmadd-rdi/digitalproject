@@ -439,13 +439,35 @@ export const ProposalStep3 = ({
               {errors.appArchitecture.message}
             </p>
           )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3">
+          <SingleFileUploadWithDescBox
+            projectId={projectId}
+            title="System Diagram"
+            docTypeName="system_diagram"
+            name="systemDiagramFile"
+            watch={watch}
+            setValue={setValue}
+            errors={errors}
+            onUploadingChange={handleChildUploadingChange}
+          />
+          <SingleFileUploadWithDescBox
+            projectId={projectId}
+            title="Use Case Diagram"
+            docTypeName="use_case_diagram"
+            name="useCaseDiagramFile"
+            watch={watch}
+            setValue={setValue}
+            errors={errors}
+            onUploadingChange={handleChildUploadingChange}
+          />
+          </div>
         </div>
         <div className="space-y-2">
           <Label>
             สถาปัตยกรรมการจัดการองค์กรด้านข้อมูล (Data Architecture)<span className="text-status-orange">(7.3)</span>
           </Label>
           <Label>
-            หน่วยงานเจ้าของข้อมูล <span className="text-status-orange"></span>
+            หน่วยงานเจ้าของข้อมูล
           </Label>
           <Input
             {...register("dataOwner")}
@@ -463,8 +485,7 @@ export const ProposalStep3 = ({
         </div>
         <div className="space-y-2">
           <Label>
-            แนวทางการแลกเปลี่ยน/เชื่อมโยงข้อมูล{" "}
-            <span className="text-status-orange"></span>
+            แนวทางการแลกเปลี่ยน/เชื่อมโยงข้อมูล
           </Label>
           <RichTextarea
             {...register("dataExchangePlan")}
@@ -482,6 +503,28 @@ export const ProposalStep3 = ({
               {errors.dataExchangePlan.message}
             </p>
           )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3">
+          <SingleFileUploadWithDescBox
+            projectId={projectId}
+            title="ER Diagram"
+            docTypeName="er_diagram"
+            name="erDiagramFile"
+            watch={watch}
+            setValue={setValue}
+            errors={errors}
+            onUploadingChange={handleChildUploadingChange}
+          />
+          <SingleFileUploadWithDescBox
+            projectId={projectId}
+            title="Data Flow Diagram"
+            docTypeName="data_flow_diagram"
+            name="dataFlowDiagramFile"
+            watch={watch}
+            setValue={setValue}
+            errors={errors}
+            onUploadingChange={handleChildUploadingChange}
+          />
+          </div>
         </div>
       </div>
 
@@ -498,29 +541,9 @@ export const ProposalStep3 = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SingleFileUploadWithDescBox
             projectId={projectId}
-            title="System Diagram"
-            docTypeName="system_diagram"
-            name="systemDiagramFile"
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            onUploadingChange={handleChildUploadingChange}
-          />
-          <SingleFileUploadWithDescBox
-            projectId={projectId}
             title="Network Diagram"
             docTypeName="network_diagram"
             name="networkDiagramFile"
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            onUploadingChange={handleChildUploadingChange}
-          />
-          <SingleFileUploadWithDescBox
-            projectId={projectId}
-            title="Use Case Diagram"
-            docTypeName="use_case_diagram"
-            name="useCaseDiagramFile"
             watch={watch}
             setValue={setValue}
             errors={errors}

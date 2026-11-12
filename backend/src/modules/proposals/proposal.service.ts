@@ -1,14 +1,14 @@
 // src/modules/proposals/proposal.service.ts
 import { db } from "../../db";
-import { and, desc, eq, isNull, lt, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 // import {
 //   proposals,
 //   proposalBudgets,
 // } from "../../db/schema/proposals";
 import { proposals } from "../../db/schema/proposals";
 import { proposalDrafts } from "../../db/schema/proposal_drafts";
-import { projects } from "../../db/schema/projects";
-import { divisions } from "../../db/schema/lookups";
+import { projectAttachments, projects } from "../../db/schema/projects";
+import { departments, divisions, projectAttachmentTypes } from "../../db/schema/lookups";
 import { users } from "../../db/schema/users";
 import { HTTPException } from "hono/http-exception";
 import { v7 as uuidv7 } from "uuid";
@@ -26,6 +26,7 @@ import { syncProposalCollections } from "./proposal.persistence";
 import { sumProposalBudgets } from "./proposal-budget.util";
 import { calculateEstimatedCostTotal } from "./proposal-estimated-cost.util";
 import { submitProposalSchema } from "./proposal.schema";
+
 import { isSameDepartmentUser } from "../projects/project-access.policy";
 
 async function assertUserExists(userId: string) {
@@ -137,6 +138,13 @@ async function getProposalProjectAccess(projectId: string, user: UserContext) {
 
 // const hasOwn = (payload: Record<string, unknown>, key: string) =>
 //   Object.prototype.hasOwnProperty.call(payload, key);
+
+// เอกสารแนบที่ต้องมีก่อนส่งโครงการเข้ารับการพิจารณา (ห้ามว่าง)
+const REQUIRED_SUBMIT_ATTACHMENTS = [
+  { docTypeName: "approval_document", label: "เอกสารประกอบการพิจารณา (พร้อมลายเซ็นรับรอง)" },
+  { docTypeName: "bma_agency_plan", label: "แผนปฏิบัติราชการกรุงเทพมหานครหรือหน่วยงาน" },
+  { docTypeName: "project_document", label: "เอกสารโครงการ (พร้อมลายเซ็นรับรอง)" },
+] as const;
 
 const SUBMIT_PROPOSAL_FIELD_NAMES = new Set(Object.keys(submitProposalSchema.shape));
 
@@ -418,6 +426,19 @@ export const proposalService = {
         message: `Invalid proposal payload: ${parsedPayload.error.issues.map((issue) => `${issue.path.join(".")} ${issue.message}`).join(", ")}`,
       });
     }
+    const history = parsedPayload.data;
+    if (history.projectEverPassed === "EVER") {
+      const year = Number(history.prevYear);
+      if (!/^\d{4}$/.test(history.prevYear ?? "") || year < 2500 || year > 2600) {
+        throw new HTTPException(400, { message: "กรุณาระบุปี พ.ศ. ที่เคยนำเสนอให้ถูกต้อง (เช่น 2567)" });
+      }
+      if (history.prevProjectNameMode === "DIFFERENT" && !history.prevProject?.trim()) {
+        throw new HTTPException(400, { message: "กรุณาระบุชื่อโครงการที่เคยเสนอ" });
+      }
+      if (!history.prevResolution) {
+        throw new HTTPException(400, { message: "กรุณาเลือกมติที่ประชุมของการนำเสนอครั้งก่อน" });
+      }
+    }
     const projectId = typeof data.projectId === "string" ? data.projectId : "";
     if (!projectId) throw new HTTPException(400, { message: "Project ID is required" });
     // Use the parsed/defaulted payload for both the root row and every child collection.
@@ -447,6 +468,23 @@ export const proposalService = {
         throw new HTTPException(409, { message: "This project is currently outside the owner's editing stage" });
       }
 
+      // ต้องมีเอกสารแนบบังคับครบก่อนจึงจะส่งได้ (ตรวจที่ backend เสมอ ไม่พึ่งการตรวจฝั่งหน้าเว็บ)
+      const uploadedTypes = await tx
+        .selectDistinct({ name: projectAttachmentTypes.docTypeName })
+        .from(projectAttachments)
+        .innerJoin(projectAttachmentTypes, eq(projectAttachments.docTypeId, projectAttachmentTypes.id))
+        .where(and(
+          eq(projectAttachments.projectId, projectId),
+          inArray(projectAttachmentTypes.docTypeName, REQUIRED_SUBMIT_ATTACHMENTS.map((item) => item.docTypeName)),
+        ));
+      const uploadedNames = new Set(uploadedTypes.map((row) => row.name));
+      const missingAttachments = REQUIRED_SUBMIT_ATTACHMENTS.filter((item) => !uploadedNames.has(item.docTypeName));
+      if (missingAttachments.length > 0) {
+        throw new HTTPException(400, {
+          message: `ไม่สามารถส่งโครงการได้ กรุณาอัปโหลดเอกสารต่อไปนี้ในแท็บไฟล์แนบก่อน: ${missingAttachments.map((item) => item.label).join(", ")}`,
+        });
+      }
+
       const targetStatus = lockedProject.statusId === PROJECT_STATUS.DRAFT || lockedProject.statusId === PROJECT_STATUS.RETURNED_SECRETARY
         ? PROJECT_STATUS.PENDING_SECRETARY
         : PROJECT_STATUS.IN_ANALYSIS;
@@ -464,12 +502,40 @@ export const proposalService = {
       const estimatedCostTotal = calculateEstimatedCostTotal(data);
       const submittedAt = new Date();
 
+      // The dropdown ids are authoritative: verify the division really belongs
+      // to the department and rebuild the agency_name snapshot on the server.
+      const [agency] = await tx
+        .select({
+          departmentId: divisions.departmentId,
+          departmentName: departments.departmentName,
+          divisionName: divisions.divisionName,
+        })
+        .from(divisions)
+        .innerJoin(departments, eq(divisions.departmentId, departments.departmentId))
+        .where(eq(divisions.divisionId, data.divisionId))
+        .limit(1);
+      if (!agency || agency.departmentId !== data.departmentId) {
+        throw new HTTPException(400, { message: "หน่วยงานและส่วนราชการที่เลือกไม่สัมพันธ์กัน" });
+      }
+      const agencyName = `${agency.departmentName} - ${agency.divisionName}`;
+
       // 1. จัดการตารางแม่ (Proposals) ด้วย Upsert -> ตัดปัญหา Race Condition 
       const mainProposalData = {
         userId: user.userId,
         status: "submitted" as const,
         projectName: data.projectName,
-        agencyName: data.agencyName,
+        agencyName,
+        departmentId: data.departmentId,
+        divisionId: data.divisionId,
+        // ถ้าเลือก "ไม่เคยผ่านการพิจารณา" ล้างรายละเอียดประวัติทั้งหมด
+        projectEverPassed: data.projectEverPassed,
+        prevYear: data.projectEverPassed === "EVER" ? data.prevYear : null,
+        prevProjectNameMode: data.projectEverPassed === "EVER" ? data.prevProjectNameMode : null,
+        prevProject:
+          data.projectEverPassed === "EVER" && data.prevProjectNameMode === "DIFFERENT"
+            ? data.prevProject?.trim() || null
+            : null,
+        prevResolution: data.projectEverPassed === "EVER" ? data.prevResolution || null : null,
         headOfAgency: data.headOfAgency,
         dcioName: data.dcioName,
         projectManager: data.projectManager,
@@ -484,6 +550,9 @@ export const proposalService = {
         currentSystemStatus: data.currentSystemStatus,
         currentProblems: data.currentProblems,
         isBmaPlan: data.isBmaPlan,
+        bmaPlanStrategy: data.bmaPlanStrategy,
+        bmaPlanIssue: data.bmaPlanIssue,
+        bmaPlanKpi: data.bmaPlanKpi,
         isAgencyPlan: data.isAgencyPlan,
         agencyStrategy: data.agencyStrategy,
         agencyIssue: data.agencyIssue,

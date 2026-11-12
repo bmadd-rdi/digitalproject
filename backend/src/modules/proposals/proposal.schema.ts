@@ -9,8 +9,8 @@ export const draftProposalSchema = z.object({
   projectId: z.string().uuid().optional(),
   currentStep: z.coerce.number().optional(),
   draftPayload: z.any().optional().openapi({
-    type: 'object',
-    description: 'ข้อมูลฟอร์มแบบร่างทั้งหมด (JSON)'
+      type: 'object',
+      description: 'ข้อมูลฟอร์มแบบร่างทั้งหมด (JSON)'
   }),
 
   // service (upsertDraft)
@@ -19,7 +19,7 @@ export const draftProposalSchema = z.object({
   requestedBudgetTotal: z.coerce.number().optional(),
   estimatedCostTotal: z.coerce.number().optional(),
 }).partial().strict().openapi('DraftProposalRequest', {
-  // }).partial().passthrough().openapi('DraftProposalRequest', {
+// }).partial().passthrough().openapi('DraftProposalRequest', {
   description: 'Schema สำหรับข้อมูลแบบร่างโครงการ (Auto-Save)'
 });
 
@@ -125,7 +125,7 @@ const speakerCostSchema = z.object({
 
 const foodCostSchema = z.object({
   id: z.string().uuid().optional(),
-  itemName: z.enum(["FULL_MEAL", "LIGHT_MEAL", "SNACK_AND_BEVERAGES", "OTHER"]),
+  itemName: z.enum(["PARTIAL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]),
   mealsCount: z.coerce.number().min(0),
   ratePerMeal: z.coerce.number().min(0),
   traineesCount: z.coerce.number().min(0),
@@ -188,10 +188,26 @@ const ictPersonnelSchema = z.object({
   count: z.coerce.number().min(1),
 });
 
+// มติที่ประชุมคณะกรรมการดิจิทัล กทม. ในอดีต (ส่วนที่ 4 ของ Step 1)
+export const PREV_RESOLUTIONS = [
+  "APPROVED",
+  "APPROVED_WITH_CONDITIONS",
+  "UNDER_REVIEW",
+  "NOT_APPROVED",
+  "RETURNED",
+] as const;
+
 export const submitProposalSchema = z.object({
   // Step 1: ข้อมูลเบื้องต้น
   projectName: z.string().min(5),
   agencyName: z.string().min(2),
+  departmentId: z.number().int().positive(),
+  divisionId: z.number().int().positive(),
+  projectEverPassed: z.enum(["NEVER", "EVER"]).default("NEVER"),
+  prevYear: z.string().max(4).optional(),
+  prevProjectNameMode: z.enum(["SAME", "DIFFERENT"]).default("SAME"),
+  prevProject: z.string().max(1000).optional(),
+  prevResolution: z.union([z.enum(PREV_RESOLUTIONS), z.literal("")]).optional(),
   headOfAgency: z.string().min(2),
   dcioName: z.string().min(2),
   projectManager: z.string().min(2),
@@ -211,6 +227,9 @@ export const submitProposalSchema = z.object({
 
   // Step 3: สถาปัตยกรรมองค์กร
   isBmaPlan: z.boolean().default(false),
+  bmaPlanStrategy: z.string().optional(),
+  bmaPlanIssue: z.string().optional(),
+  bmaPlanKpi: z.string().optional(),
   isAgencyPlan: z.boolean().default(false),
   agencyStrategy: z.string().optional(),
   agencyIssue: z.string().optional(),
@@ -220,8 +239,8 @@ export const submitProposalSchema = z.object({
   governorPolicyName: z.string().optional(),
   obstacleLaws: z.string().optional(),
   appArchitecture: z.string().min(5),
-  dataOwner: z.string().min(2),
-  dataExchangePlan: z.string().min(5),
+  dataOwner: z.string().optional(),
+  dataExchangePlan: z.string().optional(),
 
   // Step 4: งบประมาณ
   hardwareCosts: z.array(hardwareCostSchema).default([]),
@@ -420,6 +439,13 @@ export const proposalResponseSchema = z.strictObject({
 
   projectName: responseString,
   agencyName: responseString,
+  departmentId: z.number().int().nullable(),
+  divisionId: z.number().int().nullable(),
+  projectEverPassed: responseString,
+  prevYear: responseString,
+  prevProjectNameMode: responseString,
+  prevProject: responseString,
+  prevResolution: responseString,
   headOfAgency: responseString,
   dcioName: responseString,
   projectManager: responseString,
@@ -437,6 +463,9 @@ export const proposalResponseSchema = z.strictObject({
   currentProblems: responseString,
 
   isBmaPlan: z.boolean().nullable(),
+  bmaPlanStrategy: responseString,
+  bmaPlanIssue: responseString,
+  bmaPlanKpi: responseString,
   isAgencyPlan: z.boolean().nullable(),
   agencyStrategy: responseString,
   agencyIssue: responseString,

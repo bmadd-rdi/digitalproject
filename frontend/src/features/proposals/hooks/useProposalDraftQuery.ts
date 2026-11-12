@@ -70,3 +70,28 @@ export function useGetProposal(projectId: string | undefined) {
     },
   });
 }
+
+/**
+ * useGetSubmittedProposalMeta — เมทาดาทาของข้อเสนอที่ส่งแล้ว (id, วันที่สร้าง/อัปเดต ฯลฯ)
+ * ใช้ query key เดียวกับ useGetProposal จึงไม่ยิง API ซ้ำ
+ * (useGetProposal ผ่าน normalizeProposalForForm ซึ่งตัดฟิลด์เหล่านี้ทิ้งเพราะไม่ใช่ฟิลด์ของฟอร์ม)
+ */
+export function useGetSubmittedProposalMeta(projectId: string | undefined) {
+  return useQuery({
+    queryKey: ["proposals", "submitted", projectId],
+    queryFn: () => fetchSubmittedProposal(projectId!),
+    enabled: !!projectId,
+    select: (res) => {
+      const data = res.data as Record<string, unknown> | null;
+      if (!data) return null;
+      return {
+        id: data.id,
+        status: data.status,
+        version: data.version,
+        submittedAt: data.submittedAt,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      } as Record<string, unknown>;
+    },
+  });
+}

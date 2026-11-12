@@ -2,14 +2,28 @@ import { HTTPException } from "hono/http-exception";
 
 type Row = Record<string, unknown>;
 
-function cents(value: unknown, field: string) {
+// ตัวคูณเงินเดือนบุคลากรรับทศนิยมได้สูงสุดกี่ตำแหน่ง — ต้องตรงกับ scale ของคอลัมน์
+// proposal_personnel_costs.multiplier ในฐานข้อมูล (numeric(7,4)) ถ้าแก้ค่านี้ต้องแก้
+// คอลัมน์ (และ MULTIPLIER_SCALE ด้านล่างซึ่งคำนวณจากค่านี้อัตโนมัติ) ให้ตรงกันด้วย
+const MULTIPLIER_DECIMALS = 4;
+const MULTIPLIER_SCALE = 10n ** BigInt(MULTIPLIER_DECIMALS);
+
+// แปลงตัวเลขทศนิยมเป็นจำนวนเต็มคูณ 10^decimals (fixed-point) โดยไม่ผ่าน floating point
+// เพื่อให้ยอดรวมเงินแม่นยำ ปฏิเสธค่าที่ทศนิยมเกิน decimals ตำแหน่ง, ติดลบ หรือเขียนแบบ 1e-7
+function toFixedPoint(value: unknown, field: string, decimals: number) {
   if (value === null || value === undefined || value === "") return 0n;
   const raw = typeof value === "number" ? String(value) : String(value).trim();
-  if (!/^(?:\+)?\d+(?:\.\d{1,2})?$/.test(raw)) {
+  const pattern = new RegExp(`^(?:\\+)?\\d+(?:\\.\\d{1,${decimals}})?$`);
+  if (!pattern.test(raw)) {
     throw new HTTPException(400, { message: `Invalid decimal value for ${field}` });
   }
   const [whole, fraction = ""] = raw.replace(/^\+/, "").split(".");
-  return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, "0"));
+  return BigInt(whole) * 10n ** BigInt(decimals) + BigInt(fraction.padEnd(decimals, "0"));
+}
+
+// จำนวนเงิน/จำนวนนับทั่วไป — ทศนิยม 2 ตำแหน่ง (หน่วยสตางค์)
+function cents(value: unknown, field: string) {
+  return toFixedPoint(value, field, 2);
 }
 
 function product(row: Row, left: string, right: string) {
@@ -37,8 +51,13 @@ export function calculateEstimatedCostTotal(payload: Record<string, unknown>) {
     const rows = Array.isArray(payload[key]) ? payload[key] as Row[] : [];
     for (const row of rows) {
       const multiplier = row.multiplier === undefined || row.multiplier === "" ? 1 : row.multiplier;
-      total += (cents(row.baseSalary, "baseSalary") * cents(multiplier, "multiplier") *
-        cents(row.personCount, "personCount") * cents(row.durationMonths, "durationMonths")) / 1000000n;
+      // หน่วยของตัวคูณ: baseSalary/personCount/durationMonths เป็น ×100 ส่วน multiplier เป็น
+      // ×MULTIPLIER_SCALE (10^4) ผลคูณจึงเป็น ×(100 × 100 × 100 × 10^4) = ×10^10
+      // หารด้วย 10^8 เพื่อให้กลับมาเป็นหน่วยสตางค์ (×100) เหมือนเดิม
+      total += (cents(row.baseSalary, "baseSalary") *
+        toFixedPoint(multiplier, "multiplier", MULTIPLIER_DECIMALS) *
+        cents(row.personCount, "personCount") * cents(row.durationMonths, "durationMonths")) /
+        (100n * 100n * MULTIPLIER_SCALE);
     }
   }
 

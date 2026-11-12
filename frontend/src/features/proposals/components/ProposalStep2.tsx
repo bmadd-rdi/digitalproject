@@ -134,9 +134,9 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
         {/* ============================================================== */}
 
         <div className="w-full">
-          <Label htmlFor="background" className="text-sm font-medium text-foreground">
+          <h3 className="text-lg font-bold text-foreground mb-4">
             1. หลักการและเหตุผล / ความเป็นมา <span className="text-status-orange"></span>
-          </Label>
+          </h3>
           <RichTextarea
             id="background"
             {...register("background")}
@@ -152,9 +152,9 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
         </div>
 
         <div className="w-full">
-          <Label htmlFor="objective" className="text-sm font-medium text-foreground">
+          <h3 className="text-lg font-bold text-foreground mb-4">
             2. วัตถุประสงค์ <span className="text-status-orange"></span>
-          </Label>
+          </h3>
           <RichTextarea
             id="objective"
             {...register("objective")}
@@ -170,9 +170,9 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
         </div>
 
         <div className="w-full">
-          <Label htmlFor="target" className="text-sm font-medium text-foreground">
+          <h3 className="text-lg font-bold text-foreground mb-4">
             3. เป้าหมาย <span className="text-status-orange"></span>
-          </Label>
+          </h3>
           <RichTextarea
             id="target"
             {...register("target")}
@@ -188,9 +188,9 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
         </div>
 
         <div className="w-full">
-          <Label htmlFor="scope" className="text-sm font-medium text-foreground">
+          <h3 className="text-lg font-bold text-foreground mb-4">
             4. ขอบเขตการดำเนินงาน <span className="text-status-orange"></span>
-          </Label>
+          </h3>
           <RichTextarea
             id="scope"
             {...register("scope")}
@@ -205,16 +205,16 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
           )}
         </div>
 
-        <div className="border-t border-border" />
+        {/* <div className="border-t border-border" /> */}
 
         {/* ============================================================== */}
         {/* --- ส่วนที่ ข2: ลักษณะโครงการ และ โครงการที่เกี่ยวข้อง --- */}
         {/* ============================================================== */}
 
         <div>
-          <Label className="text-sm font-medium text-foreground mb-3 block">
+          <h3 className="text-lg font-bold text-foreground mb-4">
             5. ลักษณะโครงการ <span className="text-status-orange"></span>
-          </Label>
+          </h3>
           <Controller
             control={control}
             name="projectType"
@@ -331,14 +331,14 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
           </div>
         )}
 
-        <div className="border-t border-border" />
+        {/* <div className="border-t border-border" /> */}
 
         {/* ============================================================== */}
         {/* --- ส่วนที่ ข3: สภาพปัจจุบัน (Current Status) --- */}
         {/* ============================================================== */}
 
         <div className="flex flex-col space-y-8">
-          <h3 className="text-xl font-bold text-foreground">6. สภาพปัจจุบัน</h3>
+          <h3 className="text-lg font-bold text-foreground">6. สภาพปัจจุบัน</h3>
 
           <div className="space-y-6">
             <div className="w-full">
@@ -393,7 +393,7 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
             </div>
           </div>
 
-          <div className="border-t border-border border-dashed" />
+          {/* <div className="border-t border-border border-dashed" /> */}
 
           {/* ============================================================== */}
           {/* --- ส่วนที่ ข4: ข้อมูลทรัพยากรที่มีอยู่ (Manpower & Equipment) --- */}
@@ -401,7 +401,8 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
 
           <div>
             <div className="mb-6">
-              <h4 className="text-base font-bold text-foreground">6.3 คอมพิวเตอร์และอุปกรณ์ที่มีอยู่ในปัจจุบันของส่วนราชการ</h4>
+              <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
+                6.4 คอมพิวเตอร์และอุปกรณ์ที่มีอยู่ในปัจจุบันของส่วนราชการ</Label>
               <p className="text-sm text-slate-gray">(เฉพาะกรณีโครงการที่มีการจัดหาครุภัณฑ์) (ให้ระบุรายการอุปกรณ์ของส่วนราชการที่มีอยู่ในปัจจุบัน สถานที่ติดตั้งของระบบ ส่วนที่รับผิดชอบ)</p>
             </div>
 

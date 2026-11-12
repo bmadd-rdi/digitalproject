@@ -113,6 +113,19 @@ export interface ProposalTemplateData extends ProposalTemplateBase {
   
   // ปรับเป็นประเภทสติงเพื่อรองรับจุดไข่ปลาหากกรณีไม่มีข้อมูล
   otherReadiness?: string;
+
+  // --- ส่วนที่ 4 ของ Step 1: ประวัติการนำเสนอเข้าคณะกรรมการดิจิทัล กทม. (ข้อ ๕ ใน Word) ---
+  chkNever: string;
+  chkEver: string;
+  prevYearStr: string;
+  chkPrevNameSame: string;
+  chkPrevNameDiff: string;
+  prevProjectStr: string;
+  chkResApproved: string;
+  chkResCond: string;
+  chkResReview: string;
+  chkResNot: string;
+  chkResReturned: string;
 }
 
 
@@ -411,6 +424,12 @@ export const prepareTemplateData = (
   // --- จัดการข้อมูล Cloud Requests ---
   const cloudData = mapCloudRequests(rawData.cloudRequests || []);
 
+  // --- ส่วนที่ 4: ประวัติการนำเสนอเข้าคณะกรรมการดิจิทัล กทม. ---
+  const dots = "..........................";
+  const isEver = rawData.projectEverPassed === "EVER";
+  const nameDiffers = isEver && rawData.prevProjectNameMode === "DIFFERENT";
+  const resolution = isEver ? rawData.prevResolution : "";
+
   return {
     ...rawData, // โยนข้อมูลพื้นฐานไปก่อน
 
@@ -429,6 +448,9 @@ export const prepareTemplateData = (
     chkGov: rawData.isGovernorPolicy ? "☑" : "☐",
 
     // --- Step 3 (ต่อ): ป้องกันค่าว่างด้วยจุดไข่ปลาแบบเดิมของคุณ ---
+    bmaPlanStrategy: rawData.isBmaPlan ? withPlaceholder(rawData.bmaPlanStrategy, "..........................") : "..........................",
+    bmaPlanIssue: rawData.isBmaPlan ? withPlaceholder(rawData.bmaPlanIssue, "..........................") : "..........................",
+    bmaPlanKpi: rawData.isBmaPlan ? withPlaceholder(rawData.bmaPlanKpi, "..........................") : "..........................",
     agencyStrategy: rawData.isAgencyPlan ? withPlaceholder(rawData.agencyStrategy, "..........................") : "..........................",
     agencyIssue: rawData.isAgencyPlan ? withPlaceholder(rawData.agencyIssue, "..........................") : "..........................",
     agencyKpi: rawData.isAgencyPlan ? withPlaceholder(rawData.agencyKpi, "..........................") : "..........................",
@@ -436,6 +458,19 @@ export const prepareTemplateData = (
     governorPolicyName: rawData.isGovernorPolicy ? withPlaceholder(rawData.governorPolicyName, "..........................") : "..........................",
 
     hasRelatedProjects: hasItems(rawData.relatedProjects),
+
+    // --- ส่วนที่ 4 (ข้อ ๕ ใน Word): ประวัติการนำเสนอ ---
+    chkNever: isEver ? "☐" : "☑",
+    chkEver: isEver ? "☑" : "☐",
+    prevYearStr: isEver ? withPlaceholder(rawData.prevYear, dots) : dots,
+    chkPrevNameSame: isEver && !nameDiffers ? "☑" : "☐",
+    chkPrevNameDiff: nameDiffers ? "☑" : "☐",
+    prevProjectStr: nameDiffers ? withPlaceholder(rawData.prevProject, dots) : dots,
+    chkResApproved: resolution === "APPROVED" ? "☑" : "☐",
+    chkResCond: resolution === "APPROVED_WITH_CONDITIONS" ? "☑" : "☐",
+    chkResReview: resolution === "UNDER_REVIEW" ? "☑" : "☐",
+    chkResNot: resolution === "NOT_APPROVED" ? "☑" : "☐",
+    chkResReturned: resolution === "RETURNED" ? "☑" : "☐",
 
     // --- Step 4 : Boolean Flag เพื่อซ่อน/แสดงตารางราคา ---
     // ตั้งค่า Boolean Flags คุมการแสดงตารางใน Word

@@ -55,11 +55,10 @@ export function SecretaryReviewDialog({
   const reviewMutation = useReviewSecretaryProject();
   const projectTypesQuery = useSecretaryProjectTypes();
 
+  // The lookup only contains the two project types (each is a review committee),
+  // so no name-based filtering is needed.
   const allowedProjectTypes = useMemo(
-    () => (projectTypesQuery.data?.data ?? []).filter((type) => {
-      const name = type.name.trim().toLowerCase();
-      return name === "hardware" || name === "software";
-    }),
+    () => projectTypesQuery.data?.data ?? [],
     [projectTypesQuery.data],
   );
 
@@ -205,12 +204,12 @@ export function SecretaryReviewDialog({
                 <Label htmlFor="secretary-project-type">ประเภทโครงการ *</Label>
                 <Select value={projectTypeId} onValueChange={setProjectTypeId}>
                   <SelectTrigger id="secretary-project-type" className="bg-background">
-                    <SelectValue placeholder="เลือกฮาร์ดแวร์หรือซอฟต์แวร์" />
+                    <SelectValue placeholder="เลือกประเภทโครงการ" />
                   </SelectTrigger>
                   <SelectContent>
                     {allowedProjectTypes.map((type) => (
                       <SelectItem key={type.id} value={String(type.id)}>
-                        {type.name.trim().toLowerCase() === "hardware" ? "ฮาร์ดแวร์" : "ซอฟต์แวร์"}
+                        {type.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -219,7 +218,7 @@ export function SecretaryReviewDialog({
                   <p className="text-xs text-muted-foreground">กำลังโหลดประเภทโครงการ...</p>
                 )}
                 {!projectTypesQuery.isLoading && allowedProjectTypes.length === 0 && (
-                  <p className="text-xs text-destructive">ไม่พบประเภทฮาร์ดแวร์หรือซอฟต์แวร์ในระบบ</p>
+                  <p className="text-xs text-destructive">ไม่พบประเภทโครงการในระบบ</p>
                 )}
               </div>
             )}

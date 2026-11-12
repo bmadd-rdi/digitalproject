@@ -1,17 +1,21 @@
 import { z } from "zod";
 import { schemas } from "@/types/api-schemas";
 
-export const PROJECT_ATTACHMENT_TYPE_NAMES = {
+export const PROJECT_ATTACHMENT_TYPE_NAMES = { 
   systemDiagram: "system_diagram",
   networkDiagram: "network_diagram",
   useCaseDiagram: "use_case_diagram",
   securityDiagram: "security_diagram",
   currentDiagram: "current_diagram",
+  erDiagram: "er_diagram",
+  dataFlowDiagram: "data_flow_diagram",
   presentation: "presentation",
   report: "report",
   quotation: "quotation",
   onePageSummary: "one_page_summary",
   approvalDocument: "approval_document",
+  projectDocument: "project_document",
+  bmaAgencyPlan: "bma_agency_plan",
   bmaDcUsage: "bma_dc_usage",
   other: "other",
   expenseClaim: "ใบเบิกเงิน",

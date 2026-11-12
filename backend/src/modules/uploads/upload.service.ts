@@ -4,7 +4,6 @@ import { db } from "../../db";
 import { projectAttachments, projects } from "../../db/schema/projects";
 import { divisions, projectAttachmentTypes } from "../../db/schema/lookups";
 import { users } from "../../db/schema/users";
-// import { and, eq, isNull, like } from "drizzle-orm";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { PROJECT_STATUS, OWNER_EDITABLE_STATUS_IDS } from "../projects/project-workflow";
@@ -67,11 +66,11 @@ function assertDocumentTypeMatchesFile(file: File, docTypeName: string) {
   if (docTypeName === "presentation") {
     allowedExtensions = new Set([".pdf", ".ppt", ".pptx"]);
     allowedMimeTypes = PRESENTATION_MIME_TYPES;
-  } else if (["quotation", "one_page_summary", "bma_dc_usage"].includes(docTypeName)) {
+  } else if (["quotation", "one_page_summary", "bma_dc_usage", "approval_document", "project_document", "bma_agency_plan"].includes(docTypeName)) {
     allowedExtensions = new Set([".pdf"]);
     allowedMimeTypes = PDF_MIME_TYPES;
   } else if (
-    ["system_diagram", "network_diagram", "use_case_diagram", "security_diagram", "current_diagram"].includes(docTypeName)
+    ["system_diagram", "network_diagram", "use_case_diagram", "security_diagram", "current_diagram", "er_diagram", "data_flow_diagram"].includes(docTypeName)
   ) {
     allowedExtensions = new Set([".png", ".jpg", ".jpeg", ".webp"]);
     allowedMimeTypes = DIAGRAM_MIME_TYPES;
@@ -212,7 +211,14 @@ export class UploadService {
 
     if (attachment.docTypeName !== "approval_document") {
       const normalizedRoles = user.roles.map((role) => String(role).toLowerCase());
-      if (normalizedRoles.includes("analyst") && !normalizedRoles.some((role) => ["admin", "super_admin"].includes(role))) {
+      // The project owner (the person who created/submitted the project) may delete
+      // attachments even if they also hold the Analyst role.
+      const isProjectOwner = attachment.ownerId === user.userId;
+      if (
+        normalizedRoles.includes("analyst") &&
+        !isProjectOwner &&
+        !normalizedRoles.some((role) => ["admin", "super_admin"].includes(role))
+      ) {
         throw new HTTPException(403, {
           message: "Analysts can upload attachments but cannot delete them",
         });

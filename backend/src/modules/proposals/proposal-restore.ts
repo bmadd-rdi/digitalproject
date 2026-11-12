@@ -2,9 +2,9 @@ type ProposalRow = Record<string, any>;
 import { sumProposalBudgets } from "./proposal-budget.util";
 
 const FOOD_DEFAULTS = [
+  { itemName: "PARTIAL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
   { itemName: "FULL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-  { itemName: "LIGHT_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-  { itemName: "SNACK_AND_BEVERAGES", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+  { itemName: "SNACK", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
 ];
 
 const PROJECT_TYPE_LABELS: Record<string, string> = {
@@ -19,10 +19,9 @@ const LOCATION_TYPE_LABELS: Record<string, string> = {
 };
 
 const FOOD_TYPE_LABELS: Record<string, string> = {
-  "ค่าอาหาร (ครบทุกมื้อ)": "FULL_MEAL",
-  "ค่าอาหาร (ไม่ครบมื้อ)": "LIGHT_MEAL",
-  "ค่าอาหารและเครื่องดื่ม": "SNACK_AND_BEVERAGES",
-  "ค่าอาหารอื่น": "OTHER",
+  "ค่าอาหาร (ไม่ครบมื้อ)": "PARTIAL_MEAL",
+  "ค่าอาหารและเครื่องดื่ม": "FULL_MEAL",
+  "ค่าอาหารว่าง": "SNACK",
 };
 
 function numberValue(value: unknown, fallback = 0) {
@@ -225,6 +224,13 @@ export function mapSubmittedProposalToDraftPayload(input: {
   return {
     projectName: stringValue(proposal.projectName),
     agencyName: stringValue(proposal.agencyName),
+    departmentId: numberValue(proposal.departmentId),
+    divisionId: numberValue(proposal.divisionId),
+    projectEverPassed: stringValue(proposal.projectEverPassed, "NEVER"),
+    prevYear: stringValue(proposal.prevYear),
+    prevProjectNameMode: stringValue(proposal.prevProjectNameMode, "SAME"),
+    prevProject: stringValue(proposal.prevProject),
+    prevResolution: stringValue(proposal.prevResolution),
     headOfAgency: stringValue(proposal.headOfAgency),
     dcioName: stringValue(proposal.dcioName),
     projectManager: stringValue(proposal.projectManager),
@@ -244,6 +250,9 @@ export function mapSubmittedProposalToDraftPayload(input: {
     existingEquipment: input.existingEquipments.map(mapExistingEquipment),
 
     isBmaPlan: booleanValue(proposal.isBmaPlan),
+    bmaPlanStrategy: stringValue(proposal.bmaPlanStrategy),
+    bmaPlanIssue: stringValue(proposal.bmaPlanIssue),
+    bmaPlanKpi: stringValue(proposal.bmaPlanKpi),
     isAgencyPlan: booleanValue(proposal.isAgencyPlan),
     agencyStrategy: stringValue(proposal.agencyStrategy),
     agencyIssue: stringValue(proposal.agencyIssue),

@@ -1,12 +1,12 @@
 // src/db/schema/proposals.ts
-import {
-  pgTable,
-  text,
-  varchar,
-  integer,
-  numeric,
-  boolean,
-  timestamp,
+import { 
+  pgTable, 
+  text, 
+  varchar, 
+  integer, 
+  numeric, 
+  boolean, 
+  timestamp, 
   uuid,
   pgEnum,
   index,
@@ -14,6 +14,7 @@ import {
 import { relations } from "drizzle-orm";
 import { users } from "./users";
 import { projects } from "./projects";
+import { departments, divisions } from "./lookups";
 
 // ---------------------------------------------------------------------------
 // ENUMS
@@ -22,8 +23,8 @@ export const projectTypeEnum = pgEnum("project_type", ["NEW", "REPLACEMENT", "CO
 
 // Workflow Status
 export const proposalStatusEnum = pgEnum("proposal_status", [
-  "draft", "submitted", "passed_1", "rejected_1", "fix_1",
-  "admin_assigned", "passed_2", "rejected_2", "fix_2",
+  "draft", "submitted", "passed_1", "rejected_1", "fix_1", 
+  "admin_assigned", "passed_2", "rejected_2", "fix_2", 
   "meeting_scheduled", "meeting_passed", "fix_3", "fix_4", "meeting_rejected"
 ]);
 
@@ -31,7 +32,7 @@ export const referenceTypeEnum = pgEnum("reference_type", ["MDES", "MARKET", "PR
 export const personnelTypeEnum = pgEnum("personnel_type", ["CORE", "ASST", "SUPP"]);
 export const locationTypeEnum = pgEnum("location_type", ["GOVERNMENT", "PRIVATE"]);
 export const costTypeEnum = pgEnum("cost_type", ["IT", "NON_IT"]);
-export const foodTypeEnum = pgEnum("food_type", ["FULL_MEAL", "LIGHT_MEAL", "SNACK_AND_BEVERAGES", "OTHER"]);
+export const foodTypeEnum = pgEnum("food_type", ["PARTIAL_MEAL", "FULL_MEAL", "SNACK", "OTHER"]);
 
 // ---------------------------------------------------------------------------
 // MAIN TABLE: Proposal
@@ -39,15 +40,25 @@ export const foodTypeEnum = pgEnum("food_type", ["FULL_MEAL", "LIGHT_MEAL", "SNA
 export const proposals = pgTable("proposals", {
   id: uuid("id").primaryKey(),
   status: proposalStatusEnum("status").default("draft").notNull(),
-
+  
   projectId: uuid("project_id").references(() => projects.id),
   userId: uuid("user_id").references(() => users.userId).notNull(),
   updatedBy: uuid("updated_by").references(() => users.userId),
-  version: integer("version").default(1),
+  version: integer("version").default(1), 
 
   // --- Step 1: ข้อมูลเบื้องต้น ---
   projectName: text("project_name"),
+  // agency_name stays a text snapshot (derived "หน่วยงาน - ส่วนราชการ") so old
+  // rows and every read-only view keep working. The ids are the source of truth.
   agencyName: varchar("agency_name", { length: 255 }),
+  departmentId: integer("department_id").references(() => departments.departmentId),
+  divisionId: integer("division_id").references(() => divisions.divisionId),
+  // ประวัติการนำเสนอเข้าคณะกรรมการดิจิทัล กทม. (ส่วนที่ 4 ของ Step 1)
+  projectEverPassed: varchar("project_ever_passed", { length: 10 }), // NEVER | EVER
+  prevYear: varchar("prev_presented_year", { length: 4 }),           // พ.ศ.
+  prevProjectNameMode: varchar("prev_project_name_mode", { length: 10 }), // SAME | DIFFERENT
+  prevProject: text("prev_presented_project"),                       // ชื่อโครงการที่เคยเสนอ (เมื่อไม่เหมือนเดิม)
+  prevResolution: varchar("prev_resolution", { length: 40 }),        // มติที่ประชุม
   headOfAgency: varchar("head_of_agency", { length: 255 }),
   dcioName: varchar("dcio_name", { length: 255 }),
   projectManager: varchar("project_manager", { length: 255 }),
@@ -66,6 +77,9 @@ export const proposals = pgTable("proposals", {
 
   // --- Step 3: สถาปัตยกรรมองค์กร ---
   isBmaPlan: boolean("is_bma_plan").default(false),
+  bmaPlanStrategy: text("bma_plan_strategy"), // แผนงานการพัฒนาด้าน (แผนปฏิบัติราชการ กทม.)
+  bmaPlanIssue: text("bma_plan_issue"), // ประเด็นการพัฒนา
+  bmaPlanKpi: text("bma_plan_kpi"), // ตัววัดผลหลัก (KPI)
   isAgencyPlan: boolean("is_agency_plan").default(false),
   agencyStrategy: text("agency_strategy"),
   agencyIssue: text("agency_issue"),
@@ -172,13 +186,15 @@ export const proposalSoftwareCosts = pgTable("proposal_software_costs", {
 export const proposalPersonnelCosts = pgTable("proposal_personnel_costs", {
   id: uuid("id").primaryKey(),
   proposalId: uuid("proposal_id").references(() => proposals.id, { onDelete: "cascade" }).notNull(),
-  personnelType: personnelTypeEnum("personnel_type").notNull(),
+  personnelType: personnelTypeEnum("personnel_type").notNull(), 
   position: varchar("position", { length: 255 }),
   degree: varchar("degree", { length: 255 }),
-  fieldOfStudy: varchar("field_of_study", { length: 255 }),
+  fieldOfStudy: varchar("field_of_study", { length: 255 }), 
   experienceYears: numeric("experience_years", { precision: 4, scale: 1 }),
   baseSalary: numeric("base_salary", { precision: 15, scale: 2 }),
-  multiplier: numeric("multiplier", { precision: 5, scale: 2 }),
+  // scale 4 ต้องตรงกับ MULTIPLIER_DECIMALS ใน proposal-estimated-cost.util.ts
+  // precision 7 = เลขหน้าจุดได้ 3 หลัก (สูงสุด 999.9999) เท่ากับ numeric(5,2) เดิม
+  multiplier: numeric("multiplier", { precision: 7, scale: 4 }), 
   personCount: integer("person_count"),
   durationMonths: integer("duration_months"),
 });
@@ -197,7 +213,7 @@ export const proposalOtherCosts = pgTable("proposal_other_costs", {
   quantity: integer("quantity"),
   unitPrice: numeric("unit_price", { precision: 15, scale: 2 }),
   remark: text("remark"),
-  costType: costTypeEnum("cost_type"),
+  costType: costTypeEnum("cost_type"), 
 });
 
 export const proposalIctPersonnel = pgTable("proposal_ict_personnel", {

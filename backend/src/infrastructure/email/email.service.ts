@@ -13,6 +13,7 @@ type SendEmailPayload = {
 
 const getFrontendUrl = (): string => {
   return process.env.FRONTEND_URL || 'http://localhost:3000';
+  // return process.env.FRONTEND_URL || 'https://digitalproject.bangkok.go.th';
 };
 
 const logEmailToConsole = (payload: SendEmailPayload) => {
@@ -70,6 +71,10 @@ const dispatchEmail = async (payload: SendEmailPayload): Promise<{ success: bool
         port: Number(process.env.SMTP_PORT) || 587,
         secure: process.env.SMTP_SECURE === "true",
         requireTLS: true,
+        // กันค้าง: ถ้าต่อ/คุยกับเมลเซิร์ฟเวอร์ไม่ได้ ให้ล้มเหลวเร็ว (ค่าเริ่มต้นของ nodemailer ยาวราว 2 นาที)
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 20_000,
         auth: process.env.SMTP_USER ? {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { FileCheck2, History, Paperclip } from "lucide-react";
+import { FileCheck2, FileText, History, Paperclip } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -197,7 +197,91 @@ export function DocumentsTabContent({
           </CardContent>
         </Card>
       )}
-      <Card className="overflow-hidden border-amber-200 border bg-amber-50">
+      <Card id="required-attachment-bma_agency_plan" className="overflow-hidden border-amber-200 border bg-amber-50 transition-shadow">
+        <CardHeader className="border-b border-amber-200 b-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                <FileText className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CardTitle className="text-lg font-extrabold text-slate-900">
+                    แผนปฏิบัติราชการกรุงเทพมหานครหรือหน่วยงาน
+                  </CardTitle>
+                  <Badge className="border-amber-300 bg-amber-100 text-amber-800">
+                    จำเป็น
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-slate-600">
+                  อัปโหลดแผนปฏิบัติราชการกรุงเทพมหานครหรือหน่วยงานเป็นไฟล์ PDF (1 ไฟล์) ต้องอัปโหลดก่อนจึงจะส่งโครงการเข้ารับการพิจารณาได้
+                </p>
+              </div>
+            </div>
+            <Badge variant="outline" className="w-fit border-amber-300 bg-white/70">
+              {documents.bmaAgencyPlan ? "อัปโหลดแล้ว" : "ยังไม่มีเอกสาร"}
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-4 sm:p-5">
+          <FileUploadField
+            projectId={projectId}
+            docTypeName={PROJECT_ATTACHMENT_TYPE_NAMES.bmaAgencyPlan}
+            title="แผนปฏิบัติราชการกรุงเทพมหานครหรือหน่วยงาน"
+            accept=".pdf,application/pdf"
+            value={documents.bmaAgencyPlan}
+            onChange={(file) => documents.setBmaAgencyPlan(file as DocumentFile | null)}
+            canManage={canManage}
+            showDescription
+            className="border-amber-200 bg-white/80"
+          />
+        </CardContent>
+      </Card>
+
+      <Card id="required-attachment-project_document" className="overflow-hidden border-amber-200 border bg-amber-50 transition-shadow">
+        <CardHeader className="border-b border-amber-200 b-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                <FileText className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CardTitle className="text-lg font-extrabold text-slate-900">
+                    เอกสารโครงการ (พร้อมลายเซ็นรับรอง)
+                  </CardTitle>
+                  <Badge className="border-amber-300 bg-amber-100 text-amber-800">
+                    จำเป็น
+                  </Badge>
+                </div>
+                <p className="mt-1 text-sm text-slate-600">
+                  อัปโหลดเอกสารโครงการเป็นไฟล์ PDF (1 ไฟล์) ต้องอัปโหลดก่อนจึงจะส่งโครงการเข้ารับการพิจารณาได้
+                </p>
+              </div>
+            </div>
+            <Badge variant="outline" className="w-fit border-amber-300 bg-white/70">
+              {documents.projectDocument ? "อัปโหลดแล้ว" : "ยังไม่มีเอกสาร"}
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-4 sm:p-5">
+          <FileUploadField
+            projectId={projectId}
+            docTypeName={PROJECT_ATTACHMENT_TYPE_NAMES.projectDocument}
+            title="เอกสารโครงการ (พร้อมลายเซ็นรับรอง)"
+            accept=".pdf,application/pdf"
+            value={documents.projectDocument}
+            onChange={(file) => documents.setProjectDocument(file as DocumentFile | null)}
+            canManage={canManage}
+            showDescription
+            className="border-amber-200 bg-white/80"
+          />
+        </CardContent>
+      </Card>
+
+      <Card id="required-attachment-approval_document" className="overflow-hidden border-amber-200 border bg-amber-50 transition-shadow">
         <CardHeader className="border-b border-amber-200 b-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3">
@@ -207,7 +291,7 @@ export function DocumentsTabContent({
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <CardTitle className="text-lg font-extrabold text-slate-900">
-                    เอกสารประกอบการพิจารณาพร้อมลายเซ็นรับรอง
+                    เอกสารประกอบการพิจารณา (พร้อมลายเซ็นรับรอง)
                   </CardTitle>
                   <Badge className="border-amber-300 bg-amber-100 text-amber-800">
                     จำเป็น
@@ -218,7 +302,7 @@ export function DocumentsTabContent({
                 </p>
               </div>
             </div>
-            <Badge variant="outline" className="w-fit border-amber-300 bg-card/70">
+            <Badge variant="outline" className="w-fit border-amber-300 bg-white/70">
               {documents.approvalDocuments.length > 0
                 ? `${documents.approvalDocuments.length} เวอร์ชัน`
                 : "ยังไม่มีเอกสาร"}
@@ -230,7 +314,7 @@ export function DocumentsTabContent({
           <FileUploadField
             projectId={projectId}
             docTypeName={PROJECT_ATTACHMENT_TYPE_NAMES.approvalDocument}
-            title="เอกสารประกอบการพิจารณาพร้อมลายเซ็นรับรอง"
+            title="เอกสารประกอบการพิจารณา (พร้อมลายเซ็นรับรอง)"
             accept=".pdf"
             value={documents.latestApprovalDocument}
             onChange={(file) => documents.setApprovalDoc(file as DocumentFile | null)}
@@ -238,11 +322,11 @@ export function DocumentsTabContent({
             allowNewVersion
             uploadButtonLabel="อัปโหลดเวอร์ชันใหม่"
             showDescription
-            className="border-amber-200 bg-card/80"
+            className="border-amber-200 bg-white/80"
           />
 
           {documents.approvalDocumentHistory.length > 0 && (
-            <Accordion type="single" collapsible className="rounded-lg border border-amber-200 bg-card/70 px-3">
+            <Accordion type="single" collapsible className="rounded-lg border border-amber-200 bg-white/70 px-3">
               <AccordionItem value="approval-history" className="border-0">
                 <AccordionTrigger className="py-3 font-bold text-slate-800 hover:no-underline">
                   <span className="flex items-center gap-2">
@@ -284,7 +368,7 @@ export function DocumentsTabContent({
             อัปโหลดแล้ว {requiredDocuments.filter((document) => document.file).length} / {requiredDocuments.length}
           </Badge>
         </div>
-        <Card className="rounded-md border-border bg-card shadow-sm">
+        <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
           <CardContent className="grid gap-4 p-4 md:grid-cols-2">
             {requiredDocuments.map((field) => (
               <FileUploadField
@@ -308,7 +392,7 @@ export function DocumentsTabContent({
           <h2 className="text-lg font-extrabold text-slate-900">แผนภาพระบบ</h2>
           <p className="text-sm text-slate-500">รูปภาพจะถูกปรับขนาดและบีบอัดก่อนอัปโหลด</p>
         </div>
-        <Card className="rounded-md border-border bg-card shadow-sm">
+        <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
           <CardContent className="grid gap-4 p-4 md:grid-cols-2">
             {diagrams.map((field) => (
               <FileUploadField
@@ -346,7 +430,7 @@ export function DocumentsTabContent({
           canManage={canManage}
           showDescription
         />
-        <Card className="rounded-md border-border bg-card shadow-sm">
+        <Card className="rounded-md border-[#D1CDC7] bg-white shadow-sm">
           <CardContent className="space-y-3 p-4">
             {documents.additionalDocs.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center text-slate-400">

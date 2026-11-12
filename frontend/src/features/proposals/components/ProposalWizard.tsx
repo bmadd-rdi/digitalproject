@@ -24,7 +24,7 @@ import { useGetDraft } from "../hooks/useProposalDraftQuery";
 import { useInitializeDraft } from "../hooks/useProposalMutations";
 
 import { StepperIndicator } from "./StepperIndicator";
-import { getProposalStep1ContextValues, ProposalStep1 } from "./ProposalStep1";
+import { getDefaultProjectManager, getProposalStep1ContextValues, ProposalStep1 } from "./ProposalStep1";
 import { ProposalStep2 } from "./ProposalStep2";
 import { ProposalStep3 } from "./ProposalStep3";
 import { ProposalStep4 } from "./ProposalStep4";
@@ -153,6 +153,10 @@ const WizardForm = ({
     // const hydratedDraft: Record<string, unknown> = normalizeProposalForForm(sourceValues ?? {});
     const hydratedDraft: Record<string, unknown> = normalizeProposalForForm(existingDraft ?? {});
     Object.assign(hydratedDraft, getProposalStep1ContextValues(projectDetail));
+    // ผู้รับผิดชอบโครงการแก้ไขได้: ใช้ค่าที่บันทึกไว้ และเติมชื่อเจ้าของโครงการให้เฉพาะเมื่อยังว่าง
+    if (!String(hydratedDraft.projectManager ?? "").trim()) {
+      hydratedDraft.projectManager = getDefaultProjectManager(projectDetail);
+    }
 
     const fileFields = [
       { field: "systemDiagram", docTypeName: "system_diagram" },
@@ -160,6 +164,8 @@ const WizardForm = ({
       { field: "useCaseDiagram", docTypeName: "use_case_diagram" },
       { field: "securityDiagram", docTypeName: "security_diagram" },
       { field: "currentDiagram", docTypeName: "current_diagram" },
+      { field: "erDiagram", docTypeName: "er_diagram" },
+      { field: "dataFlowDiagram", docTypeName: "data_flow_diagram" },
     ] as const;
 
     // Recreate the UI descriptor from either the saved draft URL or the
@@ -308,7 +314,7 @@ const WizardForm = ({
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto w-full rounded-container border border-border bg-card p-6 shadow-sm sm:p-10">
+    <div className="mx-auto w-full rounded-container border border-[#D1CDC7] bg-white p-6 shadow-sm sm:p-10">
 
       <div className="mb-5 flex items-center justify-between gap-3">
         <Button type="button" variant="ghost" onClick={requestExit} className="-ml-2 text-slate-600">
@@ -343,7 +349,7 @@ const WizardForm = ({
             {currentStep === 5 && <ProposalStep5 />}
           </fieldset>
 
-          <div className="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-center sm:justify-between border-t border-border gap-4">
+          <div className="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-center sm:justify-between border-t border-[#ededf4] gap-4">
 
             {/* Save status indicator replaces the raw timestamp text */}
             <div className="order-2 sm:order-1 w-full flex items-center">
@@ -356,7 +362,7 @@ const WizardForm = ({
                   type="button"
                   onClick={handlePrev}
                   variant="outline"
-                  className="px-6 h-12 w-full sm:w-auto font-bold rounded-full border-[1.5px] border-border text-muted-foreground hover:bg-surface-variant hover:text-foreground"
+                  className="px-6 h-12 w-full sm:w-auto font-bold rounded-full border-[1.5px] border-[#D1CDC7] text-[#3f4942] hover:bg-surface-variant hover:text-[#191c20]"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" /> ย้อนกลับ
                 </Button>
@@ -367,7 +373,7 @@ const WizardForm = ({
                   key="next-btn"
                   type="button"
                   onClick={handleNext}
-                  className="px-8 h-12 w-full sm:w-auto font-bold rounded-full bg-primary hover:bg-primary-dark text-white shadow-sm transition-transform active:scale-[0.99]"
+                  className="px-8 h-12 w-full sm:w-auto font-bold rounded-full bg-[#00734b] hover:bg-primary-dark text-white shadow-sm transition-transform active:scale-[0.99]"
                 >
                   ถัดไป <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -391,7 +397,7 @@ const WizardForm = ({
             type="button"
             onClick={() => void handleSaveDraft()}
             disabled={isSavingDraft}
-            className="fixed bottom-5 right-5 z-40 h-11 rounded-full bg-primary px-5 font-bold text-white shadow-lg hover:bg-primary-dark"
+            className="fixed bottom-5 right-5 z-40 h-11 rounded-full bg-[#00734b] px-5 font-bold text-white shadow-lg hover:bg-primary-dark"
           >
             <Save className="mr-2 h-4 w-4" />
             {isSavingDraft ? "กำลังบันทึก..." : "บันทึกแบบร่าง"}

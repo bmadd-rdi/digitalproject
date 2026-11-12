@@ -3,12 +3,15 @@ import { useEffect } from "react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
 import { ProposalStep1Values } from "../types";
+import { useDepartments, useDivisions } from "@/features/lookups/hooks/useLookups";
+import { LookupCombobox } from "./LookupCombobox";
 import type { ProjectDetail } from "@/features/projects/types/workspace";
 import { cn } from "@/lib/utils";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -17,24 +20,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export type ProposalStep1ContextValues = Pick<
-  ProposalStep1Values,
-  "projectName" | "agencyName" | "projectManager"
->;
+// ค่าที่ระบบบังคับใส่จากข้อมูลโครงการ (แก้ไม่ได้ในฟอร์ม) มีเฉพาะชื่อโครงการ
+// ผู้รับผิดชอบโครงการ (projectManager) ผู้ใช้กรอกเองได้ จึงต้องไม่ถูกเขียนทับที่นี่
+export type ProposalStep1ContextValues = Pick<ProposalStep1Values, "projectName">;
 
 export function getProposalStep1ContextValues(project: ProjectDetail): ProposalStep1ContextValues {
-  const agencyName = [project.division?.departmentName, project.division?.name]
-    .filter((value): value is string => Boolean(value?.trim()))
-    .join(" - ");
-  const projectManager = project.owner
-    ? `${project.owner.firstName} ${project.owner.lastName}`.trim()
-    : "";
-
   return {
     projectName: project.projectName?.trim() ?? "",
-    agencyName,
-    projectManager,
   };
+}
+
+// ค่าเริ่มต้นของ "ผู้รับผิดชอบโครงการ" ใช้เฉพาะตอนที่แบบร่างยังไม่มีค่านี้
+export function getDefaultProjectManager(project: ProjectDetail): string {
+  return project.owner
+    ? `${project.owner.firstName} ${project.owner.lastName}`.trim()
+    : "";
 }
 
 interface ProposalStep1Props {
@@ -44,11 +44,24 @@ interface ProposalStep1Props {
 const readOnlyContextClass = "mt-1.5 cursor-not-allowed bg-slate-100 text-slate-500";
 
 export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
-  const { register, control, watch, setValue, formState: { errors } } = useFormContext<ProposalStep1Values>();
+  const { register, control, watch, setValue, clearErrors, formState: { errors } } = useFormContext<ProposalStep1Values>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "budgetsByYear",
   });
+
+  // โหมดชื่อโครงการในส่วนประวัติการนำเสนอ (ส่วนที่ 4) — เป็น state ของหน้าจอเท่านั้น ยังไม่ถูกบันทึก
+
+  const selectedDepartmentId = Number(watch("departmentId")) || 0;
+  const { data: deptsRes } = useDepartments();
+  const { data: divsRes } = useDivisions(selectedDepartmentId);
+  const departments = deptsRes?.data ?? [];
+  const divisions = divsRes?.data ?? [];
+
+  const updateAgencyName = (departmentName?: string, divisionName?: string) => {
+    const name = [departmentName, divisionName].filter(Boolean).join(" - ");
+    setValue("agencyName", name, { shouldDirty: true, shouldValidate: true });
+  };
 
   const watchedBudgets = watch("budgetsByYear") || [];
   const calculatedTotal = watchedBudgets.reduce((sum, item) => sum + (Number(item?.amount) || 0), 0);
@@ -58,8 +71,6 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
 
     const contextValues = getProposalStep1ContextValues(project);
     setValue("projectName", contextValues.projectName, { shouldDirty: false, shouldValidate: false });
-    setValue("agencyName", contextValues.agencyName, { shouldDirty: false, shouldValidate: false });
-    setValue("projectManager", contextValues.projectManager, { shouldDirty: false, shouldValidate: false });
   }, [project, setValue]);
 
   // คอยส่งค่าผลรวมกลับเข้าไปอัปเดตในระบบฟอร์มเบื้องหลัง เพื่อให้ Zod เอาไป Validate ได้ตามปกติ
@@ -104,19 +115,65 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
             <Label htmlFor="agencyName" className="text-sm font-medium text-foreground">
               2.1 ชื่อหน่วยงาน <span className="text-status-orange"></span>
             </Label>
-            <Input
-              id="agencyName"
-              {...register("agencyName")}
-              readOnly
-              tabIndex={-1}
-              onMouseDown={(event) => event.preventDefault()}
-              aria-readonly="true"
-              className={readOnlyContextClass}
-            />
+            <div className="mt-1.5">
+              <Controller
+                control={control}
+                name="departmentId"
+                render={({ field }) => (
+                  <LookupCombobox
+                    options={departments}
+                    value={Number(field.value) || 0}
+                    onChange={(id) => {
+                      field.onChange(id);
+                      setValue("divisionId", 0, { shouldDirty: true, shouldValidate: true });
+                      updateAgencyName(undefined, undefined);
+                    }}
+                    placeholder="ค้นหาหรือเลือกหน่วยงาน..."
+                    error={!!errors.departmentId}
+                  />
+                )}
+              />
+            </div>
+            {errors.departmentId && (
+              <p className="mt-1 text-sm text-status-orange flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" /> {errors.departmentId.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label className="text-sm font-medium text-foreground">
+              ส่วนราชการ <span className="text-status-orange">*</span>
+            </Label>
+            <div className="mt-1.5">
+              <Controller
+                control={control}
+                name="divisionId"
+                render={({ field }) => (
+                  <LookupCombobox
+                    options={divisions}
+                    value={Number(field.value) || 0}
+                    onChange={(id) => {
+                      field.onChange(id);
+                      const department = departments.find((item) => item.id === selectedDepartmentId);
+                      const division = divisions.find((item) => item.id === id);
+                      updateAgencyName(department?.name, division?.name);
+                    }}
+                    placeholder={selectedDepartmentId ? "ค้นหาหรือเลือกส่วนราชการ..." : "กรุณาเลือกหน่วยงานก่อน"}
+                    error={!!errors.divisionId}
+                    disabled={!selectedDepartmentId}
+                  />
+                )}
+              />
+            </div>
+            {errors.divisionId && (
+              <p className="mt-1 text-sm text-status-orange flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" /> {errors.divisionId.message}
+              </p>
+            )}
           </div>
           <div>
             <Label htmlFor="headOfAgency" className="text-sm font-medium text-foreground">
-              2.2 หัวหน้าส่วนราชการ <span className="text-status-orange"></span>
+              หัวหน้าส่วนราชการ <span className="text-status-orange">*</span>
             </Label>
             <Input
               id="headOfAgency"
@@ -132,7 +189,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="dcioName" className="text-sm font-medium text-foreground">
-              2.3 ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO) <span className="text-status-orange"></span>
+              ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO) <span className="text-status-orange">*</span>
             </Label>
             <Input
               id="dcioName"
@@ -148,7 +205,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="projectManager" className="text-sm font-medium text-foreground">
-              2.4 ชื่อ-สกุล ตำแหน่งผู้รับผิดชอบโครงการ <span className="text-status-orange"></span>
+              ผู้รับผิดชอบโครงการ <span className="text-status-orange">*</span>
             </Label>
             <Input
               id="projectManager"
@@ -161,16 +218,6 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
                 <AlertCircle className="w-4 h-4" /> {errors.projectManager.message}
               </p>
             )}
-            {/*<Input
-              id="projectManager"
-              {...register("projectManager")}
-              readOnly
-              tabIndex={-1}
-              onMouseDown={(event) => event.preventDefault()}
-              aria-readonly="true"
-              className={readOnlyContextClass}
-              placeholder="ex. นายสมชาย ใจดี"
-            />*/}
           </div>
         </div>
       </div>
@@ -200,7 +247,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
             return (
               <div key={field.id} className="flex flex-wrap sm:flex-nowrap gap-3 items-start bg-surface p-4 rounded-lg border border-border shadow-sm">
                 <div className="w-full sm:w-1/4">
-                  <Label className="text-xs text-slate-gray mb-1 block">ปี พ.ศ. <span className="text-status-orange"></span></Label>
+                  <Label className="text-xs text-slate-gray mb-1 block">ปี พ.ศ. <span className="text-status-orange">*</span></Label>
                   <Input
                     type="number"
                     {...register(`budgetsByYear.${index}.year`, { valueAsNumber: true })}
@@ -211,7 +258,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
                   {rowErr.year && <span className="text-[10px] text-status-orange mt-1 block">{rowErr.year.message}</span>}
                 </div>
                 <div className="w-full sm:flex-1">
-                  <Label className="text-xs text-slate-gray mb-1 block">จำนวนเงิน (บาท) <span className="text-status-orange"></span></Label>
+                  <Label className="text-xs text-slate-gray mb-1 block">จำนวนเงิน (บาท) <span className="text-status-orange">*</span></Label>
                   <Input
                     type="number"
                     {...register(`budgetsByYear.${index}.amount`, { valueAsNumber: true })}
@@ -266,7 +313,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           ${errors.totalBudget ? 'bg-orange-50/50 border-status-orange' : 'bg-primary-container/20 border-primary/20'}
         `}>
           <div className="text-md font-bold text-foreground">
-            วงเงินงบประมาณทั้งโครงการ จำนวน{" "}
+            รวมวงเงินงบประมาณทั้งโครงการ เป็นจำนวน{" "}
             <span className="text-2xl font-black text-primary mx-1">
               {calculatedTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })}
             </span>{" "}
@@ -283,8 +330,157 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
       </div>
 
       <div className="border-t border-border" />
+      {/* --- ส่วนที่ 4: ประวัติการนำเสนอโครงการเข้ารับการพิจารณาของคณะกรรมการดิจิทัลกรุงเทพมหานคร --- */}
       <div>
         <h3 className="text-lg font-bold text-foreground mb-4">4. ประวัติการนำเสนอโครงการเข้ารับการพิจารณาของคณะกรรมการดิจิทัลกรุงเทพมหานคร</h3>
+        <div className="w-full mb-4 gap-4 p-3">
+          <Controller
+            control={control}
+            name="projectEverPassed"
+            render={({ field: { onChange, value } }) => (
+              <RadioGroup
+                className="flex flex-col sm:flex-row gap-4"
+                value={value ?? "NEVER"}
+                onValueChange={(v) => {
+                  onChange(v);
+                  // เลือก "ไม่เคย" -> ล้างรายละเอียดประวัติเพื่อไม่ให้ค่าเก่าค้าง
+                  if (v === "NEVER") {
+                    setValue("prevYear", "", { shouldDirty: true });
+                    setValue("prevProjectNameMode", "SAME", { shouldDirty: true });
+                    setValue("prevProject", "", { shouldDirty: true });
+                    setValue("prevResolution", "", { shouldDirty: true });
+                    clearErrors(["prevYear", "prevProject", "prevResolution"]);
+                  }
+                }}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="NEVER" id="project-ever-never" />
+                  <Label htmlFor="project-ever-never">ไม่เคยผ่านการพิจารณา</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="EVER" id="project-ever-ever" />
+                  <Label htmlFor="project-ever-ever">เคยผ่านการพิจารณา</Label>
+                </div>
+              </RadioGroup>
+            )}
+          />
+        </div>
+
+        {/* แสดงรายการประวัติเฉพาะเมื่อเลือก "เคยผ่านการพิจารณา" */}
+        {watch("projectEverPassed") === "EVER" && (
+          <div className="space-y-2.5 animate-in fade-in duration-300 mt-4 rounded-lg border border-border shadow-sm">
+            <div>{/* สร้างแถว  */}
+              {/* แถวแรก  */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 p-4"> {/* สร้างคอลัมธ์  */}
+                <div>
+                  <Label htmlFor="historyYear" className="text-sm font-medium text-foreground">
+                    ปี พ.ศ. <span className="text-status-orange">*</span>
+                  </Label>
+                  <Input
+                    id="historyYear"
+                    type="number"
+                    placeholder="เช่น 2567"
+                    className={cn("mt-1.5", errors.prevYear && "border-status-orange focus-visible:ring-status-orange")}
+                    {...register("prevYear")}
+                  />
+                  {errors.prevYear && (
+                    <p className="text-sm text-status-orange mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" /> {errors.prevYear.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-foreground block mb-1">
+                    ชื่อโครงการ <span className="text-status-orange">*</span>
+                  </Label>
+                  <Controller
+                    control={control}
+                    name="prevProjectNameMode"
+                    render={({ field: { onChange, value } }) => (
+                      <RadioGroup
+                        className="flex flex-col sm:flex-row gap-4"
+                        value={value ?? "SAME"}
+                        onValueChange={(v) => {
+                          onChange(v);
+                          if (v === "SAME") {
+                            setValue("prevProject", "", { shouldDirty: true });
+                            clearErrors("prevProject");
+                          }
+                        }}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="SAME" id="history-same" />
+                          <Label htmlFor="history-same">เหมือนกับที่เสนอ</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="DIFFERENT" id="history-diff" />
+                          <Label htmlFor="history-diff">ไม่เหมือนกับที่เสนอ</Label>
+                        </div>
+                      </RadioGroup>
+                    )}
+                  />
+                </div>
+              </div>
+              {/* แถวสอง  */}
+              {watch("prevProjectNameMode") === "DIFFERENT" && (
+                <div className="grid gap-x-6 p-4">
+                  <Label htmlFor="historyProjectName" className="text-sm font-medium text-foreground">
+                    ชื่อโครงการที่เคยเสนอ
+                  </Label>
+                  <Input
+                    id="historyProjectName"
+                    placeholder="ชื่อโครงการที่เคยเสนอ"
+                    className={cn("mt-1.5", errors.prevProject && "border-status-orange focus-visible:ring-status-orange")}
+                    {...register("prevProject")}
+                  />
+                  {errors.prevProject && (
+                    <p className="text-sm text-status-orange mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" /> {errors.prevProject.message}
+                    </p>
+                  )}
+                </div>
+              )}
+              {/* แถวสาม  */}
+              <div className="grid gap-x-6 p-4">
+                <Label className="text-sm font-medium text-foreground block mb-1">
+                  มติที่ประชุม <span className="text-status-orange">*</span>
+                </Label>
+                <div>
+                  <Controller
+                    control={control}
+                    name="prevResolution"
+                    render={({ field: { onChange, value } }) => (
+                      <RadioGroup
+                        className="flex flex-col sm:flex-row gap-4"
+                        value={value ?? ""}
+                        onValueChange={onChange}
+                      >
+                        {[
+                          { value: "APPROVED", label: "เห็นชอบในหลักการ" },
+                          { value: "APPROVED_WITH_CONDITIONS", label: "เห็นชอบแบบมีเงื่อนไข" },
+                          { value: "UNDER_REVIEW", label: "ทบทวน" },
+                          { value: "NOT_APPROVED", label: "ไม่เห็นชอบในหลักการ" },
+                          { value: "RETURNED", label: "คืนเรื่องหรือไม่เป็นไปตามหลักเกณฑ์" },
+                        ].map((opt) => (
+                          <div key={opt.value} className="flex items-center space-x-2">
+                            <RadioGroupItem value={opt.value} id={`history-resolution-${opt.value}`} />
+                            <Label htmlFor={`history-resolution-${opt.value}`}>{opt.label}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    )}
+                  />
+                  {errors.prevResolution && (
+                    <p className="text-sm text-status-orange mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" /> {errors.prevResolution.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

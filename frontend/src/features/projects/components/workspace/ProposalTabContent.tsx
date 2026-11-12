@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProposalState } from "@/features/proposals/hooks/useProposalState";
+import { useGetSubmittedProposalMeta } from "@/features/proposals/hooks/useProposalDraftQuery";
 import { useInitializeDraft } from "@/features/proposals/hooks/useProposalMutations";
 import type { ProjectDetail } from "../../types/workspace";
 import { SubmittedProposalView } from "./SubmittedProposalView";
@@ -20,6 +21,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
   const proposalState = useProposalState(projectId, {
     preferEditableDraft: project.permissions?.canSubmitProposal === true,
   });
+  const submittedMetaQuery = useGetSubmittedProposalMeta(projectId);
   const { mutate: initializeDraft, isPending: isCreatingDraft } = useInitializeDraft(projectId);
 
   if (proposalState.status === "loading") {
@@ -65,7 +67,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
     return (
       <SubmittedProposalView
         project={project}
-        proposal={proposalState.data as RawSubmittedProposal}
+        proposal={{ ...proposalState.data, ...(submittedMetaQuery.data ?? {}) } as unknown as RawSubmittedProposal}
         // onEdit={() => router.push(`/projects/${projectId}/proposal/create?mode=review`)}
         onEdit={() => router.push(`/projects/${projectId}/proposal/create`)}
       />
@@ -76,7 +78,7 @@ export function ProposalTabContent({ project }: ProposalTabContentProps) {
     <Card className="rounded-2xl border-orange-200 bg-orange-50/50 shadow-sm">
       <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between md:p-8">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-card text-orange-600 shadow-sm">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white text-orange-600 shadow-sm">
             <Clock className="h-6 w-6" />
           </div>
           <div>

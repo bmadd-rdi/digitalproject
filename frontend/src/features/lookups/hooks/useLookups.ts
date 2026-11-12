@@ -8,6 +8,7 @@ import {
   getProjectTypesAction,
   getBudgetTypesAction,
   getAnalystsLookupAction,
+  getGovernorPoliciesAction,
 } from "../actions/lookup.actions";
 
 // ตั้งค่า Stale Time ฝั่ง Client (เช่น 24 ชั่วโมง ให้สอดคล้องกับ Backend)
@@ -77,6 +78,16 @@ export function useAnalystsLookup(enabled = true) {
     queryKey: ["lookups", "analysts"],
     queryFn: () => getAnalystsLookupAction(),
     staleTime: 1000 * 60 * 5,
+    enabled,
+  });
+}
+
+// รายการนโยบายผู้ว่าฯ (id, code, name) สำหรับ dropdown — ดึงเฉพาะตอนที่ต้องใช้ (enabled)
+export function useGovernorPolicies(enabled = true) {
+  return useQuery({
+    queryKey: ["lookups", "governorPolicies"],
+    queryFn: () => getGovernorPoliciesAction(),
+    staleTime: 1000 * 60 * 60,
     enabled,
   });
 }

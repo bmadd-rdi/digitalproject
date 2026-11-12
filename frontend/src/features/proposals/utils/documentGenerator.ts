@@ -1,4 +1,4 @@
-// src/lib/documentGenerator.ts
+// src/features/proposals/utils/documentGenerator.ts
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { saveAs } from "file-saver";
@@ -8,56 +8,139 @@ import { prepareTemplateData } from "@/features/proposals/utils/template-adapter
 // @ts-expect-error - ImageModule ไม่มี Type definition ของ TypeScript อย่างเป็นทางการ
 import ImageModule from "docxtemplater-image-module-free";
 
-const fileToBase64 = (file: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
+const BLANK_IMAGE_BASE64 =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
+const MAX_IMAGE_WIDTH = 600;
+
+type LoadedImage = { dataUrl: string; width: number; height: number };
+
+const blobToDataUrl = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
   });
-};
 
-const attachmentToBase64 = async (attachment: unknown): Promise<string> => {
-  if (typeof Blob !== "undefined" && attachment instanceof Blob) {
-    return fileToBase64(attachment);
-  }
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === "object" && !Array.isArray(value);
 
-  if (typeof attachment === "string") {
-    if (attachment.startsWith("data:")) return attachment;
+/**
+ * แหล่งรูปที่เป็นไปได้ (ลองตามลำดับ):
+ *  1) attachment.file เป็น File/Blob (เพิ่งเลือกในหน้าจอ)
+ *  2) attachment.file เป็นสตริง (data URL หรือ URL ของไฟล์ที่อัปโหลดแล้ว)
+ *  3) attachment.file เป็น object ที่มี url/fileUrl/downloadUrl
+ *  4) ฟิลด์ *Url ของโครงการ (เมื่อโหลดจากฐานข้อมูล)
+ */
+const resolveImageSource = (attachment: unknown, fallbackUrl: unknown): Blob | string | null => {
+  const file = isRecord(attachment) ? attachment.file : undefined;
 
-    const response = await fetch(attachment, { credentials: "include" });
-    if (!response.ok) {
-      throw new Error(`Unable to load image attachment (${response.status})`);
+  if (typeof Blob !== "undefined" && file instanceof Blob) return file;
+  if (typeof file === "string" && file) return file;
+  if (isRecord(file)) {
+    for (const key of ["url", "fileUrl", "downloadUrl", "previewUrl"]) {
+      const candidate = file[key];
+      if (typeof candidate === "string" && candidate) return candidate;
     }
-    return fileToBase64(await response.blob());
   }
-
-  throw new Error("Image attachment is not a File or URL");
+  if (isRecord(attachment)) {
+    for (const key of ["url", "fileUrl", "downloadUrl"]) {
+      const candidate = attachment[key];
+      if (typeof candidate === "string" && candidate) return candidate;
+    }
+  }
+  if (typeof fallbackUrl === "string" && fallbackUrl) return fallbackUrl;
+  return null;
 };
 
-// อ่านขนาด Original ของภาพจาก Base64 (รันบน Browser)
-const getImageDimensions = (base64: string): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve) => {
+const loadHtmlImage = (src: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    img.onerror = () => resolve({ width: 0, height: 0 }); // Fallback กรณีโหลดภาพล้มเหลว
-    img.src = base64;
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("โหลดรูปภาพไม่สำเร็จ"));
+    img.src = src;
   });
+
+/**
+ * แปลงรูปทุกชนิดที่เบราว์เซอร์แสดงได้ (PNG/JPG/WebP/GIF) ให้เป็น PNG data URL
+ * พร้อมย่อให้พอดีหน้ากระดาษ เพราะ Word ฝัง WebP ไม่ได้
+ * คืน null ถ้าโหลดไม่ได้ (เอกสารยังสร้างต่อได้ ไม่ล้มทั้งไฟล์)
+ */
+const loadImage = async (source: Blob | string | null, label: string): Promise<LoadedImage | null> => {
+  if (!source) return null;
+  try {
+    let dataUrl: string;
+    if (typeof source === "string") {
+      if (source.startsWith("data:")) {
+        dataUrl = source;
+      } else {
+        const response = await fetch(source, { credentials: "include" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        dataUrl = await blobToDataUrl(await response.blob());
+      }
+    } else {
+      dataUrl = await blobToDataUrl(source);
+    }
+
+    const img = await loadHtmlImage(dataUrl);
+    const naturalW = img.naturalWidth || img.width;
+    const naturalH = img.naturalHeight || img.height;
+    if (!naturalW || !naturalH) throw new Error("ขนาดรูปไม่ถูกต้อง");
+
+    const scale = naturalW > MAX_IMAGE_WIDTH ? MAX_IMAGE_WIDTH / naturalW : 1;
+    const width = Math.round(naturalW * scale);
+    const height = Math.round(naturalH * scale);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("ไม่สามารถสร้าง canvas ได้");
+    // พื้นหลังขาว กันรูปโปร่งใสกลายเป็นพื้นดำ
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+
+    return { dataUrl: canvas.toDataURL("image/png"), width, height };
+  } catch (error) {
+    console.warn(`ไม่สามารถนำรูป "${label}" ลงเอกสารได้:`, error);
+    return null;
+  }
 };
 
-// คำนวณสัดส่วนภาพไม่ให้ล้น A4 (สมมติจำกัดกว้างสุด 600px)
-const calculateScaledDimensions = (originalW: number, originalH: number, maxWidth = 600): [number, number] => {
-  if (originalW === 0 || originalH === 0) return [1, 1];
-  if (originalW <= maxWidth) return [originalW, originalH]; // ถ้าภาพเล็กกว่า A4 อยู่แล้ว ให้ใช้ขนาดจริง
-  const scale = maxWidth / originalW;
-  return [maxWidth, Math.round(originalH * scale)];
+type DiagramSpec = {
+  /** ชื่อแท็กรูปในเทมเพลต เช่น systemImage -> {%systemImage} */
+  tag: string;
+  fileKey: string;
+  urlKey: string;
+  label: string;
+  /** รูปที่เทมเพลตไม่ได้ซ่อนเมื่อว่าง: ใส่รูปว่างแทน / รูปที่เทมเพลตมี {#hasXxx} ครอบ: ซ่อนทั้งหัวข้อ */
+  flag?: string;
 };
 
-const getBlankImageBase64 = (): string => {
-  return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+const DIAGRAMS: DiagramSpec[] = [
+  { tag: "systemImage", fileKey: "systemDiagramFile", urlKey: "systemDiagramUrl", label: "System Diagram" },
+  { tag: "networkImage", fileKey: "networkDiagramFile", urlKey: "networkDiagramUrl", label: "Network Diagram" },
+  { tag: "useCaseImage", fileKey: "useCaseDiagramFile", urlKey: "useCaseDiagramUrl", label: "Use Case Diagram" },
+  { tag: "securityImage", fileKey: "securityDiagramFile", urlKey: "securityDiagramUrl", label: "Security Diagram" },
+  { tag: "erImage", fileKey: "erDiagramFile", urlKey: "erDiagramUrl", label: "ER Diagram", flag: "hasErImage" },
+  { tag: "dfdImage", fileKey: "dataFlowDiagramFile", urlKey: "dataFlowDiagramUrl", label: "Data Flow Diagram", flag: "hasDfdImage" },
+  { tag: "currentImage", fileKey: "currentDiagramFile", urlKey: "currentDiagramUrl", label: "Current System Diagram", flag: "hasCurrentImage" },
+];
+
+export type GenerateProposalDocxOptions = {
+  /** ใช้เมื่อ formData.agencyName ว่าง */
+  agencyNameFallback?: string;
+  /** ชื่อหน่วยงาน/ส่วนราชการ ที่แปลงจาก department_id / division_id แล้ว (แท็ก {departmentName} {divisionName}) */
+  departmentName?: string;
+  divisionName?: string;
 };
 
-export const generateProposalDocx = async (formData: ProposalDraftValues) => {
+export const generateProposalDocx = async (
+  formData: ProposalDraftValues,
+  options: GenerateProposalDocxOptions = {},
+) => {
   try {
     const response = await fetch("/templates/project-proposal.docx");
 
@@ -67,66 +150,53 @@ export const generateProposalDocx = async (formData: ProposalDraftValues) => {
 
     const arrayBuffer = await response.arrayBuffer();
     const zip = new PizZip(arrayBuffer);
-    const blankImageBase64 = getBlankImageBase64();
 
-    // สร้าง Object ไว้เก็บขนาด Original ของแต่ละภาพ
+    const source = formData as unknown as Record<string, unknown>;
     const imageDimensions: Record<string, { width: number; height: number }> = {};
+    const imageData: Record<string, string | boolean> = {};
+    const failedImages: string[] = [];
 
-    let systemImageBase64 = blankImageBase64;
-    if (formData.systemDiagramFile?.file) {
-      systemImageBase64 = await attachmentToBase64(formData.systemDiagramFile.file);
-      imageDimensions["systemImage"] = await getImageDimensions(systemImageBase64);
-    }
+    await Promise.all(
+      DIAGRAMS.map(async (spec) => {
+        const attachment = source[spec.fileKey];
+        const hadSource = resolveImageSource(attachment, source[spec.urlKey]);
+        const loaded = await loadImage(hadSource, spec.label);
 
-    let networkImageBase64 = blankImageBase64;
-    if (formData.networkDiagramFile?.file) {
-      networkImageBase64 = await attachmentToBase64(formData.networkDiagramFile.file);
-      imageDimensions["networkImage"] = await getImageDimensions(networkImageBase64);
-    }
+        if (hadSource && !loaded) failedImages.push(spec.label);
 
-    let useCaseImageBase64 = blankImageBase64;
-    if (formData.useCaseDiagramFile?.file) {
-      useCaseImageBase64 = await attachmentToBase64(formData.useCaseDiagramFile.file);
-      imageDimensions["useCaseImage"] = await getImageDimensions(useCaseImageBase64);
-    }
+        const description =
+          isRecord(attachment) && typeof attachment.description === "string" && attachment.description.trim()
+            ? attachment.description
+            : "-";
 
-    let securityImageBase64 = blankImageBase64;
-    if (formData.securityDiagramFile?.file) {
-      securityImageBase64 = await attachmentToBase64(formData.securityDiagramFile.file);
-      imageDimensions["securityImage"] = await getImageDimensions(securityImageBase64);
-    }
+        imageData[spec.tag] = loaded ? loaded.dataUrl : BLANK_IMAGE_BASE64;
+        imageData[`${spec.tag}Desc`] = loaded ? description : "-";
+        if (loaded) imageDimensions[spec.tag] = { width: loaded.width, height: loaded.height };
+        if (spec.flag) imageData[spec.flag] = !!loaded;
+      }),
+    );
 
     const imageOptions = {
       centered: true,
       getImage: function (tagValue: string): ArrayBuffer {
         try {
-          if (!tagValue || typeof tagValue !== 'string') {
-             tagValue = blankImageBase64;
-          }
-
-          const base64Data = tagValue.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+          const value = !tagValue || typeof tagValue !== "string" ? BLANK_IMAGE_BASE64 : tagValue;
+          const base64Data = value.replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
           const binaryString = window.atob(base64Data);
-          const len = binaryString.length;
-          const bytes = new Uint8Array(len);
-          for (let i = 0; i < len; i++) {
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
             bytes[i] = binaryString.charCodeAt(i);
           }
           return bytes.buffer;
         } catch (err) {
-           console.error("Error converting image:", err);
-           return new ArrayBuffer(0);
+          console.error("Error converting image:", err);
+          return new ArrayBuffer(0);
         }
       },
       getSize: function (img: ArrayBuffer, tagValue: string, tagName: string): [number, number] {
-        if (img.byteLength === 0 || tagValue === blankImageBase64) return [1, 1];
-
-        // ดึงสัดส่วนภาพที่คำนวณเก็บไว้มาใช้งาน แล้ว Scale ให้พอดีหน้ากระดาษ (600px)
+        if (img.byteLength === 0 || tagValue === BLANK_IMAGE_BASE64) return [1, 1];
         const dim = imageDimensions[tagName];
-        if (dim) {
-          return calculateScaledDimensions(dim.width, dim.height, 600);
-        }
-
-        return [400, 300]; // ค่าดีฟอลต์เผื่อฉุกเฉิน
+        return dim ? [dim.width, dim.height] : [400, 300];
       },
     };
 
@@ -145,28 +215,20 @@ export const generateProposalDocx = async (formData: ProposalDraftValues) => {
 
     const finalTemplateData = {
       ...baseTemplateData,
+      agencyName: formData.agencyName?.trim() ? formData.agencyName : (options.agencyNameFallback ?? ""),
+      departmentName: options.departmentName ?? "",
+      divisionName: options.divisionName ?? "",
       totalBudgetFormatted: formData.totalBudget
-        ? new Intl.NumberFormat('th-TH').format(formData.totalBudget)
+        ? new Intl.NumberFormat("th-TH").format(formData.totalBudget)
         : "0.00",
       budgets: formData.budgetsByYear?.map(b => ({
         year: b.year,
-        amount: new Intl.NumberFormat('th-TH').format(b.amount)
+        amount: new Intl.NumberFormat("th-TH").format(b.amount)
       })) || [],
-      currentDate: new Date().toLocaleDateString('th-TH', {
-        year: 'numeric', month: 'long', day: 'numeric'
+      currentDate: new Date().toLocaleDateString("th-TH", {
+        year: "numeric", month: "long", day: "numeric"
       }),
-
-      systemImage: systemImageBase64,
-      systemImageDesc: formData.systemDiagramFile?.description || "-",
-
-      networkImage: networkImageBase64,
-      networkImageDesc: formData.networkDiagramFile?.description || "-",
-
-      useCaseImage: useCaseImageBase64,
-      useCaseImageDesc: formData.useCaseDiagramFile?.description || "-",
-
-      securityImage: securityImageBase64,
-      securityImageDesc: formData.securityDiagramFile?.description || "-",
+      ...imageData,
     };
 
     doc.render(finalTemplateData);
@@ -182,9 +244,17 @@ export const generateProposalDocx = async (formData: ProposalDraftValues) => {
 
     saveAs(output, fileName);
 
-    return { success: true };
+    return {
+      success: true,
+      // รูปที่มีไฟล์แต่โหลดไม่สำเร็จ (ให้ผู้เรียกแจ้งผู้ใช้ได้)
+      failedImages,
+    } as { success: boolean; error?: string; failedImages: string[] };
   } catch (error) {
     console.error("Error generating document:", error);
-    return { success: false, error: String(error) };
+    return { success: false, error: String(error), failedImages: [] as string[] } as {
+      success: boolean;
+      error?: string;
+      failedImages: string[];
+    };
   }
 };

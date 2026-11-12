@@ -1,4 +1,4 @@
-import { proposalFormSchema } from "../types";
+import { proposalFormSchema, refineProposalHistory } from "../types";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -14,16 +14,18 @@ const LOCATION_TYPE_LABELS: Record<string, string> = {
 };
 
 const FOOD_TYPE_LABELS: Record<string, string> = {
-  "ค่าอาหาร (ครบทุกมื้อ)": "FULL_MEAL",
-  "ค่าอาหาร (ไม่ครบมื้อ)": "LIGHT_MEAL",
-  "ค่าอาหารและเครื่องดื่ม": "SNACK_AND_BEVERAGES",
-  "ค่าอาหารอื่น": "OTHER",
+  "ค่าอาหาร (ไม่ครบมื้อ)": "PARTIAL_MEAL",
+  "ค่าอาหารและเครื่องดื่ม": "FULL_MEAL",
+  "ค่าอาหารว่าง": "SNACK",
+  // ชื่อรหัสรุ่นเก่าที่เคยถูกบันทึกในแบบร่าง (draft) ให้แปลงเป็นรหัสปัจจุบัน
+  LIGHT_MEAL: "PARTIAL_MEAL",
+  SNACK_AND_BEVERAGES: "SNACK",
 };
 
 const FOOD_DEFAULTS = [
+  { itemName: "PARTIAL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
   { itemName: "FULL_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-  { itemName: "LIGHT_MEAL", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
-  { itemName: "SNACK_AND_BEVERAGES", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
+  { itemName: "SNACK", mealsCount: 0, ratePerMeal: 0, traineesCount: 0, days: 0 },
 ];
 
 const UI_ONLY_FIELDS = [
@@ -35,6 +37,10 @@ const UI_ONLY_FIELDS = [
   "networkDiagramUrl",
   "useCaseDiagramUrl",
   "securityDiagramUrl",
+  "erDiagramFile",
+  "dataFlowDiagramFile",
+  "erDiagramUrl",
+  "dataFlowDiagramUrl",
   "currentDiagramFile",
   "currentDiagramUrl",
 ] as const;
@@ -46,6 +52,13 @@ const UI_ONLY_FIELDS = [
 const FORM_FIELD_KEYS = [
   "projectName",
   "agencyName",
+  "departmentId",
+  "divisionId",
+  "projectEverPassed",
+  "prevYear",
+  "prevProjectNameMode",
+  "prevProject",
+  "prevResolution",
   "headOfAgency",
   "dcioName",
   "projectManager",
@@ -62,6 +75,9 @@ const FORM_FIELD_KEYS = [
   "manpower",
   "existingEquipment",
   "isBmaPlan",
+  "bmaPlanStrategy",
+  "bmaPlanIssue",
+  "bmaPlanKpi",
   "isAgencyPlan",
   "agencyStrategy",
   "agencyIssue",
@@ -81,6 +97,10 @@ const FORM_FIELD_KEYS = [
   "networkDiagramUrl",
   "useCaseDiagramUrl",
   "securityDiagramUrl",
+  "erDiagramFile",
+  "dataFlowDiagramFile",
+  "erDiagramUrl",
+  "dataFlowDiagramUrl",
   "currentDiagramFile",
   "currentDiagramUrl",
   "hardwareCosts",
@@ -224,9 +244,8 @@ function normalizeFoodRows(input: unknown) {
   const mapped = rows(input).map(mapFood);
   const byType = new Map(mapped.map((row) => [row.itemName, row]));
   const standardRows = FOOD_DEFAULTS.map((fallback) => byType.get(fallback.itemName) ?? fallback);
-  const extraRows = mapped.filter(
-    (row) => !FOOD_DEFAULTS.some((fallback) => fallback.itemName === row.itemName),
-  );
+  // เก็บเฉพาะแถวพิเศษที่เป็น OTHER (ค่าที่ไม่รู้จักจะถูกตัดทิ้ง ไม่ให้ทำให้การตรวจสอบล้มเหลว)
+  const extraRows = mapped.filter((row) => row.itemName === "OTHER");
   return [...standardRows, ...extraRows];
 }
 
@@ -241,6 +260,13 @@ export function normalizeProposalForForm(source: unknown): JsonRecord {
   const normalized: JsonRecord = {
     projectName: stringValue(value.projectName),
     agencyName: stringValue(value.agencyName),
+    departmentId: numberValue(value.departmentId),
+    divisionId: numberValue(value.divisionId),
+    projectEverPassed: stringValue(value.projectEverPassed, "NEVER"),
+    prevYear: stringValue(value.prevYear),
+    prevProjectNameMode: stringValue(value.prevProjectNameMode, "SAME"),
+    prevProject: stringValue(value.prevProject),
+    prevResolution: stringValue(value.prevResolution),
     headOfAgency: stringValue(value.headOfAgency),
     dcioName: stringValue(value.dcioName),
     projectManager: stringValue(value.projectManager),
@@ -262,6 +288,9 @@ export function normalizeProposalForForm(source: unknown): JsonRecord {
     existingEquipment: rows(existingEquipments).map(mapEquipment),
 
     isBmaPlan: booleanValue(value.isBmaPlan),
+    bmaPlanStrategy: stringValue(value.bmaPlanStrategy),
+    bmaPlanIssue: stringValue(value.bmaPlanIssue),
+    bmaPlanKpi: stringValue(value.bmaPlanKpi),
     isAgencyPlan: booleanValue(value.isAgencyPlan),
     agencyStrategy: stringValue(value.agencyStrategy),
     agencyIssue: stringValue(value.agencyIssue),
@@ -369,9 +398,13 @@ export const proposalSubmitPayloadSchema = proposalFormSchema.omit({
   networkDiagramUrl: true,
   useCaseDiagramUrl: true,
   securityDiagramUrl: true,
+  erDiagramFile: true,
+  dataFlowDiagramFile: true,
+  erDiagramUrl: true,
+  dataFlowDiagramUrl: true,
   currentDiagramFile: true,
   currentDiagramUrl: true,
-});
+}).superRefine((data, ctx) => refineProposalHistory(data, ctx));
 
 export function toProposalSubmitPayload(source: Record<string, unknown>) {
   const normalized = normalizeProposalForForm(source);
