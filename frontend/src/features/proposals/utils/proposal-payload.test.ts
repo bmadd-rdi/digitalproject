@@ -14,6 +14,8 @@ type TestPayload = Record<string, unknown> & {
 const completeResponse = {
   projectName: "ระบบบริการประชาชนรุ่นใหม่",
   agencyName: "สำนักดิจิทัล",
+  departmentId: 21,
+  divisionId: 369,
   headOfAgency: "หัวหน้าหน่วยงาน",
   dcioName: "ผู้บริหารเทคโนโลยีสารสนเทศ",
   projectManager: "ผู้จัดการโครงการ",
@@ -59,6 +61,8 @@ test("normalizes response fields into canonical form state", () => {
   const form = normalizeProposalForForm(completeResponse) as TestPayload;
 
   expect(form.projectType).toBe("NEW");
+  expect(form.departmentId).toBe(21);
+  expect(form.divisionId).toBe(369);
   expect(form.isAgencyPlan).toBe(false);
   expect(form.isGovernorPolicy).toBe(false);
   expect(form.budgetsByYear).toEqual([{ year: 2569, amount: 100000, budgetType: "งบประมาณรายจ่าย" }]);
@@ -73,10 +77,24 @@ test("creates a backend-compatible payload without stale relational IDs", () => 
   const parsed = proposalSubmitPayloadSchema.safeParse(payload);
 
   expect(parsed.success).toBe(true);
+  expect(payload.departmentId).toBe(21);
+  expect(payload.divisionId).toBe(369);
   expect(payload.budgetsByYear[0]).not.toHaveProperty("id");
   expect(payload.trainingCourses[0]).not.toHaveProperty("id");
   expect(payload.cloudRequests[0]).not.toHaveProperty("id");
   expect(payload.cloudRequests[0].requestedServiceDate).toBe("2027-01-02");
+});
+
+test("rejects submit payloads without organization identifiers", () => {
+  const payload = toProposalSubmitPayload(completeResponse);
+  delete payload.departmentId;
+  delete payload.divisionId;
+
+  const result = proposalSubmitPayloadSchema.safeParse(payload);
+  expect(result.success).toBe(false);
+  if (result.success) throw new Error("Expected missing organization identifiers to be rejected");
+  expect(result.error.issues.map((issue) => issue.path[0])).toContain("departmentId");
+  expect(result.error.issues.map((issue) => issue.path[0])).toContain("divisionId");
 });
 
 test("does not leak submitted-proposal response metadata into form or submit payload", () => {

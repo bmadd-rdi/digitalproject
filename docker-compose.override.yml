@@ -25,6 +25,8 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - HOSTNAME=0.0.0.0
+      - NEXT_PUBLIC_API_URL=/api/v1
+      - BACKEND_URL=http://backend:8081
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     # ยกเลิก limit แรมของ production เพื่อให้ next dev ทำงานได้ราบรื่น

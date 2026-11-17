@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Save } from "lucide-react";
-import { toast } from "sonner";
 
 import {
   proposalFormSchema,
@@ -106,13 +105,19 @@ const WizardForm = ({
 
 
   // ── React Query: fetch existing draft ─────────────────────────────────────
-  const { data: existingDraft, isLoading: isDraftLoading } = useGetDraft(projectId);
+  const {
+    data: existingDraft,
+    isLoading: isDraftLoading,
+    isFetchedAfterMount: hasFetchedDraft,
+    isError: isDraftError,
+    refetch: refetchDraft,
+  } = useGetDraft(projectId);
   // const { data: existingProposal, isLoading: isProposalLoading } = useGetProposal(projectId);
   const { mutate: initDraft } = useInitializeDraft(projectId);
   const canEditProposal = projectDetail?.permissions?.canEditProposal === true;
   // const isReadOnly = isProjectLoading || isDraftLoading || isProposalLoading || !projectDetail || !canEditProposal ||
   // (mode === "submitted" && !existingProposal);
-  const isReadOnly = isProjectLoading || isDraftLoading || !projectDetail || !canEditProposal;
+  const isReadOnly = isProjectLoading || isDraftLoading || !hasFetchedDraft || isDraftError || !projectDetail || !canEditProposal;
 
   // ── RHF setup ─────────────────────────────────────────────────────────────
   const methods = useForm<ProposalFormValues>({
@@ -144,6 +149,8 @@ const WizardForm = ({
     if (
       isProjectLoading ||
       isDraftLoading ||
+      !hasFetchedDraft ||
+      isDraftError ||
       // isProposalLoading ||
       !projectDetail ||
       hasHydratedRef.current
@@ -218,13 +225,10 @@ const WizardForm = ({
     // if (!existingDraft && mode === "draft" && !isReadOnly) {
     // No draft yet — create one so we have a record to PATCH against.
     if (!existingDraft && !isReadOnly) {
-      +      // No draft yet — create one so auto-save has a record to write to.
-        initDraft();
+      initDraft();
     }
     hasHydratedRef.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [existingDraft, existingProposal, getAttachmentTypeId, isDraftLoading, isProjectLoading, isProposalLoading, isReadOnly, mode, projectDetail]);
-  }, [existingDraft, getAttachmentTypeId, isDraftLoading, isProjectLoading, isReadOnly, projectDetail]);
+  }, [existingDraft, getAttachmentTypeId, hasFetchedDraft, initDraft, isDraftError, isDraftLoading, isProjectLoading, isReadOnly, projectDetail, reset]);
   // ── Step validation helper ─────────────────────────────────────────────────
   const getCurrentSchema = (step: number) => {
     switch (step) {
@@ -281,17 +285,6 @@ const WizardForm = ({
     }
   };
 
-  const handleSaveDraft = async () => {
-    if (isSavingDraft || isReadOnly) return;
-    setIsSavingDraft(true);
-    const saved = await flushDraftRef.current?.() ?? true;
-    if (saved) {
-      reset(methods.getValues());
-      toast.success("บันทึกข้อมูลแล้ว");
-    }
-    setIsSavingDraft(false);
-  };
-
   const requestExit = () => {
     if (methods.formState.isDirty) {
       setExitConfirmOpen(true);
@@ -333,7 +326,14 @@ const WizardForm = ({
           flushRef={flushDraftRef}
         />
 
-        {isReadOnly && (
+        {isDraftError ? (
+          <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <p>ไม่สามารถโหลดแบบร่างได้ กรุณาลองใหม่ก่อนแก้ไขข้อมูล</p>
+            <Button type="button" variant="outline" onClick={() => void refetchDraft()}>
+              ลองใหม่
+            </Button>
+          </div>
+        ) : isReadOnly && (
           <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-800">
             This proposal is read-only while the project is being reviewed.
           </div>
@@ -391,18 +391,6 @@ const WizardForm = ({
             </div>
           </div>
         </form>
-
-        {/* {!isReadOnly && (
-          <Button
-            type="button"
-            onClick={() => void handleSaveDraft()}
-            disabled={isSavingDraft}
-            className="fixed bottom-5 right-5 z-40 h-11 rounded-full bg-[#00734b] px-5 font-bold text-white shadow-lg hover:bg-primary-dark"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {isSavingDraft ? "กำลังบันทึก..." : "บันทึกแบบร่าง"}
-          </Button>
-        )} */}
 
         <AlertDialog open={exitConfirmOpen} onOpenChange={setExitConfirmOpen}>
           <AlertDialogContent>

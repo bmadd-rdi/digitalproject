@@ -120,6 +120,17 @@ const ResetPasswordRequest = z
   .object({ token: z.string().min(1), newPassword: z.string().min(8) })
   .passthrough();
 const RefreshSessionResponse = z.object({ token: z.string() }).passthrough();
+const LoginHistoryItem = z
+  .object({
+    id: z.string(),
+    loginAt: z.string().datetime({ offset: true }),
+    ipAddress: z.string().nullable(),
+    userAgent: z.string().nullable(),
+  })
+  .passthrough();
+const LoginHistoryResponse = z
+  .object({ items: z.array(LoginHistoryItem) })
+  .passthrough();
 const UploadDocumentRequest = z
   .object({
     file: z.instanceof(File),
@@ -130,6 +141,13 @@ const UploadDocumentRequest = z
   .passthrough();
 const statusIds = z
   .union([z.array(z.number().int().gte(1).lte(15)), z.number(), z.string()])
+  .optional();
+const departmentIds = z
+  .union([z.array(z.number().int().gt(0)), z.number(), z.string()])
+  .optional();
+const analystIds = z.union([z.array(z.string().uuid()), z.string()]).optional();
+const budgetTypes = z
+  .union([z.array(z.string().min(1)), z.string()])
   .optional();
 const Project = z
   .object({
@@ -190,6 +208,8 @@ const Project = z
         userId: z.string().uuid(),
         firstName: z.string(),
         lastName: z.string(),
+        position: z.string().nullable(),
+        level: z.string().nullable(),
       })
       .passthrough()
       .nullable(),
@@ -310,6 +330,8 @@ const AssignmentProject = z
         userId: z.string().uuid(),
         firstName: z.string(),
         lastName: z.string(),
+        position: z.string().nullable(),
+        level: z.string().nullable(),
       })
       .passthrough()
       .nullable(),
@@ -513,7 +535,6 @@ const DraftProposalRequest = z
     estimatedCostTotal: z.number().nullable(),
   })
   .partial();
-const SubmittedProposalPatchRequest = z.object({}).partial();
 const ProposalResponse = z.object({
   id: z.string().uuid(),
   status: z.string(),
@@ -523,6 +544,13 @@ const ProposalResponse = z.object({
   version: z.number().nullable(),
   projectName: z.string().nullable(),
   agencyName: z.string().nullable(),
+  departmentId: z.number().int().nullable(),
+  divisionId: z.number().int().nullable(),
+  projectEverPassed: z.string().nullable(),
+  prevYear: z.string().nullable(),
+  prevProjectNameMode: z.string().nullable(),
+  prevProject: z.string().nullable(),
+  prevResolution: z.string().nullable(),
   headOfAgency: z.string().nullable(),
   dcioName: z.string().nullable(),
   projectManager: z.string().nullable(),
@@ -538,6 +566,9 @@ const ProposalResponse = z.object({
   currentSystemStatus: z.string().nullable(),
   currentProblems: z.string().nullable(),
   isBmaPlan: z.boolean().nullable(),
+  bmaPlanStrategy: z.string().nullable(),
+  bmaPlanIssue: z.string().nullable(),
+  bmaPlanKpi: z.string().nullable(),
   isAgencyPlan: z.boolean().nullable(),
   agencyStrategy: z.string().nullable(),
   agencyIssue: z.string().nullable(),
@@ -581,6 +612,27 @@ const SubmitProposalRequest = z
   .object({
     projectName: z.string().min(5),
     agencyName: z.string().min(2),
+    departmentId: z.number().int().gt(0),
+    divisionId: z.number().int().gt(0),
+    projectEverPassed: z.enum(["NEVER", "EVER"]).optional().default("NEVER"),
+    prevYear: z.string().max(4).optional(),
+    prevProjectNameMode: z
+      .enum(["SAME", "DIFFERENT"])
+      .optional()
+      .default("SAME"),
+    prevProject: z.string().max(1000).optional(),
+    prevResolution: z
+      .union([
+        z.enum([
+          "APPROVED",
+          "APPROVED_WITH_CONDITIONS",
+          "UNDER_REVIEW",
+          "NOT_APPROVED",
+          "RETURNED",
+        ]),
+        z.literal(""),
+      ])
+      .optional(),
     headOfAgency: z.string().min(2),
     dcioName: z.string().min(2),
     projectManager: z.string().min(2),
@@ -650,6 +702,9 @@ const SubmitProposalRequest = z
       .optional()
       .default([]),
     isBmaPlan: z.boolean().optional().default(false),
+    bmaPlanStrategy: z.string().optional(),
+    bmaPlanIssue: z.string().optional(),
+    bmaPlanKpi: z.string().optional(),
     isAgencyPlan: z.boolean().optional().default(false),
     agencyStrategy: z.string().optional(),
     agencyIssue: z.string().optional(),
@@ -659,8 +714,8 @@ const SubmitProposalRequest = z
     governorPolicyName: z.string().optional(),
     obstacleLaws: z.string().optional(),
     appArchitecture: z.string().min(5),
-    dataOwner: z.string().min(2),
-    dataExchangePlan: z.string().min(5),
+    dataOwner: z.string().optional(),
+    dataExchangePlan: z.string().optional(),
     hardwareCosts: z
       .array(
         z
@@ -1217,6 +1272,21 @@ const ProjectAttachmentTypeLookupItem = z
 const ProjectAttachmentTypeLookupResponse = z
   .object({ data: z.array(ProjectAttachmentTypeLookupItem) })
   .passthrough();
+const StringLookupResponse = z
+  .object({ data: z.array(z.string()) })
+  .passthrough();
+const AnalystLookupItem = z
+  .object({ userId: z.string().uuid(), name: z.string() })
+  .passthrough();
+const AnalystLookupResponse = z
+  .object({ data: z.array(AnalystLookupItem) })
+  .passthrough();
+const PolicyLookupItem = z
+  .object({ id: z.number().int(), code: z.string(), name: z.string().max(255) })
+  .passthrough();
+const PolicyLookupResponse = z
+  .object({ data: z.array(PolicyLookupItem) })
+  .passthrough();
 
 export const schemas = {
   UserProfileResponse,
@@ -1234,8 +1304,13 @@ export const schemas = {
   RecoveryEmailRequest,
   ResetPasswordRequest,
   RefreshSessionResponse,
+  LoginHistoryItem,
+  LoginHistoryResponse,
   UploadDocumentRequest,
   statusIds,
+  departmentIds,
+  analystIds,
+  budgetTypes,
   Project,
   PaginatedProjectResponse,
   CreateProjectRequest,
@@ -1260,7 +1335,6 @@ export const schemas = {
   PublicProject,
   PaginatedPublicProjectResponse,
   DraftProposalRequest,
-  SubmittedProposalPatchRequest,
   ProposalResponse,
   ProposalDataResponse,
   SubmitProposalRequest,
@@ -1294,9 +1368,70 @@ export const schemas = {
   ProjectStatusResponse,
   ProjectAttachmentTypeLookupItem,
   ProjectAttachmentTypeLookupResponse,
+  StringLookupResponse,
+  AnalystLookupItem,
+  AnalystLookupResponse,
+  PolicyLookupItem,
+  PolicyLookupResponse,
 };
 
 const endpoints = makeApi([
+  {
+    method: "post",
+    path: "/api/v1/admin/projects/:id/recall-analyst-approval",
+    alias: "postApiv1adminprojectsIdrecallAnalystApproval",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.unknown().nullable(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthenticated`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+      {
+        status: 404,
+        description: `Not found`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+      {
+        status: 409,
+        description: `Workflow conflict`,
+        schema: z
+          .object({
+            message: z.string(),
+            dependencies: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      },
+    ],
+  },
   {
     method: "post",
     path: "/api/v1/admin/projects/:id/reopen-rejected",
@@ -1493,6 +1628,21 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "get",
+    path: "/api/v1/auth/login-history",
+    alias: "getApiv1authloginHistory",
+    description: `คืนรายการประวัติการเข้าสู่ระบบล่าสุด 20 รายการของผู้ใช้ที่กำลังเข้าใช้งาน`,
+    requestFormat: "json",
+    response: LoginHistoryResponse,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
     method: "post",
     path: "/api/v1/auth/logout",
     alias: "postApiv1authlogout",
@@ -1601,6 +1751,27 @@ const endpoints = makeApi([
   },
   {
     method: "get",
+    path: "/api/v1/lookups/analysts",
+    alias: "getApiv1lookupsanalysts",
+    requestFormat: "json",
+    response: AnalystLookupResponse,
+    errors: [
+      {
+        status: 401,
+        description: `ยังไม่ได้ล็อกอิน`,
+        schema: z.object({ message: z.string() }).passthrough(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/v1/lookups/budget-types",
+    alias: "getApiv1lookupsbudgetTypes",
+    requestFormat: "json",
+    response: StringLookupResponse,
+  },
+  {
+    method: "get",
     path: "/api/v1/lookups/departments",
     alias: "getApiv1lookupsdepartments",
     requestFormat: "json",
@@ -1633,6 +1804,13 @@ const endpoints = makeApi([
     alias: "getApiv1lookupsfourQuadrants",
     requestFormat: "json",
     response: LookupResponse,
+  },
+  {
+    method: "get",
+    path: "/api/v1/lookups/governor-policies",
+    alias: "getApiv1lookupsgovernorPolicies",
+    requestFormat: "json",
+    response: PolicyLookupResponse,
   },
   {
     method: "get",
@@ -3062,6 +3240,26 @@ const endpoints = makeApi([
           .optional()
           .default("all"),
       },
+      {
+        name: "departmentIds",
+        type: "Query",
+        schema: departmentIds,
+      },
+      {
+        name: "projectTypeIds",
+        type: "Query",
+        schema: departmentIds,
+      },
+      {
+        name: "analystIds",
+        type: "Query",
+        schema: analystIds,
+      },
+      {
+        name: "budgetTypes",
+        type: "Query",
+        schema: budgetTypes,
+      },
     ],
     response: PaginatedProjectResponse,
     errors: [
@@ -3530,39 +3728,6 @@ const endpoints = makeApi([
       })
       .partial()
       .passthrough(),
-  },
-  {
-    method: "patch",
-    path: "/api/v1/proposals/projects/:projectId",
-    alias: "patchApiv1proposalsprojectsProjectId",
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: z.object({}).partial(),
-      },
-      {
-        name: "projectId",
-        type: "Path",
-        schema: z.string().uuid(),
-      },
-    ],
-    response: z
-      .object({
-        data: z.unknown().nullable(),
-        message: z.string(),
-        success: z.boolean(),
-      })
-      .partial()
-      .passthrough(),
-    errors: [
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.object({ message: z.string() }).passthrough(),
-      },
-    ],
   },
   {
     method: "get",
@@ -4063,6 +4228,32 @@ const endpoints = makeApi([
         type: "Body",
         schema: z.object({ isActive: z.boolean() }),
       },
+      {
+        name: "userId",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: UserProfileResponse,
+    errors: [
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: ErrorResponse,
+      },
+      {
+        status: 404,
+        description: `User not found`,
+        schema: ErrorResponse,
+      },
+    ],
+  },
+  {
+    method: "patch",
+    path: "/api/v1/users/:userId/verify",
+    alias: "patchApiv1usersUserIdverify",
+    requestFormat: "json",
+    parameters: [
       {
         name: "userId",
         type: "Path",

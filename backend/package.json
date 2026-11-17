@@ -12,6 +12,7 @@
     "db:create-super-admin": "bun run src/db/scripts/create-super-admin.ts",
     "db:seed": "bun run db:seed:required",
     "db:seed:required": "bun run src/db/seeds/seed-required.ts",
+    "db:seed:governor-policies": "bun run src/db/seeds/seed-governor-policies.ts",
     "db:seed:demo": "bun run src/db/seeds/seed-demo.ts",
     "test:db:up": "docker compose -f ../infrastructure/compose.test.yml up -d --wait",
     "test:db:prepare": "bun run tests/setup/prepare-db.ts",

@@ -439,7 +439,7 @@ export function ProjectHeader({ project, proposal }: ProjectHeaderProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>ยืนยันการดึงสถานะกลับหรือไม่</AlertDialogTitle>
             <AlertDialogDescription>
-              โครงการจะกลับไปอยู่ในสถานะ "รอผลการวิเคราะห์" ให้นักวิเคราะห์ทบทวนใหม่อีกครั้ง
+              โครงการจะกลับไปอยู่ในสถานะ &quot;รอผลการวิเคราะห์&quot; ให้นักวิเคราะห์ทบทวนใหม่อีกครั้ง
               การดึงกลับจะไม่สำเร็จหากโครงการถูกบรรจุเข้าวาระการประชุมที่เริ่มดำเนินการแล้ว
             </AlertDialogDescription>
           </AlertDialogHeader>

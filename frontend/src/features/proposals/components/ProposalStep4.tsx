@@ -2,7 +2,7 @@
 "use client";
 
 import { useFormContext, useWatch } from "react-hook-form";
-import { ProposalStep4Values } from "../types";
+import { ProposalFormValues } from "../types";
 import { AlertCircle, Calculator } from "lucide-react";
 
 // นำเข้า Accordion จาก shadcn
@@ -21,7 +21,7 @@ import { TrainingCostSection } from "./step4/TrainingCostSection";
 import { OtherCostSection } from "./step4/OtherCostSection";
 
 export const ProposalStep4 = () => {
-  const { control, formState: { errors } } = useFormContext<ProposalStep4Values>();
+  const { control, formState: { errors } } = useFormContext<ProposalFormValues>();
 
   // 1. Watch ข้อมูลจากทุก Section เพื่อเอามาคำนวณ Grand Total
   const watchedHw = useWatch({ control, name: "hardwareCosts" }) || [];
@@ -33,7 +33,7 @@ export const ProposalStep4 = () => {
   const watchedOther = useWatch({ control, name: "otherCosts" }) || [];
 
   // วงเงินงบประมาณทั้งโครงการ (จาก Step 1: budgetsByYear)
-  const watchedBudgets = (useWatch({ control: control as any, name: "budgetsByYear" }) || []) as Array<{ amount?: number }>;
+  const watchedBudgets = useWatch({ control, name: "budgetsByYear" }) || [];
   const totalBudgetAll = watchedBudgets.reduce((sum, item) => sum + (Number(item?.amount) || 0), 0);
 
   // 2. คำนวณผลรวมแต่ละหมวด

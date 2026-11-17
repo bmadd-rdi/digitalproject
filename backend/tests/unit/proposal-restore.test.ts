@@ -7,6 +7,8 @@ test("maps the submitted graph into a complete canonical draft", () => {
     proposal: {
       projectName: "ระบบบริการประชาชนดิจิทัล",
       agencyName: "สำนักดิจิทัล",
+      departmentId: 21,
+      divisionId: 369,
       headOfAgency: "หัวหน้าหน่วยงาน",
       dcioName: "ผู้บริหารเทคโนโลยี",
       projectManager: "ผู้จัดการโครงการ",
@@ -44,6 +46,8 @@ test("maps the submitted graph into a complete canonical draft", () => {
 
   expect(payload.requestedBudgetTotal).toBe(100000.5);
   expect(payload.projectType).toBe("REPLACEMENT");
+  expect(payload.departmentId).toBe(21);
+  expect(payload.divisionId).toBe(369);
   expect(payload.budgetsByYear[0]).not.toHaveProperty("id");
   expect(payload.cloudRequests[0].requestedServiceDate).toBe("2027-01-02");
   expect(payload.cloudRequests[0].vms[0].price).toBe(0);

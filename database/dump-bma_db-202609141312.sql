@@ -2,15 +2,14 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.18
--- Dumped by pg_dump version 17.0
+\restrict CMyKFzZMUdMA3QIge884e0dKlZPClsLb8d1sWAQNHdvi5rnPK03mI3a0ndVUnt2
 
--- Started on 2026-09-14 13:12:27
+-- Dumped from database version 15.19 (Debian 15.19-1.pgdg13+2)
+-- Dumped by pg_dump version 15.19 (Debian 15.19-1.pgdg13+2)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -19,21 +18,20 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-DROP DATABASE bma_db;
 --
--- TOC entry 4006 (class 1262 OID 16384)
 -- Name: bma_db; Type: DATABASE; Schema: -; Owner: -
 --
 
 CREATE DATABASE bma_db WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
 
 
+\unrestrict CMyKFzZMUdMA3QIge884e0dKlZPClsLb8d1sWAQNHdvi5rnPK03mI3a0ndVUnt2
 \connect bma_db
+\restrict CMyKFzZMUdMA3QIge884e0dKlZPClsLb8d1sWAQNHdvi5rnPK03mI3a0ndVUnt2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -43,24 +41,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 4 (class 2615 OID 2200)
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA public;
-
-
---
--- TOC entry 4007 (class 0 OID 0)
--- Dependencies: 4
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON SCHEMA public IS 'standard public schema';
-
-
---
--- TOC entry 897 (class 1247 OID 16401)
 -- Name: cost_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -71,20 +51,18 @@ CREATE TYPE public.cost_type AS ENUM (
 
 
 --
--- TOC entry 900 (class 1247 OID 16406)
 -- Name: food_type; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.food_type AS ENUM (
+    'PARTIAL_MEAL',
     'FULL_MEAL',
-    'LIGHT_MEAL',
-    'SNACK_AND_BEVERAGES',
+    'SNACK',
     'OTHER'
 );
 
 
 --
--- TOC entry 903 (class 1247 OID 16416)
 -- Name: location_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -95,7 +73,6 @@ CREATE TYPE public.location_type AS ENUM (
 
 
 --
--- TOC entry 1044 (class 1247 OID 17124)
 -- Name: meeting_document_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -106,7 +83,6 @@ CREATE TYPE public.meeting_document_type AS ENUM (
 
 
 --
--- TOC entry 1047 (class 1247 OID 17130)
 -- Name: meeting_resolution_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -121,7 +97,6 @@ CREATE TYPE public.meeting_resolution_type AS ENUM (
 
 
 --
--- TOC entry 906 (class 1247 OID 16422)
 -- Name: personnel_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -133,7 +108,6 @@ CREATE TYPE public.personnel_type AS ENUM (
 
 
 --
--- TOC entry 1041 (class 1247 OID 17118)
 -- Name: project_return_stage; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -144,7 +118,6 @@ CREATE TYPE public.project_return_stage AS ENUM (
 
 
 --
--- TOC entry 909 (class 1247 OID 16430)
 -- Name: project_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -156,7 +129,6 @@ CREATE TYPE public.project_type AS ENUM (
 
 
 --
--- TOC entry 912 (class 1247 OID 16438)
 -- Name: proposal_status; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -179,7 +151,6 @@ CREATE TYPE public.proposal_status AS ENUM (
 
 
 --
--- TOC entry 915 (class 1247 OID 16468)
 -- Name: reference_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -196,7 +167,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 218 (class 1259 OID 16478)
 -- Name: agenda_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -208,7 +178,6 @@ CREATE TABLE public.agenda_types (
 
 
 --
--- TOC entry 217 (class 1259 OID 16477)
 -- Name: agenda_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -222,8 +191,6 @@ CREATE SEQUENCE public.agenda_types_id_seq
 
 
 --
--- TOC entry 4008 (class 0 OID 0)
--- Dependencies: 217
 -- Name: agenda_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -231,7 +198,6 @@ ALTER SEQUENCE public.agenda_types_id_seq OWNED BY public.agenda_types.id;
 
 
 --
--- TOC entry 266 (class 1259 OID 16798)
 -- Name: agendas; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -250,7 +216,6 @@ CREATE TABLE public.agendas (
 
 
 --
--- TOC entry 220 (class 1259 OID 16487)
 -- Name: departments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -262,7 +227,6 @@ CREATE TABLE public.departments (
 
 
 --
--- TOC entry 219 (class 1259 OID 16486)
 -- Name: departments_department_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -276,8 +240,6 @@ CREATE SEQUENCE public.departments_department_id_seq
 
 
 --
--- TOC entry 4009 (class 0 OID 0)
--- Dependencies: 219
 -- Name: departments_department_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -285,7 +247,6 @@ ALTER SEQUENCE public.departments_department_id_seq OWNED BY public.departments.
 
 
 --
--- TOC entry 222 (class 1259 OID 16496)
 -- Name: deputy_governors; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -297,7 +258,6 @@ CREATE TABLE public.deputy_governors (
 
 
 --
--- TOC entry 221 (class 1259 OID 16495)
 -- Name: deputy_governors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -311,8 +271,6 @@ CREATE SEQUENCE public.deputy_governors_id_seq
 
 
 --
--- TOC entry 4010 (class 0 OID 0)
--- Dependencies: 221
 -- Name: deputy_governors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -320,7 +278,6 @@ ALTER SEQUENCE public.deputy_governors_id_seq OWNED BY public.deputy_governors.i
 
 
 --
--- TOC entry 224 (class 1259 OID 16503)
 -- Name: divisions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -333,7 +290,6 @@ CREATE TABLE public.divisions (
 
 
 --
--- TOC entry 223 (class 1259 OID 16502)
 -- Name: divisions_division_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -347,8 +303,6 @@ CREATE SEQUENCE public.divisions_division_id_seq
 
 
 --
--- TOC entry 4011 (class 0 OID 0)
--- Dependencies: 223
 -- Name: divisions_division_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -356,7 +310,6 @@ ALTER SEQUENCE public.divisions_division_id_seq OWNED BY public.divisions.divisi
 
 
 --
--- TOC entry 226 (class 1259 OID 16512)
 -- Name: four_quadrants; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -367,7 +320,6 @@ CREATE TABLE public.four_quadrants (
 
 
 --
--- TOC entry 225 (class 1259 OID 16511)
 -- Name: four_quadrants_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -381,8 +333,6 @@ CREATE SEQUENCE public.four_quadrants_id_seq
 
 
 --
--- TOC entry 4012 (class 0 OID 0)
--- Dependencies: 225
 -- Name: four_quadrants_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -390,7 +340,6 @@ ALTER SEQUENCE public.four_quadrants_id_seq OWNED BY public.four_quadrants.id;
 
 
 --
--- TOC entry 228 (class 1259 OID 16519)
 -- Name: meeting_attachment_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -402,7 +351,6 @@ CREATE TABLE public.meeting_attachment_types (
 
 
 --
--- TOC entry 227 (class 1259 OID 16518)
 -- Name: meeting_attachment_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -416,8 +364,6 @@ CREATE SEQUENCE public.meeting_attachment_types_id_seq
 
 
 --
--- TOC entry 4013 (class 0 OID 0)
--- Dependencies: 227
 -- Name: meeting_attachment_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -425,7 +371,6 @@ ALTER SEQUENCE public.meeting_attachment_types_id_seq OWNED BY public.meeting_at
 
 
 --
--- TOC entry 267 (class 1259 OID 16807)
 -- Name: meeting_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -450,7 +395,6 @@ CREATE TABLE public.meeting_attachments (
 
 
 --
--- TOC entry 271 (class 1259 OID 17143)
 -- Name: meeting_resolution_revisions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -479,7 +423,6 @@ CREATE TABLE public.meeting_resolution_revisions (
 
 
 --
--- TOC entry 230 (class 1259 OID 16528)
 -- Name: meeting_statuses; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -491,7 +434,6 @@ CREATE TABLE public.meeting_statuses (
 
 
 --
--- TOC entry 229 (class 1259 OID 16527)
 -- Name: meeting_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -505,8 +447,6 @@ CREATE SEQUENCE public.meeting_statuses_id_seq
 
 
 --
--- TOC entry 4014 (class 0 OID 0)
--- Dependencies: 229
 -- Name: meeting_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -514,7 +454,6 @@ ALTER SEQUENCE public.meeting_statuses_id_seq OWNED BY public.meeting_statuses.i
 
 
 --
--- TOC entry 232 (class 1259 OID 16537)
 -- Name: meeting_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -526,7 +465,6 @@ CREATE TABLE public.meeting_types (
 
 
 --
--- TOC entry 231 (class 1259 OID 16536)
 -- Name: meeting_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -540,8 +478,6 @@ CREATE SEQUENCE public.meeting_types_id_seq
 
 
 --
--- TOC entry 4015 (class 0 OID 0)
--- Dependencies: 231
 -- Name: meeting_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -549,7 +485,6 @@ ALTER SEQUENCE public.meeting_types_id_seq OWNED BY public.meeting_types.id;
 
 
 --
--- TOC entry 268 (class 1259 OID 16815)
 -- Name: meetings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -575,7 +510,37 @@ CREATE TABLE public.meetings (
 
 
 --
--- TOC entry 234 (class 1259 OID 16546)
+-- Name: policy_governor; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.policy_governor (
+    policy_id integer NOT NULL,
+    policy_code character varying(20) NOT NULL,
+    policy_name character varying(255) NOT NULL
+);
+
+
+--
+-- Name: policy_governor_policy_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.policy_governor_policy_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: policy_governor_policy_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.policy_governor_policy_id_seq OWNED BY public.policy_governor.policy_id;
+
+
+--
 -- Name: project_attachment_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -587,7 +552,6 @@ CREATE TABLE public.project_attachment_types (
 
 
 --
--- TOC entry 233 (class 1259 OID 16545)
 -- Name: project_attachment_types_doc_type_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -601,8 +565,6 @@ CREATE SEQUENCE public.project_attachment_types_doc_type_id_seq
 
 
 --
--- TOC entry 4016 (class 0 OID 0)
--- Dependencies: 233
 -- Name: project_attachment_types_doc_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -610,7 +572,6 @@ ALTER SEQUENCE public.project_attachment_types_doc_type_id_seq OWNED BY public.p
 
 
 --
--- TOC entry 246 (class 1259 OID 16632)
 -- Name: project_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -629,7 +590,6 @@ CREATE TABLE public.project_attachments (
 
 
 --
--- TOC entry 247 (class 1259 OID 16640)
 -- Name: project_sequences; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -640,7 +600,6 @@ CREATE TABLE public.project_sequences (
 
 
 --
--- TOC entry 270 (class 1259 OID 16835)
 -- Name: project_status_logs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -660,7 +619,6 @@ CREATE TABLE public.project_status_logs (
 
 
 --
--- TOC entry 236 (class 1259 OID 16557)
 -- Name: project_statuses; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -672,7 +630,6 @@ CREATE TABLE public.project_statuses (
 
 
 --
--- TOC entry 235 (class 1259 OID 16556)
 -- Name: project_statuses_project_status_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -686,8 +643,6 @@ CREATE SEQUENCE public.project_statuses_project_status_id_seq
 
 
 --
--- TOC entry 4017 (class 0 OID 0)
--- Dependencies: 235
 -- Name: project_statuses_project_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -695,7 +650,6 @@ ALTER SEQUENCE public.project_statuses_project_status_id_seq OWNED BY public.pro
 
 
 --
--- TOC entry 238 (class 1259 OID 16568)
 -- Name: project_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -707,7 +661,6 @@ CREATE TABLE public.project_types (
 
 
 --
--- TOC entry 237 (class 1259 OID 16567)
 -- Name: project_types_project_type_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -721,8 +674,6 @@ CREATE SEQUENCE public.project_types_project_type_id_seq
 
 
 --
--- TOC entry 4018 (class 0 OID 0)
--- Dependencies: 237
 -- Name: project_types_project_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -730,7 +681,6 @@ ALTER SEQUENCE public.project_types_project_type_id_seq OWNED BY public.project_
 
 
 --
--- TOC entry 248 (class 1259 OID 16646)
 -- Name: projects; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -767,8 +717,6 @@ CREATE TABLE public.projects (
 
 
 --
--- TOC entry 4019 (class 0 OID 0)
--- Dependencies: 248
 -- Name: COLUMN projects.project_code; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -776,8 +724,6 @@ COMMENT ON COLUMN public.projects.project_code IS 'รหัสโครงก�
 
 
 --
--- TOC entry 4020 (class 0 OID 0)
--- Dependencies: 248
 -- Name: COLUMN projects.user_id; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -785,8 +731,6 @@ COMMENT ON COLUMN public.projects.user_id IS 'รหัสผู้ใช้';
 
 
 --
--- TOC entry 4021 (class 0 OID 0)
--- Dependencies: 248
 -- Name: COLUMN projects.division_id; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -794,8 +738,6 @@ COMMENT ON COLUMN public.projects.division_id IS 'รหัสส่วนรา
 
 
 --
--- TOC entry 4022 (class 0 OID 0)
--- Dependencies: 248
 -- Name: COLUMN projects.project_status_id; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -803,8 +745,6 @@ COMMENT ON COLUMN public.projects.project_status_id IS 'รหัสสถาน
 
 
 --
--- TOC entry 4023 (class 0 OID 0)
--- Dependencies: 248
 -- Name: COLUMN projects.project_type_id; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -812,7 +752,6 @@ COMMENT ON COLUMN public.projects.project_type_id IS 'ประเภทโค�
 
 
 --
--- TOC entry 250 (class 1259 OID 16675)
 -- Name: proposal_budgets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -826,7 +765,6 @@ CREATE TABLE public.proposal_budgets (
 
 
 --
--- TOC entry 251 (class 1259 OID 16680)
 -- Name: proposal_cloud_requests; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -840,7 +778,6 @@ CREATE TABLE public.proposal_cloud_requests (
 
 
 --
--- TOC entry 252 (class 1259 OID 16687)
 -- Name: proposal_cloud_vms; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -858,7 +795,6 @@ CREATE TABLE public.proposal_cloud_vms (
 
 
 --
--- TOC entry 249 (class 1259 OID 16663)
 -- Name: proposal_drafts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -879,7 +815,6 @@ CREATE TABLE public.proposal_drafts (
 
 
 --
--- TOC entry 253 (class 1259 OID 16699)
 -- Name: proposal_existing_equipments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -896,7 +831,6 @@ CREATE TABLE public.proposal_existing_equipments (
 
 
 --
--- TOC entry 254 (class 1259 OID 16706)
 -- Name: proposal_hardware_costs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -919,7 +853,6 @@ CREATE TABLE public.proposal_hardware_costs (
 
 
 --
--- TOC entry 255 (class 1259 OID 16713)
 -- Name: proposal_ict_personnel; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -933,7 +866,6 @@ CREATE TABLE public.proposal_ict_personnel (
 
 
 --
--- TOC entry 256 (class 1259 OID 16720)
 -- Name: proposal_manpower; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -948,7 +880,6 @@ CREATE TABLE public.proposal_manpower (
 
 
 --
--- TOC entry 257 (class 1259 OID 16725)
 -- Name: proposal_other_costs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -964,7 +895,6 @@ CREATE TABLE public.proposal_other_costs (
 
 
 --
--- TOC entry 258 (class 1259 OID 16732)
 -- Name: proposal_personnel_costs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -977,14 +907,13 @@ CREATE TABLE public.proposal_personnel_costs (
     field_of_study character varying(255),
     experience_years numeric(4,1),
     base_salary numeric(15,2),
-    multiplier numeric(5,2),
+    multiplier numeric(5,3),
     person_count integer,
     duration_months integer
 );
 
 
 --
--- TOC entry 259 (class 1259 OID 16739)
 -- Name: proposal_personnel_responsibilities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -997,7 +926,6 @@ CREATE TABLE public.proposal_personnel_responsibilities (
 
 
 --
--- TOC entry 260 (class 1259 OID 16746)
 -- Name: proposal_related_projects; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1013,7 +941,6 @@ CREATE TABLE public.proposal_related_projects (
 
 
 --
--- TOC entry 261 (class 1259 OID 16753)
 -- Name: proposal_software_costs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1036,7 +963,6 @@ CREATE TABLE public.proposal_software_costs (
 
 
 --
--- TOC entry 262 (class 1259 OID 16760)
 -- Name: proposal_training_food_costs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1052,7 +978,6 @@ CREATE TABLE public.proposal_training_food_costs (
 
 
 --
--- TOC entry 263 (class 1259 OID 16765)
 -- Name: proposal_training_speaker_costs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1067,7 +992,6 @@ CREATE TABLE public.proposal_training_speaker_costs (
 
 
 --
--- TOC entry 264 (class 1259 OID 16772)
 -- Name: proposal_trainings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1083,7 +1007,6 @@ CREATE TABLE public.proposal_trainings (
 
 
 --
--- TOC entry 265 (class 1259 OID 16780)
 -- Name: proposals; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1128,12 +1051,21 @@ CREATE TABLE public.proposals (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     estimated_cost_total numeric(15,2),
-    submitted_at timestamp without time zone
+    submitted_at timestamp without time zone,
+    department_id integer,
+    division_id integer,
+    project_ever_passed character varying(10),
+    prev_presented_year character varying(4),
+    prev_project_name_mode character varying(10),
+    prev_presented_project text,
+    prev_resolution character varying(40),
+    bma_plan_strategy text,
+    bma_plan_issue text,
+    bma_plan_kpi text
 );
 
 
 --
--- TOC entry 240 (class 1259 OID 16579)
 -- Name: resolution_statuses; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1145,7 +1077,6 @@ CREATE TABLE public.resolution_statuses (
 
 
 --
--- TOC entry 239 (class 1259 OID 16578)
 -- Name: resolution_statuses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1159,8 +1090,6 @@ CREATE SEQUENCE public.resolution_statuses_id_seq
 
 
 --
--- TOC entry 4024 (class 0 OID 0)
--- Dependencies: 239
 -- Name: resolution_statuses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -1168,7 +1097,6 @@ ALTER SEQUENCE public.resolution_statuses_id_seq OWNED BY public.resolution_stat
 
 
 --
--- TOC entry 269 (class 1259 OID 16824)
 -- Name: resolutions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1189,7 +1117,6 @@ CREATE TABLE public.resolutions (
 
 
 --
--- TOC entry 241 (class 1259 OID 16587)
 -- Name: role_user; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1202,7 +1129,6 @@ CREATE TABLE public.role_user (
 
 
 --
--- TOC entry 243 (class 1259 OID 16594)
 -- Name: roles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1215,7 +1141,6 @@ CREATE TABLE public.roles (
 
 
 --
--- TOC entry 242 (class 1259 OID 16593)
 -- Name: roles_role_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1229,8 +1154,6 @@ CREATE SEQUENCE public.roles_role_id_seq
 
 
 --
--- TOC entry 4025 (class 0 OID 0)
--- Dependencies: 242
 -- Name: roles_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -1238,7 +1161,6 @@ ALTER SEQUENCE public.roles_role_id_seq OWNED BY public.roles.role_id;
 
 
 --
--- TOC entry 244 (class 1259 OID 16604)
 -- Name: user_login_history; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1252,7 +1174,6 @@ CREATE TABLE public.user_login_history (
 
 
 --
--- TOC entry 245 (class 1259 OID 16613)
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1282,7 +1203,6 @@ CREATE TABLE public.users (
 
 
 --
--- TOC entry 272 (class 1259 OID 17152)
 -- Name: workflow_audit_events; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1299,7 +1219,6 @@ CREATE TABLE public.workflow_audit_events (
 
 
 --
--- TOC entry 3512 (class 2604 OID 16481)
 -- Name: agenda_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1307,7 +1226,6 @@ ALTER TABLE ONLY public.agenda_types ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- TOC entry 3513 (class 2604 OID 16490)
 -- Name: departments department_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1315,7 +1233,6 @@ ALTER TABLE ONLY public.departments ALTER COLUMN department_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3514 (class 2604 OID 16499)
 -- Name: deputy_governors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1323,7 +1240,6 @@ ALTER TABLE ONLY public.deputy_governors ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3516 (class 2604 OID 16506)
 -- Name: divisions division_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1331,7 +1247,6 @@ ALTER TABLE ONLY public.divisions ALTER COLUMN division_id SET DEFAULT nextval('
 
 
 --
--- TOC entry 3517 (class 2604 OID 16515)
 -- Name: four_quadrants id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1339,7 +1254,6 @@ ALTER TABLE ONLY public.four_quadrants ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3518 (class 2604 OID 16522)
 -- Name: meeting_attachment_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1347,7 +1261,6 @@ ALTER TABLE ONLY public.meeting_attachment_types ALTER COLUMN id SET DEFAULT nex
 
 
 --
--- TOC entry 3519 (class 2604 OID 16531)
 -- Name: meeting_statuses id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1355,7 +1268,6 @@ ALTER TABLE ONLY public.meeting_statuses ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3520 (class 2604 OID 16540)
 -- Name: meeting_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1363,7 +1275,13 @@ ALTER TABLE ONLY public.meeting_types ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- TOC entry 3521 (class 2604 OID 16549)
+-- Name: policy_governor policy_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.policy_governor ALTER COLUMN policy_id SET DEFAULT nextval('public.policy_governor_policy_id_seq'::regclass);
+
+
+--
 -- Name: project_attachment_types doc_type_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1371,7 +1289,6 @@ ALTER TABLE ONLY public.project_attachment_types ALTER COLUMN doc_type_id SET DE
 
 
 --
--- TOC entry 3522 (class 2604 OID 16560)
 -- Name: project_statuses project_status_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1379,7 +1296,6 @@ ALTER TABLE ONLY public.project_statuses ALTER COLUMN project_status_id SET DEFA
 
 
 --
--- TOC entry 3523 (class 2604 OID 16571)
 -- Name: project_types project_type_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1387,7 +1303,6 @@ ALTER TABLE ONLY public.project_types ALTER COLUMN project_type_id SET DEFAULT n
 
 
 --
--- TOC entry 3524 (class 2604 OID 16582)
 -- Name: resolution_statuses id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1395,7 +1310,6 @@ ALTER TABLE ONLY public.resolution_statuses ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 3526 (class 2604 OID 16597)
 -- Name: roles role_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1403,670 +1317,1194 @@ ALTER TABLE ONLY public.roles ALTER COLUMN role_id SET DEFAULT nextval('public.r
 
 
 --
--- TOC entry 3946 (class 0 OID 16478)
--- Dependencies: 218
 -- Data for Name: agenda_types; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.agenda_types VALUES (1, 'Chairman''s Announcements', 'FOR_INFORMATION');
-INSERT INTO public.agenda_types VALUES (2, 'Adoption of Minutes', 'APPROVE_MINUTES');
-INSERT INTO public.agenda_types VALUES (3, 'Matters Arising / Follow-up', 'FOLLOW_UP');
-INSERT INTO public.agenda_types VALUES (4, 'Matters for Consideration', 'FOR_CONSIDERATION');
-INSERT INTO public.agenda_types VALUES (5, 'Any Other Business', 'OTHER');
+COPY public.agenda_types (id, name, code) FROM stdin;
+1	Chairman's Announcements	FOR_INFORMATION
+2	Adoption of Minutes	APPROVE_MINUTES
+3	Matters Arising / Follow-up	FOLLOW_UP
+4	Matters for Consideration	FOR_CONSIDERATION
+5	Any Other Business	OTHER
+\.
 
 
 --
--- TOC entry 3994 (class 0 OID 16798)
--- Dependencies: 266
 -- Data for Name: agendas; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+COPY public.agendas (id, meeting_id, project_id, agenda_number, sort_order, agenda_type_id, title, description, created_at, updated_at) FROM stdin;
+\.
 
 
 --
--- TOC entry 3948 (class 0 OID 16487)
--- Dependencies: 220
 -- Data for Name: departments; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.departments VALUES (1, 'สำนักงานเลขานุการสภากรุงเทพมหานคร', '01000000');
-INSERT INTO public.departments VALUES (2, 'สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร', '02000000');
-INSERT INTO public.departments VALUES (3, 'สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร', '03000000');
-INSERT INTO public.departments VALUES (4, 'สำนักปลัดกรุงเทพมหานคร', '04000000');
-INSERT INTO public.departments VALUES (5, 'สำนักการแพทย์', '07000000');
-INSERT INTO public.departments VALUES (6, 'สำนักอนามัย', '08000000');
-INSERT INTO public.departments VALUES (7, 'สำนักการศึกษา', '09000000');
-INSERT INTO public.departments VALUES (8, 'สำนักการโยธา', '10000000');
-INSERT INTO public.departments VALUES (9, 'สำนักการระบายน้ำ', '11000000');
-INSERT INTO public.departments VALUES (10, 'สำนักการคลัง', '14000000');
-INSERT INTO public.departments VALUES (11, 'สำนักเทศกิจ', '15000000');
-INSERT INTO public.departments VALUES (12, 'สำนักการจราจรและขนส่ง', '17000000');
-INSERT INTO public.departments VALUES (13, 'สำนักผังเมือง', '18000000');
-INSERT INTO public.departments VALUES (14, 'สำนักป้องกันและบรรเทาสาธารณภัย', '19000000');
-INSERT INTO public.departments VALUES (15, 'สำนักงบประมาณกรุงเทพมหานคร', '20000000');
-INSERT INTO public.departments VALUES (16, 'สำนักยุทธศาสตร์และประเมินผล', '21000000');
-INSERT INTO public.departments VALUES (17, 'สำนักสิ่งแวดล้อม', '22000000');
-INSERT INTO public.departments VALUES (18, 'สำนักวัฒนธรรม กีฬาและการท่องเที่ยว', '23000000');
-INSERT INTO public.departments VALUES (19, 'สำนักพัฒนาสังคม', '24000000');
-INSERT INTO public.departments VALUES (20, 'สำนักการวางผังและพัฒนาเมือง', '25000000');
-INSERT INTO public.departments VALUES (21, 'สำนักดิจิทัลกรุงเทพมหานคร', '26000000');
-INSERT INTO public.departments VALUES (22, 'ศูนย์รับเรื่องร้องเรียน', '49000000');
-INSERT INTO public.departments VALUES (23, 'การพาณิชย์ของกรุงเทพมหานคร', '51000000');
-INSERT INTO public.departments VALUES (24, 'มหาวิทยาลัยกรุงเทพมหานคร', '99000000');
-INSERT INTO public.departments VALUES (25, 'กรุงเทพมหานคร', '00000000');
-INSERT INTO public.departments VALUES (26, 'สำนักนโยบายและแผนกรุงเทพมหานคร', '06000000');
-INSERT INTO public.departments VALUES (27, 'สำนักรักษาความสะอาด', '12000000');
-INSERT INTO public.departments VALUES (28, 'สำนักสวัสดิการสังคม', '13000000');
-INSERT INTO public.departments VALUES (29, 'สำนักพัฒนาชุมชน', '16000000');
-INSERT INTO public.departments VALUES (30, 'สำนักงานเขตพระนคร', '50010000');
-INSERT INTO public.departments VALUES (31, 'สำนักงานเขตป้อมปราบศัตรูพ่าย', '50020000');
-INSERT INTO public.departments VALUES (32, 'สำนักงานเขตสัมพันธวงศ์', '50030000');
-INSERT INTO public.departments VALUES (33, 'สำนักงานเขตบางรัก', '50040000');
-INSERT INTO public.departments VALUES (34, 'สำนักงานเขตปทุมวัน', '50050000');
-INSERT INTO public.departments VALUES (35, 'สำนักงานเขตยานนาวา', '50060000');
-INSERT INTO public.departments VALUES (36, 'สำนักงานเขตดุสิต', '50070000');
-INSERT INTO public.departments VALUES (37, 'สำนักงานเขตพญาไท', '50080000');
-INSERT INTO public.departments VALUES (38, 'สำนักงานเขตห้วยขวาง', '50090000');
-INSERT INTO public.departments VALUES (39, 'สำนักงานเขตพระโขนง', '50100000');
-INSERT INTO public.departments VALUES (40, 'สำนักงานเขตบางกะปิ', '50110000');
-INSERT INTO public.departments VALUES (41, 'สำนักงานเขตบางเขน', '50120000');
-INSERT INTO public.departments VALUES (42, 'สำนักงานเขตมีนบุรี', '50130000');
-INSERT INTO public.departments VALUES (43, 'สำนักงานเขตลาดกระบัง', '50140000');
-INSERT INTO public.departments VALUES (44, 'สำนักงานเขตหนองจอก', '50150000');
-INSERT INTO public.departments VALUES (45, 'สำนักงานเขตธนบุรี', '50160000');
-INSERT INTO public.departments VALUES (46, 'สำนักงานเขตคลองสาน', '50170000');
-INSERT INTO public.departments VALUES (47, 'สำนักงานเขตบางกอกใหญ่', '50180000');
-INSERT INTO public.departments VALUES (48, 'สำนักงานเขตบางกอกน้อย', '50190000');
-INSERT INTO public.departments VALUES (49, 'สำนักงานเขตตลิ่งชัน', '50200000');
-INSERT INTO public.departments VALUES (50, 'สำนักงานเขตภาษีเจริญ', '50210000');
-INSERT INTO public.departments VALUES (51, 'สำนักงานเขตหนองแขม', '50220000');
-INSERT INTO public.departments VALUES (52, 'สำนักงานเขตบางขุนเทียน', '50230000');
-INSERT INTO public.departments VALUES (53, 'สำนักงานเขตราษฎร์บูรณะ', '50240000');
-INSERT INTO public.departments VALUES (54, 'สำนักงานเขตดอนเมือง', '50250000');
-INSERT INTO public.departments VALUES (55, 'สำนักงานเขตจตุจักร', '50260000');
-INSERT INTO public.departments VALUES (56, 'สำนักงานเขตลาดพร้าว', '50270000');
-INSERT INTO public.departments VALUES (57, 'สำนักงานเขตบึงกุ่ม', '50280000');
-INSERT INTO public.departments VALUES (58, 'สำนักงานเขตสาทร', '50290000');
-INSERT INTO public.departments VALUES (59, 'สำนักงานเขตบางคอแหลม', '50300000');
-INSERT INTO public.departments VALUES (60, 'สำนักงานเขตบางซื่อ', '50310000');
-INSERT INTO public.departments VALUES (61, 'สำนักงานเขตราชเทวี', '50320000');
-INSERT INTO public.departments VALUES (62, 'สำนักงานเขตคลองเตย', '50330000');
-INSERT INTO public.departments VALUES (63, 'สำนักงานเขตประเวศ', '50340000');
-INSERT INTO public.departments VALUES (64, 'สำนักงานเขตบางพลัด', '50350000');
-INSERT INTO public.departments VALUES (65, 'สำนักงานเขตจอมทอง', '50360000');
-INSERT INTO public.departments VALUES (66, 'สำนักงานเขตดินแดง', '50370000');
-INSERT INTO public.departments VALUES (67, 'สำนักงานเขตสวนหลวง', '50380000');
-INSERT INTO public.departments VALUES (68, 'สำนักงานเขตวัฒนา', '50390000');
-INSERT INTO public.departments VALUES (69, 'สำนักงานเขตบางแค', '50400000');
-INSERT INTO public.departments VALUES (70, 'สำนักงานเขตหลักสี่', '50410000');
-INSERT INTO public.departments VALUES (71, 'สำนักงานเขตสายไหม', '50420000');
-INSERT INTO public.departments VALUES (72, 'สำนักงานเขตคันนายาว', '50430000');
-INSERT INTO public.departments VALUES (73, 'สำนักงานเขตสะพานสูง', '50440000');
-INSERT INTO public.departments VALUES (74, 'สำนักงานเขตวังทองหลาง', '50450000');
-INSERT INTO public.departments VALUES (75, 'สำนักงานเขตคลองสามวา', '50460000');
-INSERT INTO public.departments VALUES (76, 'สำนักงานเขตบางนา', '50470000');
-INSERT INTO public.departments VALUES (77, 'สำนักงานเขตทวีวัฒนา', '50480000');
-INSERT INTO public.departments VALUES (78, 'สำนักงานเขตทุ่งครุ', '50490000');
-INSERT INTO public.departments VALUES (79, 'สำนักงานเขตบางบอน', '50500000');
+COPY public.departments (department_id, department_name, department_code) FROM stdin;
+1	สำนักงานเลขานุการสภากรุงเทพมหานคร	01000000
+2	สำนักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร	02000000
+3	สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร	03000000
+4	สำนักปลัดกรุงเทพมหานคร	04000000
+5	สำนักการแพทย์	07000000
+6	สำนักอนามัย	08000000
+7	สำนักการศึกษา	09000000
+8	สำนักการโยธา	10000000
+9	สำนักการระบายน้ำ	11000000
+10	สำนักการคลัง	14000000
+11	สำนักเทศกิจ	15000000
+12	สำนักการจราจรและขนส่ง	17000000
+13	สำนักผังเมือง	18000000
+14	สำนักป้องกันและบรรเทาสาธารณภัย	19000000
+15	สำนักงบประมาณกรุงเทพมหานคร	20000000
+16	สำนักยุทธศาสตร์และประเมินผล	21000000
+17	สำนักสิ่งแวดล้อม	22000000
+18	สำนักวัฒนธรรม กีฬาและการท่องเที่ยว	23000000
+19	สำนักพัฒนาสังคม	24000000
+20	สำนักการวางผังและพัฒนาเมือง	25000000
+21	สำนักดิจิทัลกรุงเทพมหานคร	26000000
+22	ศูนย์รับเรื่องร้องเรียน	49000000
+23	การพาณิชย์ของกรุงเทพมหานคร	51000000
+24	มหาวิทยาลัยกรุงเทพมหานคร	99000000
+25	กรุงเทพมหานคร	00000000
+26	สำนักนโยบายและแผนกรุงเทพมหานคร	06000000
+27	สำนักรักษาความสะอาด	12000000
+28	สำนักสวัสดิการสังคม	13000000
+29	สำนักพัฒนาชุมชน	16000000
+30	สำนักงานเขตพระนคร	50010000
+31	สำนักงานเขตป้อมปราบศัตรูพ่าย	50020000
+32	สำนักงานเขตสัมพันธวงศ์	50030000
+33	สำนักงานเขตบางรัก	50040000
+34	สำนักงานเขตปทุมวัน	50050000
+35	สำนักงานเขตยานนาวา	50060000
+36	สำนักงานเขตดุสิต	50070000
+37	สำนักงานเขตพญาไท	50080000
+38	สำนักงานเขตห้วยขวาง	50090000
+39	สำนักงานเขตพระโขนง	50100000
+40	สำนักงานเขตบางกะปิ	50110000
+41	สำนักงานเขตบางเขน	50120000
+42	สำนักงานเขตมีนบุรี	50130000
+43	สำนักงานเขตลาดกระบัง	50140000
+44	สำนักงานเขตหนองจอก	50150000
+45	สำนักงานเขตธนบุรี	50160000
+46	สำนักงานเขตคลองสาน	50170000
+47	สำนักงานเขตบางกอกใหญ่	50180000
+48	สำนักงานเขตบางกอกน้อย	50190000
+49	สำนักงานเขตตลิ่งชัน	50200000
+50	สำนักงานเขตภาษีเจริญ	50210000
+51	สำนักงานเขตหนองแขม	50220000
+52	สำนักงานเขตบางขุนเทียน	50230000
+53	สำนักงานเขตราษฎร์บูรณะ	50240000
+54	สำนักงานเขตดอนเมือง	50250000
+55	สำนักงานเขตจตุจักร	50260000
+56	สำนักงานเขตลาดพร้าว	50270000
+57	สำนักงานเขตบึงกุ่ม	50280000
+58	สำนักงานเขตสาทร	50290000
+59	สำนักงานเขตบางคอแหลม	50300000
+60	สำนักงานเขตบางซื่อ	50310000
+61	สำนักงานเขตราชเทวี	50320000
+62	สำนักงานเขตคลองเตย	50330000
+63	สำนักงานเขตประเวศ	50340000
+64	สำนักงานเขตบางพลัด	50350000
+65	สำนักงานเขตจอมทอง	50360000
+66	สำนักงานเขตดินแดง	50370000
+67	สำนักงานเขตสวนหลวง	50380000
+68	สำนักงานเขตวัฒนา	50390000
+69	สำนักงานเขตบางแค	50400000
+70	สำนักงานเขตหลักสี่	50410000
+71	สำนักงานเขตสายไหม	50420000
+72	สำนักงานเขตคันนายาว	50430000
+73	สำนักงานเขตสะพานสูง	50440000
+74	สำนักงานเขตวังทองหลาง	50450000
+75	สำนักงานเขตคลองสามวา	50460000
+76	สำนักงานเขตบางนา	50470000
+77	สำนักงานเขตทวีวัฒนา	50480000
+78	สำนักงานเขตทุ่งครุ	50490000
+79	สำนักงานเขตบางบอน	50500000
+\.
 
 
 --
--- TOC entry 3950 (class 0 OID 16496)
--- Dependencies: 222
 -- Data for Name: deputy_governors; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.deputy_governors VALUES (2, 'รผว.วิศณุ', true);
-INSERT INTO public.deputy_governors VALUES (3, 'รผว.ทวิดา', true);
-INSERT INTO public.deputy_governors VALUES (4, 'รผว.ศานนท์', true);
-INSERT INTO public.deputy_governors VALUES (5, 'รผว.พรพรหม', true);
+COPY public.deputy_governors (id, name, activate) FROM stdin;
+2	รผว.วิศณุ	t
+3	รผว.ทวิดา	t
+4	รผว.ศานนท์	t
+5	รผว.พรพรหม	t
+1	รผว.จักกพันธุ์	f
+\.
 
 
 --
--- TOC entry 3952 (class 0 OID 16503)
--- Dependencies: 224
 -- Data for Name: divisions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.divisions VALUES (1, 25, 'กรุงเทพมหานคร', '00000000');
-INSERT INTO public.divisions VALUES (2, 1, 'สำนักงานเลขานุการสภากรุงเทพมหานคร', '01000000');
-INSERT INTO public.divisions VALUES (3, 1, 'ส่วนวิชาการ', '01010000');
-INSERT INTO public.divisions VALUES (4, 2, 'สํานักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร', '02000000');
-INSERT INTO public.divisions VALUES (5, 3, 'สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร', '03000000');
-INSERT INTO public.divisions VALUES (6, 3, 'กองบริหารทั่วไป', '03010000');
-INSERT INTO public.divisions VALUES (7, 3, 'กองอัตรากำลัง', '03020000');
-INSERT INTO public.divisions VALUES (8, 3, 'กองทะเบียนประวัติข้าราชการ', '03030000');
-INSERT INTO public.divisions VALUES (9, 3, 'กองวินัยและเสริมสร้างจริยธรรม', '03040000');
-INSERT INTO public.divisions VALUES (10, 3, 'กองสรรหาบุคคล', '03050000');
-INSERT INTO public.divisions VALUES (11, 3, 'กองระบบงาน', '03060000');
-INSERT INTO public.divisions VALUES (12, 3, 'กองพิทักษ์ระบบคุณธรรม', '03070000');
-INSERT INTO public.divisions VALUES (13, 4, 'สํานักปลัดกรุงเทพมหานคร', '04000000');
-INSERT INTO public.divisions VALUES (14, 4, 'สำนักงานเลขานุการปลัดกรุงเทพมหานคร', '04210000');
-INSERT INTO public.divisions VALUES (15, 4, 'สำนักงานการเจ้าหน้าที่', '04190000');
-INSERT INTO public.divisions VALUES (16, 4, 'สำนักงานปกครองและทะเบียน', '04170000');
-INSERT INTO public.divisions VALUES (17, 4, 'สำนักงานตรวจสอบภายใน', '04180000');
-INSERT INTO public.divisions VALUES (18, 4, 'กองงานผู้ตรวจราชการ', '04080000');
-INSERT INTO public.divisions VALUES (19, 4, 'สถาบันพัฒนาข้าราชการ กทม.', '04090000');
-INSERT INTO public.divisions VALUES (20, 4, 'สำนักงานประชาสัมพันธ์', '04200000');
-INSERT INTO public.divisions VALUES (21, 4, 'สำนักงานกฎหมายและคดี', '04150000');
-INSERT INTO public.divisions VALUES (22, 4, 'สำนักงานการต่างประเทศ', '04160000');
-INSERT INTO public.divisions VALUES (23, 26, 'สำนักนโยบายและแผนกรุงเทพมหานคร', '06000000');
-INSERT INTO public.divisions VALUES (24, 26, 'สำนักงานเลขานุการ', '06010000');
-INSERT INTO public.divisions VALUES (25, 26, 'กองนโยบายและแผนรวม', '06020000');
-INSERT INTO public.divisions VALUES (26, 26, 'กองแผนสาธารณูปโภคและ สวล.', '06030000');
-INSERT INTO public.divisions VALUES (27, 26, 'กองแผนทรัพยากรมนุษย์และสังคม', '06040000');
-INSERT INTO public.divisions VALUES (28, 26, 'กองแผนบริหารและการคลัง', '06050000');
-INSERT INTO public.divisions VALUES (29, 26, 'กองการต่างประเทศ', '06080000');
-INSERT INTO public.divisions VALUES (30, 26, 'กองพัฒนาระบบงานคอมพิวเตอร์', '06090000');
-INSERT INTO public.divisions VALUES (31, 26, 'กองควบคุมระบบคอมพิวเตอร์', '06100000');
-INSERT INTO public.divisions VALUES (32, 26, 'กองบริการระบบคอมพิวเตอร์', '06110000');
-INSERT INTO public.divisions VALUES (33, 26, 'กองสารสนเทศภูมิศาสตร์', '06120000');
-INSERT INTO public.divisions VALUES (34, 5, 'สำนักการแพทย์', '07000000');
-INSERT INTO public.divisions VALUES (35, 5, 'สำนักงานเลขานุการ', '07010000');
-INSERT INTO public.divisions VALUES (36, 5, 'สำนักงานพัฒนาระบบบริการทางการแพทย์  ', '07180000');
-INSERT INTO public.divisions VALUES (37, 5, 'วิทยาลัยพยาบาลเกื้อการุณย์', '07030000');
-INSERT INTO public.divisions VALUES (38, 5, 'โรงพยาบาลกลาง', '07050000');
-INSERT INTO public.divisions VALUES (39, 5, 'โรงพยาบาลตากสิน', '07060000');
-INSERT INTO public.divisions VALUES (40, 5, 'โรงพยาบาลเจริญกรุงประชารักษ์', '07070000');
-INSERT INTO public.divisions VALUES (41, 5, 'โรงพยาบาลหลวงพ่อทวีศักดิ์ ชุตินฺธโรอุทิศ', '07080000');
-INSERT INTO public.divisions VALUES (42, 5, 'โรงพยาบาลเวชการุณย์รัศมี์', '07160000');
-INSERT INTO public.divisions VALUES (43, 5, 'โรงพยาบาลลาดกระบัง กทม.', '07100000');
-INSERT INTO public.divisions VALUES (44, 5, 'โรงพยาบาลหนองจอก', '07090000');
-INSERT INTO public.divisions VALUES (45, 5, 'โรงพยาบาลราชพิพัฒน์', '07130000');
-INSERT INTO public.divisions VALUES (46, 5, 'โรงพยาบาลสิรินธร', '07140000');
-INSERT INTO public.divisions VALUES (47, 5, 'ศูนย์บริการการแพทย์ฉุกเฉินกรุงเทพมหานคร (ศูนย์เอราวัณ)', '07150000');
-INSERT INTO public.divisions VALUES (48, 5, 'โรงพยาบาลผู้สูงอายุบางขุนเทียน', '07170000');
-INSERT INTO public.divisions VALUES (49, 5, 'โรงพยาบาลคลองสามวา', '07190000');
-INSERT INTO public.divisions VALUES (50, 5, 'โรงพยาบาลบางนากรุงเทพมหานคร', '07200000');
-INSERT INTO public.divisions VALUES (51, 6, 'สำนักอนามัย', '08000000');
-INSERT INTO public.divisions VALUES (52, 6, 'สำนักงานเลขานุการ', '08010000');
-INSERT INTO public.divisions VALUES (53, 6, 'กองสร้างเสริมสุขภาพ', '08030000');
-INSERT INTO public.divisions VALUES (54, 6, 'กองการพยาบาลสาธารณสุข', '08040000');
-INSERT INTO public.divisions VALUES (55, 6, 'กองทันตสาธารณสุข', '08050000');
-INSERT INTO public.divisions VALUES (56, 6, 'สำนักงานสัตวแพทย์สาธารณสุข', '08750000');
-INSERT INTO public.divisions VALUES (57, 6, 'กองควบคุมโรคติดต่อ', '08080000');
-INSERT INTO public.divisions VALUES (58, 6, 'สำนักงานป้องกันและบำบัดการติดยาเสพติด', '08740000');
-INSERT INTO public.divisions VALUES (59, 6, 'กองควบคุมโรคเอดส์ วัณโรค และโรคติดต่อทางเพศสัมพันธ์', '08730000');
-INSERT INTO public.divisions VALUES (60, 6, 'กองเภสัชกรรม', '08110000');
-INSERT INTO public.divisions VALUES (61, 6, 'ศูนย์บริการสาธารณสุข 1 สะพานมอญ', '08120000');
-INSERT INTO public.divisions VALUES (62, 6, 'ศูนย์บริการสาธารณสุข 2 ราชปรารภ', '08130000');
-INSERT INTO public.divisions VALUES (63, 6, 'ศูนย์บริการสาธารณสุข 3 บางซื่อ', '08140000');
-INSERT INTO public.divisions VALUES (64, 6, 'ศูนย์บริการสาธารณสุข 4 ดินแดง', '08150000');
-INSERT INTO public.divisions VALUES (65, 6, 'ศูนย์บริการสาธารณสุข 5 จุฬาลงกรณ์', '08160000');
-INSERT INTO public.divisions VALUES (66, 6, 'ศูนย์บริการสาธารณสุข 6 สโมสรวัฒนธรรมหญิง', '08170000');
-INSERT INTO public.divisions VALUES (193, 11, 'สำนักงานเลขานุการ', '15010000');
-INSERT INTO public.divisions VALUES (67, 6, 'ศูนย์บริการสาธารณสุข 7 บุญมี ปุรุราชรังสรรค์', '08180000');
-INSERT INTO public.divisions VALUES (68, 6, 'ศูนย์บริการสาธารณสุข 8 บุญรอด รุ่งเรือง', '08190000');
-INSERT INTO public.divisions VALUES (69, 6, 'ศูนย์บริการสาธารณสุข 9 ประชาธิปไตย', '08200000');
-INSERT INTO public.divisions VALUES (70, 6, 'ศูนย์บริการสาธารณสุข 10 สุขุมวิท', '08210000');
-INSERT INTO public.divisions VALUES (71, 6, 'ศูนย์บริการสาธารณสุข 11 ประดิพัทธ์', '08220000');
-INSERT INTO public.divisions VALUES (72, 6, 'ศูนย์บริการสาธารณสุข 12 จันทร์เที่ยง เนตรวิเศษ', '08230000');
-INSERT INTO public.divisions VALUES (73, 6, 'ศูนย์บริการสาธารณสุข 13 ไมตรีวานิช', '08240000');
-INSERT INTO public.divisions VALUES (74, 6, 'ศูนย์บริการสาธารณสุข 14 แก้วสีบุญเรือง', '08250000');
-INSERT INTO public.divisions VALUES (75, 6, 'ศูนย์บริการสาธารณสุข 15 ลาดพร้าว', '08260000');
-INSERT INTO public.divisions VALUES (76, 6, 'ศูนย์บริการสาธารณสุข 16 ลุมพินี', '08270000');
-INSERT INTO public.divisions VALUES (77, 6, 'ศูนย์บริการสาธารณสุข 17 ประชานิเวศน์', '08280000');
-INSERT INTO public.divisions VALUES (78, 6, 'ศูนย์บริการสาธารณสุข 18 มงคล-วอน วังตาล', '08290000');
-INSERT INTO public.divisions VALUES (79, 6, 'ศูนย์บริการสาธารณสุข 19 วงศ์สว่าง', '08300000');
-INSERT INTO public.divisions VALUES (80, 6, 'ศูนย์บริการสาธารณสุข 20 ธนาคารศรีนคร', '08310000');
-INSERT INTO public.divisions VALUES (81, 6, 'ศูนย์บริการสาธารณสุข 21 วัดธาตุทอง', '08320000');
-INSERT INTO public.divisions VALUES (82, 6, 'ศูนย์บริการสาธารณสุข 22 วัดปากบ่อ', '08330000');
-INSERT INTO public.divisions VALUES (83, 6, 'ศูนย์บริการสาธารณสุข 23 สี่พระยา', '08340000');
-INSERT INTO public.divisions VALUES (84, 6, 'ศูนย์บริการสาธารณสุข 24 บางเขน', '08350000');
-INSERT INTO public.divisions VALUES (85, 6, 'ศูนย์บริการสาธารณสุข 25 ห้วยขวาง', '08360000');
-INSERT INTO public.divisions VALUES (86, 6, 'ศูนย์บริการสาธารณสุข 26 เจ้าคุณประยูรวงศ์', '08370000');
-INSERT INTO public.divisions VALUES (87, 6, 'ศูนย์บริการสาธารณสุข 27 จันทร์ฉิม ไพบูลย์', '08380000');
-INSERT INTO public.divisions VALUES (88, 6, 'ศูนย์บริการสาธารณสุข 28 กรุงธนบุรี', '08390000');
-INSERT INTO public.divisions VALUES (89, 6, 'ศูนย์บริการสาธารณสุข 29 ช่วง นุชเนตร', '08400000');
-INSERT INTO public.divisions VALUES (90, 6, 'ศูนย์บริการสาธารณสุข 30 วัดเจ้าอาม', '08410000');
-INSERT INTO public.divisions VALUES (91, 6, 'ศูนย์บริการสาธารณสุข 31 เอิบ - จิตร ทังสุบุตร', '08420000');
-INSERT INTO public.divisions VALUES (92, 6, 'ศูนย์บริการสาธารณสุข 32 มาริษ ตินตมุสิก', '08430000');
-INSERT INTO public.divisions VALUES (93, 6, 'ศูนย์บริการสาธารณสุข 33 วัดหงส์รัตนาราม', '08440000');
-INSERT INTO public.divisions VALUES (94, 6, 'ศูนย์บริการสาธารณสุข 34 โพธิ์ศรี', '08450000');
-INSERT INTO public.divisions VALUES (95, 6, 'ศูนย์บริการสาธารณสุข 35 หัวหมาก', '08460000');
-INSERT INTO public.divisions VALUES (96, 6, 'ศูนย์บริการสาธารณสุข 36 บุคคโล', '08470000');
-INSERT INTO public.divisions VALUES (97, 6, 'ศูนย์บริการสาธารณสุข 37 ประสงค์-สุดสาคร ตู้จินดา', '08480000');
-INSERT INTO public.divisions VALUES (98, 6, 'ศูนย์บริการสาธารณสุข 38 จี๊ด ทองคำ บำเพ็ญ', '08490000');
-INSERT INTO public.divisions VALUES (99, 6, 'ศูนย์บริการสาธารณสุข 39 ราษฎร์บูรณะ', '08500000');
-INSERT INTO public.divisions VALUES (100, 6, 'ศูนย์บริการสาธารณสุข 40 บางแค', '08510000');
-INSERT INTO public.divisions VALUES (101, 6, 'ศูนย์บริการสาธารณสุข 41 คลองเตย', '08520000');
-INSERT INTO public.divisions VALUES (102, 6, 'ศูนย์บริการสาธารณสุข 42 ถนอม ทองสิมา', '08530000');
-INSERT INTO public.divisions VALUES (103, 6, 'ศูนย์บริการสาธารณสุข 43 มีนบุรี', '08540000');
-INSERT INTO public.divisions VALUES (104, 6, 'ศูนย์บริการสาธารณสุข 46 กันตารัติอุทิศ', '08550000');
-INSERT INTO public.divisions VALUES (105, 6, 'ศูนย์บริการสาธารณสุข 47 คลองขวาง', '08560000');
-INSERT INTO public.divisions VALUES (106, 6, 'ศูนย์บริการสาธารณสุข 48 นาควัชระอุทิศ', '08570000');
-INSERT INTO public.divisions VALUES (107, 6, 'ศูนย์บริการสาธารณสุข 49 วัดชัยพฤกษมาลา', '08580000');
-INSERT INTO public.divisions VALUES (108, 6, 'ศูนย์บริการสาธารณสุข 50 บึงกุ่ม', '08590000');
-INSERT INTO public.divisions VALUES (109, 6, 'ศูนย์บริการสาธารณสุข 51 วัดไผ่ตัน', '08600000');
-INSERT INTO public.divisions VALUES (110, 6, 'ศูนย์บริการสาธารณสุข 52 สามเสนนอก', '08610000');
-INSERT INTO public.divisions VALUES (111, 6, 'ศูนย์บริการสาธารณสุข 53 ทุ่งสองห้อง', '08620000');
-INSERT INTO public.divisions VALUES (112, 6, 'ศูนย์บริการสาธารณสุข 54 ทัศน์เอี่ยม', '08630000');
-INSERT INTO public.divisions VALUES (113, 6, 'ศูนย์บริการสาธารณสุข 55 เตชะสัมพันธ์', '08640000');
-INSERT INTO public.divisions VALUES (114, 6, 'ศูนย์บริการสาธารณสุข 56 ทับเจริญ', '08650000');
-INSERT INTO public.divisions VALUES (115, 6, 'ศูนย์บริการสาธารณสุข 57 บุญเรือง ล้ำเลิศ', '08660000');
-INSERT INTO public.divisions VALUES (116, 6, 'ศูนย์บริการสาธารณสุข 58 ล้อม-พิมเสน ฟักอุดม', '08670000');
-INSERT INTO public.divisions VALUES (117, 6, 'ศูนย์บริการสาธารณสุข 59 ทุ่งครุ', '08680000');
-INSERT INTO public.divisions VALUES (118, 6, 'ศูนย์บริการสาธารณสุข 60 รสสุคนธ์ มโนชญากร', '08690000');
-INSERT INTO public.divisions VALUES (119, 6, 'ศูนย์บริการสาธารณสุข 61 สังวาลย์ ทัสนารมย์', '08700000');
-INSERT INTO public.divisions VALUES (120, 6, 'ศูนย์บริการสาธารณสุข 62 ตวงรัชฏ์ ศศะนาวิน ภักดีฐานปัญญา', '08710000');
-INSERT INTO public.divisions VALUES (265, 19, 'กองนโยบายและแผนงาน', '24020000');
-INSERT INTO public.divisions VALUES (121, 6, 'ศูนย์บริการสาธารณสุข 63 สมาคมแต้จิ๋วแห่งประเทศไทย', '08880000');
-INSERT INTO public.divisions VALUES (122, 6, 'สำนักงานชันสูตรสาธารณสุข', '08760000');
-INSERT INTO public.divisions VALUES (123, 6, 'ศูนย์บริการสาธารณสุข 44 ลำผักชี หนองจอก', '08900000');
-INSERT INTO public.divisions VALUES (124, 6, 'ศูนย์บริการสาธารณสุข 45 ร่มเกล้า ลาดกระบัง', '08910000');
-INSERT INTO public.divisions VALUES (125, 6, 'ศูนย์บริการสาธารณสุข 65 รักษาสุข บางบอน', '08920000');
-INSERT INTO public.divisions VALUES (126, 6, 'ศูนย์บริการสาธารณสุข 66 ตำหนักพระแม่กวนอิม โชคชัย4', '08930000');
-INSERT INTO public.divisions VALUES (127, 6, 'สำนักงานพัฒนาระบบสาธารณสุข', '08720000');
-INSERT INTO public.divisions VALUES (128, 6, 'สำนักงานสุขาภิบาลสิ่งแวดล้อม', '08950000');
-INSERT INTO public.divisions VALUES (129, 6, 'กองสุขาภิบาลอาหาร', '08960000');
-INSERT INTO public.divisions VALUES (130, 6, 'ศูนย์บริการสาธารณสุข 64 คลองสามวา', '08970000');
-INSERT INTO public.divisions VALUES (131, 6, 'ศูนย์บริการสาธารณสุข 67 ทวีวัฒนา', '08980000');
-INSERT INTO public.divisions VALUES (132, 6, 'ศูนย์บริการสาธารณสุข 68 สะพานสูง', '08990000');
-INSERT INTO public.divisions VALUES (133, 7, 'สำนักการศึกษา', '09000000');
-INSERT INTO public.divisions VALUES (134, 7, 'สำนักงานเลขานุการ', '09010000');
-INSERT INTO public.divisions VALUES (135, 7, 'สำนักงานการเจ้าหน้าที่', '09020000');
-INSERT INTO public.divisions VALUES (136, 7, 'กองคลัง', '09030000');
-INSERT INTO public.divisions VALUES (137, 7, 'หน่วยงานศึกษานิเทศก์', '09040000');
-INSERT INTO public.divisions VALUES (138, 7, 'กองวิชาการ', '09060000');
-INSERT INTO public.divisions VALUES (139, 7, 'โรงเรียนมัธยมบ้านบางกะปิ', '09070000');
-INSERT INTO public.divisions VALUES (140, 7, 'โรงเรียนมัธยมประชานิเวศน์', '09080000');
-INSERT INTO public.divisions VALUES (141, 7, 'โรงเรียนมัธยมนาคนาวาอุปถัมภ์', '09090000');
-INSERT INTO public.divisions VALUES (142, 7, 'โรงเรียนมัธยมสุวิทย์เสรีอนุสรณ์', '09100000');
-INSERT INTO public.divisions VALUES (143, 7, 'สำนักงานยุทธศาสตร์การศึกษา', '09110000');
-INSERT INTO public.divisions VALUES (144, 7, 'กองเทคโนโลยีเพื่อการเรียนการสอน', '09120000');
-INSERT INTO public.divisions VALUES (145, 7, 'กองพัฒนาข้าราชการครูากรุงเทพมหานคร', '09130000');
-INSERT INTO public.divisions VALUES (146, 7, 'สำนักงานการเจ้าหน้าที่', '09140000');
-INSERT INTO public.divisions VALUES (147, 8, 'สำนักการโยธา', '10000000');
-INSERT INTO public.divisions VALUES (148, 8, 'สำนักงานเลขานุการ', '10010000');
-INSERT INTO public.divisions VALUES (149, 8, 'กองวิเคราะห์และวิจัย', '10030000');
-INSERT INTO public.divisions VALUES (150, 8, 'กองควบคุมการก่อสร้าง', '10060000');
-INSERT INTO public.divisions VALUES (151, 8, 'กองควบคุมอาคาร', '10070000');
-INSERT INTO public.divisions VALUES (152, 8, 'กองแผนงานและประสานสาธารณูปโภค', '10090000');
-INSERT INTO public.divisions VALUES (153, 8, 'สำนักงานก่อสร้างและบูรณะ', '10100000');
-INSERT INTO public.divisions VALUES (154, 8, 'สำนักงานออกแบบ', '10110000');
-INSERT INTO public.divisions VALUES (155, 8, 'กองสำรวจและแผนที่ที่ดิน', '10120000');
-INSERT INTO public.divisions VALUES (156, 8, 'สำนักงานจัดกรรมสิทธิ์', '10130000');
-INSERT INTO public.divisions VALUES (157, 8, 'สำนักงานวิศวกรรมทาง', '10160000');
-INSERT INTO public.divisions VALUES (158, 9, 'สำนักการระบายน้ำ', '11000000');
-INSERT INTO public.divisions VALUES (159, 9, 'สำนักงานเลขานุการ', '11010000');
-INSERT INTO public.divisions VALUES (160, 9, 'กองเครื่องจักรกล', '11060000');
-INSERT INTO public.divisions VALUES (161, 9, 'กองสารสนเทศระบายน้ำ', '11080000');
-INSERT INTO public.divisions VALUES (162, 9, 'สำนักงานระบบควบคุมน้ำ', '11160000');
-INSERT INTO public.divisions VALUES (163, 9, 'กองระบบท่อระบายน้ำ', '11100000');
-INSERT INTO public.divisions VALUES (164, 9, 'กองระบบคลอง', '11110000');
-INSERT INTO public.divisions VALUES (165, 9, 'กองจัดการคุณภาพน้ำ', '11120000');
-INSERT INTO public.divisions VALUES (166, 9, 'สำนักงานจัดการคุณภาพน้ำ', '11130000');
-INSERT INTO public.divisions VALUES (167, 9, 'สำนักงานพัฒนาระบบระบายน้ำ', '11140000');
-INSERT INTO public.divisions VALUES (168, 27, 'สำนักรักษาความสะอาด', '12000000');
-INSERT INTO public.divisions VALUES (169, 27, 'สำนักงานเลขานุการ', '12010000');
-INSERT INTO public.divisions VALUES (170, 27, 'กองบริการรักษาความสะอาด', '12020000');
-INSERT INTO public.divisions VALUES (171, 27, 'กองควบคุมสิ่งปฏิกูล', '12030000');
-INSERT INTO public.divisions VALUES (172, 27, 'กองโรงงานกำจัดมูลฝอย', '12040000');
-INSERT INTO public.divisions VALUES (173, 27, 'กองวิชาการและแผนงาน', '12050000');
-INSERT INTO public.divisions VALUES (174, 28, 'สำนักสวัสดิการสังคม', '13000000');
-INSERT INTO public.divisions VALUES (175, 28, 'สำนักงานเลขานุการ', '13010000');
-INSERT INTO public.divisions VALUES (176, 28, 'กองสังคมสงเคราะห์', '13020000');
-INSERT INTO public.divisions VALUES (177, 28, 'กองนันทนาการ', '13040000');
-INSERT INTO public.divisions VALUES (178, 28, 'กองการกีฬา', '13050000');
-INSERT INTO public.divisions VALUES (179, 28, 'สำนักงานสวนสาธารณะ', '13060000');
-INSERT INTO public.divisions VALUES (180, 28, 'กองสวัสดิภาพเด็ก สตรี ผู้สูงอายุ ผู้พิการ และผู้ด้อยโอกาส', '13070000');
-INSERT INTO public.divisions VALUES (181, 10, 'สํานักการคลัง', '14000000');
-INSERT INTO public.divisions VALUES (182, 10, 'สำนักงานเลขานุการ', '14010000');
-INSERT INTO public.divisions VALUES (183, 10, 'กองรายได้', '14020000');
-INSERT INTO public.divisions VALUES (184, 10, 'กองการเงิน', '14030000');
-INSERT INTO public.divisions VALUES (185, 10, 'กองทะเบียนทรัพย์สินและพัสดุ', '14040000');
-INSERT INTO public.divisions VALUES (186, 10, 'กองบัญชี', '14050000');
-INSERT INTO public.divisions VALUES (187, 10, 'กองระบบการคลัง', '14060000');
-INSERT INTO public.divisions VALUES (188, 10, 'กองโรงงานช่างกล', '14070000');
-INSERT INTO public.divisions VALUES (189, 10, 'กองตรวจจ่าย', '14080000');
-INSERT INTO public.divisions VALUES (190, 10, 'สำนักงานเศรษฐกิจการคลัง', '14090000');
-INSERT INTO public.divisions VALUES (191, 10, 'กองบำเหน็จบำนาญ', '14100000');
-INSERT INTO public.divisions VALUES (192, 11, 'สํานักเทศกิจ', '15000000');
-INSERT INTO public.divisions VALUES (194, 11, 'กองวิชาการและแผนงาน', '15020000');
-INSERT INTO public.divisions VALUES (195, 11, 'กองตรวจการเทศกิจ', '15030000');
-INSERT INTO public.divisions VALUES (196, 11, 'กองนโยบายและแผนงาน', '15050000');
-INSERT INTO public.divisions VALUES (197, 11, 'กองตรวจและปฏิบัติการพื้นที่ 1', '15060000');
-INSERT INTO public.divisions VALUES (198, 11, 'กองนิติการและบังคับคดี', '15110000');
-INSERT INTO public.divisions VALUES (199, 29, 'สำนักพัฒนาชุมชน', '16000000');
-INSERT INTO public.divisions VALUES (200, 29, 'สำนักงานเลขานุการ', '16010000');
-INSERT INTO public.divisions VALUES (201, 29, 'กองส่งเสริมอาชีพ', '16030000');
-INSERT INTO public.divisions VALUES (202, 29, 'กองวิชาการและแผนงาน', '16130000');
-INSERT INTO public.divisions VALUES (203, 29, 'กองการพัฒนาชุมชน', '16140000');
-INSERT INTO public.divisions VALUES (204, 12, 'สํานักการจราจรและขนส่ง', '17000000');
-INSERT INTO public.divisions VALUES (205, 12, 'สำนักงานเลขานุการ', '17010000');
-INSERT INTO public.divisions VALUES (206, 12, 'สำนักงานระบบขนส่ง', '17040000');
-INSERT INTO public.divisions VALUES (207, 12, 'กองนโยบายและแผนงาน', '17120000');
-INSERT INTO public.divisions VALUES (208, 12, 'สำนักงานวิศวกรรมจราจร', '17130000');
-INSERT INTO public.divisions VALUES (209, 12, 'กองพัฒนาระบบจราจร', '17140000');
-INSERT INTO public.divisions VALUES (210, 13, 'สำนักการวางผังและพัฒนาเมือง', '18000000');
-INSERT INTO public.divisions VALUES (211, 13, 'สำนักงานเลขานุการ', '18010000');
-INSERT INTO public.divisions VALUES (212, 13, 'กองสำรวจและแผนที่', '18030000');
-INSERT INTO public.divisions VALUES (213, 13, 'กองวางผังพัฒนาเมือง', '18050000');
-INSERT INTO public.divisions VALUES (214, 13, 'กองจัดรูปที่ดินและปรับปรุงฟื้นฟูเมือง', '18060000');
-INSERT INTO public.divisions VALUES (215, 13, 'กองควบคุมทางผังเมือง', '18070000');
-INSERT INTO public.divisions VALUES (216, 13, 'กองนโยบายและแผนงาน', '18080000');
-INSERT INTO public.divisions VALUES (217, 14, 'สำนักป้องกันและบรรเทาสาธารณภัย', '19000000');
-INSERT INTO public.divisions VALUES (218, 14, 'สำนักงานเลขานุการ', '19010000');
-INSERT INTO public.divisions VALUES (219, 14, 'กองวิชาการและแผนงาน', '19020000');
-INSERT INTO public.divisions VALUES (220, 14, 'กองอำนวยการป้องกันและบรรเทาสาธารณภัย', '19030000');
-INSERT INTO public.divisions VALUES (221, 14, 'กองปฏิบัติการดับเพลิง 1', '19040000');
-INSERT INTO public.divisions VALUES (222, 14, 'กองปฏิบัติการดับเพลิง 2', '19050000');
-INSERT INTO public.divisions VALUES (223, 14, 'กองปฏิบัติการดับเพลิง 3', '19060000');
-INSERT INTO public.divisions VALUES (224, 14, 'กองปฏิบัติการดับเพลิง 4', '19070000');
-INSERT INTO public.divisions VALUES (225, 14, 'กองปฏิบัติการดับเพลิง 5', '19080000');
-INSERT INTO public.divisions VALUES (226, 14, 'กองปฏิบัติการดับเพลิง 6', '19090000');
-INSERT INTO public.divisions VALUES (227, 15, 'สำนักงบประมาณกรุงเทพมหานคร', '20000000');
-INSERT INTO public.divisions VALUES (228, 15, 'สำนักงานเลขานุการ', '20010000');
-INSERT INTO public.divisions VALUES (229, 15, 'สำนักงานระบบงบประมาณ', '20070000');
-INSERT INTO public.divisions VALUES (230, 15, 'กองวิเคราะห์งบประมาณ 1', '20030000');
-INSERT INTO public.divisions VALUES (231, 15, 'กองวิเคราะห์งบประมาณ 2', '20040000');
-INSERT INTO public.divisions VALUES (232, 15, 'กองวิเคราะห์งบประมาณ 3', '20050000');
-INSERT INTO public.divisions VALUES (233, 15, 'กองวิเคราะห์งบประมาณ 4', '20060000');
-INSERT INTO public.divisions VALUES (234, 15, 'กองวิเคราะห์งบประมาณ 5', '20080000');
-INSERT INTO public.divisions VALUES (235, 15, 'กองวิเคราะห์งบประมาณ 6', '20090000');
-INSERT INTO public.divisions VALUES (236, 16, 'สำนักยุทธศาสตร์และประเมินผล', '21000000');
-INSERT INTO public.divisions VALUES (237, 16, 'สำนักงานเลขานุการ', '21010000');
-INSERT INTO public.divisions VALUES (238, 16, 'กองยุทธศาสตร์บริหารจัดการ', '21020000');
-INSERT INTO public.divisions VALUES (239, 16, 'กองยุทธศาสตร์เศรษฐกิจ การเงิน และการคลัง', '21030000');
-INSERT INTO public.divisions VALUES (240, 16, 'กองยุทธศาสตร์สาธารณสุขและสิ่งแวดล้อม', '21040000');
-INSERT INTO public.divisions VALUES (241, 16, 'กองยุทธศาสตร์สาธารณูปโภคพื้นฐาน', '21050000');
-INSERT INTO public.divisions VALUES (242, 16, 'กองยุทธศาสตร์ทรัพยากรมนุษย์และสังคม', '21060000');
-INSERT INTO public.divisions VALUES (243, 16, 'กองพัฒนาระบบงานคอมพิวเตอร์', '21070000');
-INSERT INTO public.divisions VALUES (244, 16, 'กองควบคุมระบบคอมพิวเตอร์', '21080000');
-INSERT INTO public.divisions VALUES (245, 16, 'กองบริการระบบคอมพิวเตอร์', '21090000');
-INSERT INTO public.divisions VALUES (246, 16, 'กองสารสนเทศภูมิศาสตร์', '21100000');
-INSERT INTO public.divisions VALUES (247, 17, 'สำนักสิ่งแวดล้อม', '22000000');
-INSERT INTO public.divisions VALUES (248, 17, 'สำนักงานเลขานุการ', '22010000');
-INSERT INTO public.divisions VALUES (249, 17, 'กองนโยบายและแผนงาน', '22020000');
-INSERT INTO public.divisions VALUES (250, 17, 'กองจัดการขยะ ของเสียอันตรายและสิ่งปฏิกูล', '22030000');
-INSERT INTO public.divisions VALUES (251, 17, 'กองจัดการคุณภาพอากาศและเสียง', '22040000');
-INSERT INTO public.divisions VALUES (252, 17, 'กองโรงงานกำจัดมูลฝอย', '22050000');
-INSERT INTO public.divisions VALUES (253, 17, 'สำนักงานสวนสาธารณะ', '22060000');
-INSERT INTO public.divisions VALUES (254, 18, 'สำนักวัฒนธรรม กีฬา และการท่องเที่ยว', '23000000');
-INSERT INTO public.divisions VALUES (255, 18, 'สำนักงานเลขานุการ', '23010000');
-INSERT INTO public.divisions VALUES (256, 18, 'กองนโยบายและแผนงาน', '23020000');
-INSERT INTO public.divisions VALUES (257, 18, 'ศูนย์เยาวชนกรุงเทพมหานคร (ไทย - ญี่ปุ่น)', '23030000');
-INSERT INTO public.divisions VALUES (258, 18, 'สำนักงานนันทนาการและส่งเสริมการเรียนรู้', '23090000');
-INSERT INTO public.divisions VALUES (259, 18, 'กองการกีฬา', '23050000');
-INSERT INTO public.divisions VALUES (260, 18, 'กองการสังคีต', '23060000');
-INSERT INTO public.divisions VALUES (261, 18, 'กองการท่องเที่ยว', '23070000');
-INSERT INTO public.divisions VALUES (262, 18, 'กองวัฒนธรรม', '23080000');
-INSERT INTO public.divisions VALUES (263, 19, 'สำนักพัฒนาสังคม', '24000000');
-INSERT INTO public.divisions VALUES (264, 19, 'สำนักงานเลขานุการ', '24010000');
-INSERT INTO public.divisions VALUES (266, 19, 'กองการพัฒนาชุมชน', '24030000');
-INSERT INTO public.divisions VALUES (267, 19, 'กองส่งเสริมอาชีพ', '24040000');
-INSERT INTO public.divisions VALUES (268, 19, 'สำนักงานการสงเคราะห์และสวัสดิภาพสังคม', '24050000');
-INSERT INTO public.divisions VALUES (269, 24, 'มหาวิทยาลัยกรุงเทพมหานคร', '99000000');
-INSERT INTO public.divisions VALUES (270, 24, 'สำนักงานอธิการบดี', '99010000');
-INSERT INTO public.divisions VALUES (271, 24, 'สำนักงานสภามหาวิทยาลัย', '99020000');
-INSERT INTO public.divisions VALUES (272, 24, 'คณะแพทย์ศาสตร์วชิรพยาบาล', '99030000');
-INSERT INTO public.divisions VALUES (273, 24, 'คณะพยาบาลศาสตร์เกื้อการุณย์', '99040000');
-INSERT INTO public.divisions VALUES (274, 22, 'ศูนย์รับเรื่องร้องเรียน', '49000000');
-INSERT INTO public.divisions VALUES (275, 30, '-', '50010000');
-INSERT INTO public.divisions VALUES (276, 31, '-', '50020000');
-INSERT INTO public.divisions VALUES (277, 32, '-', '50030000');
-INSERT INTO public.divisions VALUES (278, 33, '-', '50040000');
-INSERT INTO public.divisions VALUES (279, 34, '-', '50050000');
-INSERT INTO public.divisions VALUES (280, 35, '-', '50060000');
-INSERT INTO public.divisions VALUES (281, 36, '-', '50070000');
-INSERT INTO public.divisions VALUES (282, 37, '-', '50080000');
-INSERT INTO public.divisions VALUES (283, 38, '-', '50090000');
-INSERT INTO public.divisions VALUES (284, 39, '-', '50100000');
-INSERT INTO public.divisions VALUES (285, 40, '-', '50110000');
-INSERT INTO public.divisions VALUES (286, 41, '-', '50120000');
-INSERT INTO public.divisions VALUES (287, 42, '-', '50130000');
-INSERT INTO public.divisions VALUES (288, 43, '-', '50140000');
-INSERT INTO public.divisions VALUES (289, 44, '-', '50150000');
-INSERT INTO public.divisions VALUES (290, 45, '-', '50160000');
-INSERT INTO public.divisions VALUES (291, 46, '-', '50170000');
-INSERT INTO public.divisions VALUES (292, 47, '-', '50180000');
-INSERT INTO public.divisions VALUES (293, 48, '-', '50190000');
-INSERT INTO public.divisions VALUES (294, 49, '-', '50200000');
-INSERT INTO public.divisions VALUES (295, 50, '-', '50210000');
-INSERT INTO public.divisions VALUES (296, 51, '-', '50220000');
-INSERT INTO public.divisions VALUES (297, 52, '-', '50230000');
-INSERT INTO public.divisions VALUES (298, 53, '-', '50240000');
-INSERT INTO public.divisions VALUES (299, 54, '-', '50250000');
-INSERT INTO public.divisions VALUES (300, 55, '-', '50260000');
-INSERT INTO public.divisions VALUES (301, 56, '-', '50270000');
-INSERT INTO public.divisions VALUES (302, 57, '-', '50280000');
-INSERT INTO public.divisions VALUES (303, 58, '-', '50290000');
-INSERT INTO public.divisions VALUES (304, 59, '-', '50300000');
-INSERT INTO public.divisions VALUES (305, 60, '-', '50310000');
-INSERT INTO public.divisions VALUES (306, 61, '-', '50320000');
-INSERT INTO public.divisions VALUES (307, 62, '-', '50330000');
-INSERT INTO public.divisions VALUES (308, 63, '-', '50340000');
-INSERT INTO public.divisions VALUES (309, 64, '-', '50350000');
-INSERT INTO public.divisions VALUES (310, 65, '-', '50360000');
-INSERT INTO public.divisions VALUES (311, 66, '-', '50370000');
-INSERT INTO public.divisions VALUES (312, 67, '-', '50380000');
-INSERT INTO public.divisions VALUES (313, 68, '-', '50390000');
-INSERT INTO public.divisions VALUES (314, 69, '-', '50400000');
-INSERT INTO public.divisions VALUES (315, 70, '-', '50410000');
-INSERT INTO public.divisions VALUES (316, 71, '-', '50420000');
-INSERT INTO public.divisions VALUES (317, 72, '-', '50430000');
-INSERT INTO public.divisions VALUES (318, 73, '-', '50440000');
-INSERT INTO public.divisions VALUES (319, 74, '-', '50450000');
-INSERT INTO public.divisions VALUES (320, 75, '-', '50460000');
-INSERT INTO public.divisions VALUES (321, 76, '-', '50470000');
-INSERT INTO public.divisions VALUES (322, 77, '-', '50480000');
-INSERT INTO public.divisions VALUES (323, 78, '-', '50490000');
-INSERT INTO public.divisions VALUES (324, 79, '-', '50500000');
-INSERT INTO public.divisions VALUES (325, 3, 'กองพัฒนาระบบราชการกรุงเทพมหานคร', '03080000');
-INSERT INTO public.divisions VALUES (326, 4, 'กองกลาง', '04010000');
-INSERT INTO public.divisions VALUES (327, 4, 'กองการเจ้าหน้าที่', '04020000');
-INSERT INTO public.divisions VALUES (328, 4, 'กองประชาสัมพันธ์', '04110000');
-INSERT INTO public.divisions VALUES (329, 6, 'ศูนย์บริการสาธารณสุข 69 คันนายาว', '08810000');
-INSERT INTO public.divisions VALUES (330, 7, 'กองเทคโนโลยีการศึกษา', '09150000');
-INSERT INTO public.divisions VALUES (331, 7, 'สถาบันพัฒนาข้าราชการครูและบุคลากรทางการศึกษากรุงเทพมหานคร', '09160000');
-INSERT INTO public.divisions VALUES (332, 7, 'กองเสริมสร้างสมรรถนะนักเรียน', '09170000');
-INSERT INTO public.divisions VALUES (333, 8, 'สำนักงานควบคุมอาคาร', '10140000');
-INSERT INTO public.divisions VALUES (334, 8, 'สำนักงานจัดกรรมสิทธิ์', '10150000');
-INSERT INTO public.divisions VALUES (335, 9, 'กองพัฒนาระบบหลัก', '11070000');
-INSERT INTO public.divisions VALUES (336, 9, 'สำนักงานอาคารบังคับน้ำ', '11150000');
-INSERT INTO public.divisions VALUES (337, 11, 'กองตรวจและปฏิบัติการพื้นที่ 2', '15070000');
-INSERT INTO public.divisions VALUES (338, 11, 'กองตรวจและปฏิบัติการพื้นที่ 3', '15080000');
-INSERT INTO public.divisions VALUES (339, 11, 'สำนักงานตรวจและบังคับการ', '15100000');
-INSERT INTO public.divisions VALUES (340, 12, 'กองระบบเทคโนโลยีจราจร', '17150000');
-INSERT INTO public.divisions VALUES (341, 12, 'สำนักงานระบบขนส่ง', '17160000');
-INSERT INTO public.divisions VALUES (342, 15, 'กองวิชาการและแผนงาน', '20020000');
-INSERT INTO public.divisions VALUES (343, 17, 'สำนักงานจัดการมูลฝอยและสิ่งปฏิกูล', '22070000');
-INSERT INTO public.divisions VALUES (344, 17, 'กองกำจัดมูลฝอย', '22080000');
-INSERT INTO public.divisions VALUES (345, 18, 'กองนันทนาการ', '23040000');
-INSERT INTO public.divisions VALUES (346, 18, 'สำนักงานวัฒนธรรมและการท่องเที่ยว', '23100000');
-INSERT INTO public.divisions VALUES (347, 19, 'สำนักงานการพัฒนาชุมชน', '24060000');
-INSERT INTO public.divisions VALUES (348, 19, 'สำนักงานการส่งเสริมอาชีพ', '24070000');
-INSERT INTO public.divisions VALUES (349, 19, 'สำนักงานสวัสดิการสังคม', '24080000');
-INSERT INTO public.divisions VALUES (350, 20, 'สำนักการวางผังและพัฒนาเมือง', '25000000');
-INSERT INTO public.divisions VALUES (351, 20, 'สำนักงานเลขานุการ', '25010000');
-INSERT INTO public.divisions VALUES (352, 20, 'กองนโยบายและแผนงาน', '25020000');
-INSERT INTO public.divisions VALUES (353, 20, 'สำนักงานภูมิสารสนเทศ', '25030000');
-INSERT INTO public.divisions VALUES (354, 20, 'สำนักงานวางผังเมือง', '25040000');
-INSERT INTO public.divisions VALUES (355, 20, 'สำนักงานพัฒนาและฟื้นฟูเมือง', '25050000');
-INSERT INTO public.divisions VALUES (356, 20, 'กองควบคุมผังเมือง', '25060000');
-INSERT INTO public.divisions VALUES (357, 23, 'สำนักงานสถาธนานุบาลกรุงเทพมหานคร', '51010000');
-INSERT INTO public.divisions VALUES (358, 23, 'สำนักงานตลาดกรุงเทพมหานคร', '51020000');
-INSERT INTO public.divisions VALUES (359, 23, 'สำนักงานพัฒนาที่อยู่อาศัย', '51030000');
-INSERT INTO public.divisions VALUES (360, 23, 'กองอำนวยการตลาดนัดกรุงเทพมหานคร', '51040000');
-INSERT INTO public.divisions VALUES (361, 23, 'บริษัทกรุงเทพธนาคมจำกัด', '51050000');
-INSERT INTO public.divisions VALUES (362, 23, 'สถานีวิทยุกระจายเสียงกรุงเทพมหานคร', '51060000');
-INSERT INTO public.divisions VALUES (363, 23, 'สหกรณ์ออมทรัพย์กรุงเทพมหานครจำกัด', '51070000');
-INSERT INTO public.divisions VALUES (364, 3, 'สถาบันพัฒนาทรัพยากรบุคคลกรุงเทพมหานคร', '03090000');
-INSERT INTO public.divisions VALUES (365, 3, 'กองโครงสร้างและอัตรากำลัง', '03100000');
-INSERT INTO public.divisions VALUES (366, 3, 'ศูนย์สารเทศทรัพยากรบุคคล', '03110000');
-INSERT INTO public.divisions VALUES (367, 21, 'สำนักดิจิทัลกรุงเทพมหานคร', '26000000');
-INSERT INTO public.divisions VALUES (368, 21, 'สำนักงานเลขานุการ', '26010000');
-INSERT INTO public.divisions VALUES (369, 21, 'กองยุทธศาสตร์ดิจิทัล', '26020000');
-INSERT INTO public.divisions VALUES (370, 21, 'กองโครงสร้างพื้นฐานเทคโนโลยีดิจิทัล', '26030000');
-INSERT INTO public.divisions VALUES (371, 21, 'สำนักงานพัฒนาระบบสารสนเทศดิจิทัล', '26040000');
+COPY public.divisions (division_id, department_id, division_name, division_code) FROM stdin;
+1	25	กรุงเทพมหานคร	00000000
+2	1	สำนักงานเลขานุการสภากรุงเทพมหานคร	01000000
+3	1	ส่วนวิชาการ	01010000
+4	2	สํานักงานเลขานุการผู้ว่าราชการกรุงเทพมหานคร	02000000
+5	3	สำนักงานคณะกรรมการข้าราชการกรุงเทพมหานคร	03000000
+6	3	กองบริหารทั่วไป	03010000
+7	3	กองอัตรากำลัง	03020000
+8	3	กองทะเบียนประวัติข้าราชการ	03030000
+9	3	กองวินัยและเสริมสร้างจริยธรรม	03040000
+10	3	กองสรรหาบุคคล	03050000
+11	3	กองระบบงาน	03060000
+12	3	กองพิทักษ์ระบบคุณธรรม	03070000
+13	4	สํานักปลัดกรุงเทพมหานคร	04000000
+14	4	สำนักงานเลขานุการปลัดกรุงเทพมหานคร	04210000
+15	4	สำนักงานการเจ้าหน้าที่	04190000
+16	4	สำนักงานปกครองและทะเบียน	04170000
+17	4	สำนักงานตรวจสอบภายใน	04180000
+18	4	กองงานผู้ตรวจราชการ	04080000
+19	4	สถาบันพัฒนาข้าราชการ กทม.	04090000
+20	4	สำนักงานประชาสัมพันธ์	04200000
+21	4	สำนักงานกฎหมายและคดี	04150000
+22	4	สำนักงานการต่างประเทศ	04160000
+23	26	สำนักนโยบายและแผนกรุงเทพมหานคร	06000000
+24	26	สำนักงานเลขานุการ	06010000
+25	26	กองนโยบายและแผนรวม	06020000
+26	26	กองแผนสาธารณูปโภคและ สวล.	06030000
+27	26	กองแผนทรัพยากรมนุษย์และสังคม	06040000
+28	26	กองแผนบริหารและการคลัง	06050000
+29	26	กองการต่างประเทศ	06080000
+30	26	กองพัฒนาระบบงานคอมพิวเตอร์	06090000
+31	26	กองควบคุมระบบคอมพิวเตอร์	06100000
+32	26	กองบริการระบบคอมพิวเตอร์	06110000
+33	26	กองสารสนเทศภูมิศาสตร์	06120000
+34	5	สำนักการแพทย์	07000000
+35	5	สำนักงานเลขานุการ	07010000
+36	5	สำนักงานพัฒนาระบบบริการทางการแพทย์  	07180000
+37	5	วิทยาลัยพยาบาลเกื้อการุณย์	07030000
+38	5	โรงพยาบาลกลาง	07050000
+39	5	โรงพยาบาลตากสิน	07060000
+40	5	โรงพยาบาลเจริญกรุงประชารักษ์	07070000
+41	5	โรงพยาบาลหลวงพ่อทวีศักดิ์ ชุตินฺธโรอุทิศ	07080000
+42	5	โรงพยาบาลเวชการุณย์รัศมี์	07160000
+43	5	โรงพยาบาลลาดกระบัง กทม.	07100000
+44	5	โรงพยาบาลหนองจอก	07090000
+45	5	โรงพยาบาลราชพิพัฒน์	07130000
+46	5	โรงพยาบาลสิรินธร	07140000
+47	5	ศูนย์บริการการแพทย์ฉุกเฉินกรุงเทพมหานคร (ศูนย์เอราวัณ)	07150000
+48	5	โรงพยาบาลผู้สูงอายุบางขุนเทียน	07170000
+49	5	โรงพยาบาลคลองสามวา	07190000
+50	5	โรงพยาบาลบางนากรุงเทพมหานคร	07200000
+51	6	สำนักอนามัย	08000000
+52	6	สำนักงานเลขานุการ	08010000
+53	6	กองสร้างเสริมสุขภาพ	08030000
+54	6	กองการพยาบาลสาธารณสุข	08040000
+55	6	กองทันตสาธารณสุข	08050000
+56	6	สำนักงานสัตวแพทย์สาธารณสุข	08750000
+57	6	กองควบคุมโรคติดต่อ	08080000
+58	6	สำนักงานป้องกันและบำบัดการติดยาเสพติด	08740000
+59	6	กองควบคุมโรคเอดส์ วัณโรค และโรคติดต่อทางเพศสัมพันธ์	08730000
+60	6	กองเภสัชกรรม	08110000
+61	6	ศูนย์บริการสาธารณสุข 1 สะพานมอญ	08120000
+62	6	ศูนย์บริการสาธารณสุข 2 ราชปรารภ	08130000
+63	6	ศูนย์บริการสาธารณสุข 3 บางซื่อ	08140000
+64	6	ศูนย์บริการสาธารณสุข 4 ดินแดง	08150000
+65	6	ศูนย์บริการสาธารณสุข 5 จุฬาลงกรณ์	08160000
+66	6	ศูนย์บริการสาธารณสุข 6 สโมสรวัฒนธรรมหญิง	08170000
+193	11	สำนักงานเลขานุการ	15010000
+67	6	ศูนย์บริการสาธารณสุข 7 บุญมี ปุรุราชรังสรรค์	08180000
+68	6	ศูนย์บริการสาธารณสุข 8 บุญรอด รุ่งเรือง	08190000
+69	6	ศูนย์บริการสาธารณสุข 9 ประชาธิปไตย	08200000
+70	6	ศูนย์บริการสาธารณสุข 10 สุขุมวิท	08210000
+71	6	ศูนย์บริการสาธารณสุข 11 ประดิพัทธ์	08220000
+72	6	ศูนย์บริการสาธารณสุข 12 จันทร์เที่ยง เนตรวิเศษ	08230000
+73	6	ศูนย์บริการสาธารณสุข 13 ไมตรีวานิช	08240000
+74	6	ศูนย์บริการสาธารณสุข 14 แก้วสีบุญเรือง	08250000
+75	6	ศูนย์บริการสาธารณสุข 15 ลาดพร้าว	08260000
+76	6	ศูนย์บริการสาธารณสุข 16 ลุมพินี	08270000
+77	6	ศูนย์บริการสาธารณสุข 17 ประชานิเวศน์	08280000
+78	6	ศูนย์บริการสาธารณสุข 18 มงคล-วอน วังตาล	08290000
+79	6	ศูนย์บริการสาธารณสุข 19 วงศ์สว่าง	08300000
+80	6	ศูนย์บริการสาธารณสุข 20 ธนาคารศรีนคร	08310000
+81	6	ศูนย์บริการสาธารณสุข 21 วัดธาตุทอง	08320000
+82	6	ศูนย์บริการสาธารณสุข 22 วัดปากบ่อ	08330000
+83	6	ศูนย์บริการสาธารณสุข 23 สี่พระยา	08340000
+84	6	ศูนย์บริการสาธารณสุข 24 บางเขน	08350000
+85	6	ศูนย์บริการสาธารณสุข 25 ห้วยขวาง	08360000
+86	6	ศูนย์บริการสาธารณสุข 26 เจ้าคุณประยูรวงศ์	08370000
+87	6	ศูนย์บริการสาธารณสุข 27 จันทร์ฉิม ไพบูลย์	08380000
+88	6	ศูนย์บริการสาธารณสุข 28 กรุงธนบุรี	08390000
+89	6	ศูนย์บริการสาธารณสุข 29 ช่วง นุชเนตร	08400000
+90	6	ศูนย์บริการสาธารณสุข 30 วัดเจ้าอาม	08410000
+91	6	ศูนย์บริการสาธารณสุข 31 เอิบ - จิตร ทังสุบุตร	08420000
+92	6	ศูนย์บริการสาธารณสุข 32 มาริษ ตินตมุสิก	08430000
+93	6	ศูนย์บริการสาธารณสุข 33 วัดหงส์รัตนาราม	08440000
+94	6	ศูนย์บริการสาธารณสุข 34 โพธิ์ศรี	08450000
+95	6	ศูนย์บริการสาธารณสุข 35 หัวหมาก	08460000
+96	6	ศูนย์บริการสาธารณสุข 36 บุคคโล	08470000
+97	6	ศูนย์บริการสาธารณสุข 37 ประสงค์-สุดสาคร ตู้จินดา	08480000
+98	6	ศูนย์บริการสาธารณสุข 38 จี๊ด ทองคำ บำเพ็ญ	08490000
+99	6	ศูนย์บริการสาธารณสุข 39 ราษฎร์บูรณะ	08500000
+100	6	ศูนย์บริการสาธารณสุข 40 บางแค	08510000
+101	6	ศูนย์บริการสาธารณสุข 41 คลองเตย	08520000
+102	6	ศูนย์บริการสาธารณสุข 42 ถนอม ทองสิมา	08530000
+103	6	ศูนย์บริการสาธารณสุข 43 มีนบุรี	08540000
+104	6	ศูนย์บริการสาธารณสุข 46 กันตารัติอุทิศ	08550000
+105	6	ศูนย์บริการสาธารณสุข 47 คลองขวาง	08560000
+106	6	ศูนย์บริการสาธารณสุข 48 นาควัชระอุทิศ	08570000
+107	6	ศูนย์บริการสาธารณสุข 49 วัดชัยพฤกษมาลา	08580000
+108	6	ศูนย์บริการสาธารณสุข 50 บึงกุ่ม	08590000
+109	6	ศูนย์บริการสาธารณสุข 51 วัดไผ่ตัน	08600000
+110	6	ศูนย์บริการสาธารณสุข 52 สามเสนนอก	08610000
+111	6	ศูนย์บริการสาธารณสุข 53 ทุ่งสองห้อง	08620000
+112	6	ศูนย์บริการสาธารณสุข 54 ทัศน์เอี่ยม	08630000
+113	6	ศูนย์บริการสาธารณสุข 55 เตชะสัมพันธ์	08640000
+114	6	ศูนย์บริการสาธารณสุข 56 ทับเจริญ	08650000
+115	6	ศูนย์บริการสาธารณสุข 57 บุญเรือง ล้ำเลิศ	08660000
+116	6	ศูนย์บริการสาธารณสุข 58 ล้อม-พิมเสน ฟักอุดม	08670000
+117	6	ศูนย์บริการสาธารณสุข 59 ทุ่งครุ	08680000
+118	6	ศูนย์บริการสาธารณสุข 60 รสสุคนธ์ มโนชญากร	08690000
+119	6	ศูนย์บริการสาธารณสุข 61 สังวาลย์ ทัสนารมย์	08700000
+120	6	ศูนย์บริการสาธารณสุข 62 ตวงรัชฏ์ ศศะนาวิน ภักดีฐานปัญญา	08710000
+265	19	กองนโยบายและแผนงาน	24020000
+121	6	ศูนย์บริการสาธารณสุข 63 สมาคมแต้จิ๋วแห่งประเทศไทย	08880000
+122	6	สำนักงานชันสูตรสาธารณสุข	08760000
+123	6	ศูนย์บริการสาธารณสุข 44 ลำผักชี หนองจอก	08900000
+124	6	ศูนย์บริการสาธารณสุข 45 ร่มเกล้า ลาดกระบัง	08910000
+125	6	ศูนย์บริการสาธารณสุข 65 รักษาสุข บางบอน	08920000
+126	6	ศูนย์บริการสาธารณสุข 66 ตำหนักพระแม่กวนอิม โชคชัย4	08930000
+127	6	สำนักงานพัฒนาระบบสาธารณสุข	08720000
+128	6	สำนักงานสุขาภิบาลสิ่งแวดล้อม	08950000
+129	6	กองสุขาภิบาลอาหาร	08960000
+130	6	ศูนย์บริการสาธารณสุข 64 คลองสามวา	08970000
+131	6	ศูนย์บริการสาธารณสุข 67 ทวีวัฒนา	08980000
+132	6	ศูนย์บริการสาธารณสุข 68 สะพานสูง	08990000
+133	7	สำนักการศึกษา	09000000
+134	7	สำนักงานเลขานุการ	09010000
+135	7	สำนักงานการเจ้าหน้าที่	09020000
+136	7	กองคลัง	09030000
+137	7	หน่วยงานศึกษานิเทศก์	09040000
+138	7	กองวิชาการ	09060000
+139	7	โรงเรียนมัธยมบ้านบางกะปิ	09070000
+140	7	โรงเรียนมัธยมประชานิเวศน์	09080000
+141	7	โรงเรียนมัธยมนาคนาวาอุปถัมภ์	09090000
+142	7	โรงเรียนมัธยมสุวิทย์เสรีอนุสรณ์	09100000
+143	7	สำนักงานยุทธศาสตร์การศึกษา	09110000
+144	7	กองเทคโนโลยีเพื่อการเรียนการสอน	09120000
+145	7	กองพัฒนาข้าราชการครูากรุงเทพมหานคร	09130000
+146	7	สำนักงานการเจ้าหน้าที่	09140000
+147	8	สำนักการโยธา	10000000
+148	8	สำนักงานเลขานุการ	10010000
+149	8	กองวิเคราะห์และวิจัย	10030000
+150	8	กองควบคุมการก่อสร้าง	10060000
+151	8	กองควบคุมอาคาร	10070000
+152	8	กองแผนงานและประสานสาธารณูปโภค	10090000
+153	8	สำนักงานก่อสร้างและบูรณะ	10100000
+154	8	สำนักงานออกแบบ	10110000
+155	8	กองสำรวจและแผนที่ที่ดิน	10120000
+156	8	สำนักงานจัดกรรมสิทธิ์	10130000
+157	8	สำนักงานวิศวกรรมทาง	10160000
+158	9	สำนักการระบายน้ำ	11000000
+159	9	สำนักงานเลขานุการ	11010000
+160	9	กองเครื่องจักรกล	11060000
+161	9	กองสารสนเทศระบายน้ำ	11080000
+162	9	สำนักงานระบบควบคุมน้ำ	11160000
+163	9	กองระบบท่อระบายน้ำ	11100000
+164	9	กองระบบคลอง	11110000
+165	9	กองจัดการคุณภาพน้ำ	11120000
+166	9	สำนักงานจัดการคุณภาพน้ำ	11130000
+167	9	สำนักงานพัฒนาระบบระบายน้ำ	11140000
+168	27	สำนักรักษาความสะอาด	12000000
+169	27	สำนักงานเลขานุการ	12010000
+170	27	กองบริการรักษาความสะอาด	12020000
+171	27	กองควบคุมสิ่งปฏิกูล	12030000
+172	27	กองโรงงานกำจัดมูลฝอย	12040000
+173	27	กองวิชาการและแผนงาน	12050000
+174	28	สำนักสวัสดิการสังคม	13000000
+175	28	สำนักงานเลขานุการ	13010000
+176	28	กองสังคมสงเคราะห์	13020000
+177	28	กองนันทนาการ	13040000
+178	28	กองการกีฬา	13050000
+179	28	สำนักงานสวนสาธารณะ	13060000
+180	28	กองสวัสดิภาพเด็ก สตรี ผู้สูงอายุ ผู้พิการ และผู้ด้อยโอกาส	13070000
+181	10	สํานักการคลัง	14000000
+182	10	สำนักงานเลขานุการ	14010000
+183	10	กองรายได้	14020000
+184	10	กองการเงิน	14030000
+185	10	กองทะเบียนทรัพย์สินและพัสดุ	14040000
+186	10	กองบัญชี	14050000
+187	10	กองระบบการคลัง	14060000
+188	10	กองโรงงานช่างกล	14070000
+189	10	กองตรวจจ่าย	14080000
+190	10	สำนักงานเศรษฐกิจการคลัง	14090000
+191	10	กองบำเหน็จบำนาญ	14100000
+192	11	สํานักเทศกิจ	15000000
+194	11	กองวิชาการและแผนงาน	15020000
+195	11	กองตรวจการเทศกิจ	15030000
+196	11	กองนโยบายและแผนงาน	15050000
+197	11	กองตรวจและปฏิบัติการพื้นที่ 1	15060000
+198	11	กองนิติการและบังคับคดี	15110000
+199	29	สำนักพัฒนาชุมชน	16000000
+200	29	สำนักงานเลขานุการ	16010000
+201	29	กองส่งเสริมอาชีพ	16030000
+202	29	กองวิชาการและแผนงาน	16130000
+203	29	กองการพัฒนาชุมชน	16140000
+204	12	สํานักการจราจรและขนส่ง	17000000
+205	12	สำนักงานเลขานุการ	17010000
+206	12	สำนักงานระบบขนส่ง	17040000
+207	12	กองนโยบายและแผนงาน	17120000
+208	12	สำนักงานวิศวกรรมจราจร	17130000
+209	12	กองพัฒนาระบบจราจร	17140000
+210	13	สำนักการวางผังและพัฒนาเมือง	18000000
+211	13	สำนักงานเลขานุการ	18010000
+212	13	กองสำรวจและแผนที่	18030000
+213	13	กองวางผังพัฒนาเมือง	18050000
+214	13	กองจัดรูปที่ดินและปรับปรุงฟื้นฟูเมือง	18060000
+215	13	กองควบคุมทางผังเมือง	18070000
+216	13	กองนโยบายและแผนงาน	18080000
+217	14	สำนักป้องกันและบรรเทาสาธารณภัย	19000000
+218	14	สำนักงานเลขานุการ	19010000
+219	14	กองวิชาการและแผนงาน	19020000
+220	14	กองอำนวยการป้องกันและบรรเทาสาธารณภัย	19030000
+221	14	กองปฏิบัติการดับเพลิง 1	19040000
+222	14	กองปฏิบัติการดับเพลิง 2	19050000
+223	14	กองปฏิบัติการดับเพลิง 3	19060000
+224	14	กองปฏิบัติการดับเพลิง 4	19070000
+225	14	กองปฏิบัติการดับเพลิง 5	19080000
+226	14	กองปฏิบัติการดับเพลิง 6	19090000
+227	15	สำนักงบประมาณกรุงเทพมหานคร	20000000
+228	15	สำนักงานเลขานุการ	20010000
+229	15	สำนักงานระบบงบประมาณ	20070000
+230	15	กองวิเคราะห์งบประมาณ 1	20030000
+231	15	กองวิเคราะห์งบประมาณ 2	20040000
+232	15	กองวิเคราะห์งบประมาณ 3	20050000
+233	15	กองวิเคราะห์งบประมาณ 4	20060000
+234	15	กองวิเคราะห์งบประมาณ 5	20080000
+235	15	กองวิเคราะห์งบประมาณ 6	20090000
+236	16	สำนักยุทธศาสตร์และประเมินผล	21000000
+237	16	สำนักงานเลขานุการ	21010000
+238	16	กองยุทธศาสตร์บริหารจัดการ	21020000
+239	16	กองยุทธศาสตร์เศรษฐกิจ การเงิน และการคลัง	21030000
+240	16	กองยุทธศาสตร์สาธารณสุขและสิ่งแวดล้อม	21040000
+241	16	กองยุทธศาสตร์สาธารณูปโภคพื้นฐาน	21050000
+242	16	กองยุทธศาสตร์ทรัพยากรมนุษย์และสังคม	21060000
+243	16	กองพัฒนาระบบงานคอมพิวเตอร์	21070000
+244	16	กองควบคุมระบบคอมพิวเตอร์	21080000
+245	16	กองบริการระบบคอมพิวเตอร์	21090000
+246	16	กองสารสนเทศภูมิศาสตร์	21100000
+247	17	สำนักสิ่งแวดล้อม	22000000
+248	17	สำนักงานเลขานุการ	22010000
+249	17	กองนโยบายและแผนงาน	22020000
+250	17	กองจัดการขยะ ของเสียอันตรายและสิ่งปฏิกูล	22030000
+251	17	กองจัดการคุณภาพอากาศและเสียง	22040000
+252	17	กองโรงงานกำจัดมูลฝอย	22050000
+253	17	สำนักงานสวนสาธารณะ	22060000
+254	18	สำนักวัฒนธรรม กีฬา และการท่องเที่ยว	23000000
+255	18	สำนักงานเลขานุการ	23010000
+256	18	กองนโยบายและแผนงาน	23020000
+257	18	ศูนย์เยาวชนกรุงเทพมหานคร (ไทย - ญี่ปุ่น)	23030000
+258	18	สำนักงานนันทนาการและส่งเสริมการเรียนรู้	23090000
+259	18	กองการกีฬา	23050000
+260	18	กองการสังคีต	23060000
+261	18	กองการท่องเที่ยว	23070000
+262	18	กองวัฒนธรรม	23080000
+263	19	สำนักพัฒนาสังคม	24000000
+264	19	สำนักงานเลขานุการ	24010000
+266	19	กองการพัฒนาชุมชน	24030000
+267	19	กองส่งเสริมอาชีพ	24040000
+268	19	สำนักงานการสงเคราะห์และสวัสดิภาพสังคม	24050000
+269	24	มหาวิทยาลัยกรุงเทพมหานคร	99000000
+270	24	สำนักงานอธิการบดี	99010000
+271	24	สำนักงานสภามหาวิทยาลัย	99020000
+272	24	คณะแพทย์ศาสตร์วชิรพยาบาล	99030000
+273	24	คณะพยาบาลศาสตร์เกื้อการุณย์	99040000
+274	22	ศูนย์รับเรื่องร้องเรียน	49000000
+275	30	-	50010000
+276	31	-	50020000
+277	32	-	50030000
+278	33	-	50040000
+279	34	-	50050000
+280	35	-	50060000
+281	36	-	50070000
+282	37	-	50080000
+283	38	-	50090000
+284	39	-	50100000
+285	40	-	50110000
+286	41	-	50120000
+287	42	-	50130000
+288	43	-	50140000
+289	44	-	50150000
+290	45	-	50160000
+291	46	-	50170000
+292	47	-	50180000
+293	48	-	50190000
+294	49	-	50200000
+295	50	-	50210000
+296	51	-	50220000
+297	52	-	50230000
+298	53	-	50240000
+299	54	-	50250000
+300	55	-	50260000
+301	56	-	50270000
+302	57	-	50280000
+303	58	-	50290000
+304	59	-	50300000
+305	60	-	50310000
+306	61	-	50320000
+307	62	-	50330000
+308	63	-	50340000
+309	64	-	50350000
+310	65	-	50360000
+311	66	-	50370000
+312	67	-	50380000
+313	68	-	50390000
+314	69	-	50400000
+315	70	-	50410000
+316	71	-	50420000
+317	72	-	50430000
+318	73	-	50440000
+319	74	-	50450000
+320	75	-	50460000
+321	76	-	50470000
+322	77	-	50480000
+323	78	-	50490000
+324	79	-	50500000
+325	3	กองพัฒนาระบบราชการกรุงเทพมหานคร	03080000
+326	4	กองกลาง	04010000
+327	4	กองการเจ้าหน้าที่	04020000
+328	4	กองประชาสัมพันธ์	04110000
+329	6	ศูนย์บริการสาธารณสุข 69 คันนายาว	08810000
+330	7	กองเทคโนโลยีการศึกษา	09150000
+331	7	สถาบันพัฒนาข้าราชการครูและบุคลากรทางการศึกษากรุงเทพมหานคร	09160000
+332	7	กองเสริมสร้างสมรรถนะนักเรียน	09170000
+333	8	สำนักงานควบคุมอาคาร	10140000
+334	8	สำนักงานจัดกรรมสิทธิ์	10150000
+335	9	กองพัฒนาระบบหลัก	11070000
+336	9	สำนักงานอาคารบังคับน้ำ	11150000
+337	11	กองตรวจและปฏิบัติการพื้นที่ 2	15070000
+338	11	กองตรวจและปฏิบัติการพื้นที่ 3	15080000
+339	11	สำนักงานตรวจและบังคับการ	15100000
+340	12	กองระบบเทคโนโลยีจราจร	17150000
+341	12	สำนักงานระบบขนส่ง	17160000
+342	15	กองวิชาการและแผนงาน	20020000
+343	17	สำนักงานจัดการมูลฝอยและสิ่งปฏิกูล	22070000
+344	17	กองกำจัดมูลฝอย	22080000
+345	18	กองนันทนาการ	23040000
+346	18	สำนักงานวัฒนธรรมและการท่องเที่ยว	23100000
+347	19	สำนักงานการพัฒนาชุมชน	24060000
+348	19	สำนักงานการส่งเสริมอาชีพ	24070000
+349	19	สำนักงานสวัสดิการสังคม	24080000
+350	20	สำนักการวางผังและพัฒนาเมือง	25000000
+351	20	สำนักงานเลขานุการ	25010000
+352	20	กองนโยบายและแผนงาน	25020000
+353	20	สำนักงานภูมิสารสนเทศ	25030000
+354	20	สำนักงานวางผังเมือง	25040000
+355	20	สำนักงานพัฒนาและฟื้นฟูเมือง	25050000
+356	20	กองควบคุมผังเมือง	25060000
+357	23	สำนักงานสถาธนานุบาลกรุงเทพมหานคร	51010000
+358	23	สำนักงานตลาดกรุงเทพมหานคร	51020000
+359	23	สำนักงานพัฒนาที่อยู่อาศัย	51030000
+360	23	กองอำนวยการตลาดนัดกรุงเทพมหานคร	51040000
+361	23	บริษัทกรุงเทพธนาคมจำกัด	51050000
+362	23	สถานีวิทยุกระจายเสียงกรุงเทพมหานคร	51060000
+363	23	สหกรณ์ออมทรัพย์กรุงเทพมหานครจำกัด	51070000
+364	3	สถาบันพัฒนาทรัพยากรบุคคลกรุงเทพมหานคร	03090000
+365	3	กองโครงสร้างและอัตรากำลัง	03100000
+366	3	ศูนย์สารเทศทรัพยากรบุคคล	03110000
+367	21	สำนักดิจิทัลกรุงเทพมหานคร	26000000
+368	21	สำนักงานเลขานุการ	26010000
+369	21	กองยุทธศาสตร์ดิจิทัล	26020000
+370	21	กองโครงสร้างพื้นฐานเทคโนโลยีดิจิทัล	26030000
+371	21	สำนักงานพัฒนาระบบสารสนเทศดิจิทัล	26040000
+\.
 
 
 --
--- TOC entry 3954 (class 0 OID 16512)
--- Dependencies: 226
 -- Data for Name: four_quadrants; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.four_quadrants VALUES (1, 'เพิ่มประสิทธิภาพ');
-INSERT INTO public.four_quadrants VALUES (2, 'งานประจำที่บริการประชาชน');
-INSERT INTO public.four_quadrants VALUES (3, 'งานหลังบ้านที่เป็นงานใหม่');
-INSERT INTO public.four_quadrants VALUES (4, 'ยุทธศาสตร์ / งานอนาคต');
+COPY public.four_quadrants (id, name) FROM stdin;
+1	เพิ่มประสิทธิภาพ
+2	งานประจำที่บริการประชาชน
+3	งานหลังบ้านที่เป็นงานใหม่
+4	ยุทธศาสตร์ / งานอนาคต
+\.
 
 
 --
--- TOC entry 3956 (class 0 OID 16519)
--- Dependencies: 228
 -- Data for Name: meeting_attachment_types; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.meeting_attachment_types VALUES (1, 'Meeting Document', 'MEETING_DOCUMENT');
-INSERT INTO public.meeting_attachment_types VALUES (2, 'Meeting Minutes', 'MEETING_MINUTES');
-INSERT INTO public.meeting_attachment_types VALUES (3, 'Supporting Document', 'SUPPORTING_DOCUMENT');
+COPY public.meeting_attachment_types (id, name, code) FROM stdin;
+1	Meeting Document	MEETING_DOCUMENT
+2	Meeting Minutes	MEETING_MINUTES
+3	Supporting Document	SUPPORTING_DOCUMENT
+\.
 
 
 --
--- TOC entry 3995 (class 0 OID 16807)
--- Dependencies: 267
 -- Data for Name: meeting_attachments; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+COPY public.meeting_attachments (id, meeting_id, agenda_id, meeting_doc_type_id, uploaded_by, file_name, file_url, file_type, created_at, document_type, original_file_name, stored_file_name, storage_path, mime_type, size_bytes, updated_at) FROM stdin;
+\.
 
 
 --
--- TOC entry 3999 (class 0 OID 17143)
--- Dependencies: 271
 -- Data for Name: meeting_resolution_revisions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+COPY public.meeting_resolution_revisions (id, resolution_id, project_id, revision_number, previous_resolution_type, new_resolution_type, previous_remark, new_remark, previous_project_status_id, new_project_status_id, previous_latest_approved_budget, new_latest_approved_budget, reason, changed_by, change_mode, changed_at, previous_final_approved_budget, new_final_approved_budget, previous_final_estimated_cost, new_final_estimated_cost) FROM stdin;
+\.
 
 
 --
--- TOC entry 3958 (class 0 OID 16528)
--- Dependencies: 230
 -- Data for Name: meeting_statuses; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.meeting_statuses VALUES (1, 'Scheduled', 'SCHEDULED');
-INSERT INTO public.meeting_statuses VALUES (2, 'In Progress', 'IN_PROGRESS');
-INSERT INTO public.meeting_statuses VALUES (3, 'Completed', 'COMPLETED');
-INSERT INTO public.meeting_statuses VALUES (4, 'Cancelled', 'CANCELLED');
-INSERT INTO public.meeting_statuses VALUES (5, 'Draft', 'DRAFT');
+COPY public.meeting_statuses (id, name, code) FROM stdin;
+1	Scheduled	SCHEDULED
+2	In Progress	IN_PROGRESS
+3	Completed	COMPLETED
+4	Cancelled	CANCELLED
+5	Draft	DRAFT
+\.
 
 
 --
--- TOC entry 3960 (class 0 OID 16537)
--- Dependencies: 232
 -- Data for Name: meeting_types; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.meeting_types VALUES (1, 'Small Board', 'SMALL_BOARD');
-INSERT INTO public.meeting_types VALUES (2, 'Big Board', 'BIG_BOARD');
+COPY public.meeting_types (id, name, code) FROM stdin;
+1	Small Board	คณะกรรมการกลั่นกรอง
+2	Big Board	คณะกรรมการนโยบาย
+\.
+
 
 --
--- TOC entry 3962 (class 0 OID 16546)
--- Dependencies: 234
+-- Data for Name: meetings; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.meetings (id, meeting_no, title, meeting_type_id, meeting_date, location, meeting_status_id, created_by, created_at, updated_at, updated_by, start_time, end_time, description, completed_at, cancelled_at, cancel_reason) FROM stdin;
+\.
+
+
+--
+-- Data for Name: policy_governor; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.policy_governor (policy_id, policy_code, policy_name) FROM stdin;
+1	P001	ขยายกิจกรรมเพื่อสุขภาพ เข้าสู่ ชุมชน หมู่บ้าน คอนโด
+2	P002	สั่งจ่ายกิจกรรมทางสังคม ปรับการใช้ชีวิต ลดอาการป่วยเรื้อรัง
+3	P003	ตรวจสุขภาพฟรีถ้วนหน้า
+4	P004	ขยายบริการวัคซีนให้ครอบคลุมหลายกลุ่มโรค
+5	P005	พยากรณ์โรคด้วยข้อมูล สู่การออกแบบการดูแลสุขภาพเชิงรุก
+6	P006	พัฒนาเครือข่ายการติดตามโรคติดต่อแบบเรียลไทม์
+7	P007	ขยายขีดความสามารถให้พร้อมรองรับสิทธิบัตรทองปฐมภูมิให้เป็น 1.3 ล้านสิทธิ
+8	P008	นัดหมอโรงพยาบาล กทม. แล้วรอไม่เกิน 1 ชั่วโมง
+9	P009	เพิ่มเตียงผู้ป่วยอีก 2,000 เตียง ในโรงพยาบาล กทม. ทั้งเก่าและใหม่
+10	P010	ยกระดับศูนย์บริการสาธารณสุขให้เป็นกึ่งทุติยภูมิ
+11	P011	ตรวจฟันฟรีที่ศูนย์บริการสาธารณสุข
+12	P012	พัฒนาผู้ดูแล 5,000 คน เพื่อผู้ป่วยและผู้สูงอายุที่ต้องได้รับการดูแลต่อเนื่อง
+13	P013	ปรับเวลาตรวจโรค ให้สอดคล้องกับเวลาของประชาชน
+14	P014	รักษาตัวต่อเนื่อง ส่งยาถึงบ้าน
+15	P015	ปรับการบริหารจัดการโรงพยาบาล กทม. พึ่งพางบประมาณจากรัฐน้อยลง
+16	P016	เชื่อมโยงข้อมูลสุขภาพข้ามสถานพยาบาล
+17	P017	ขยาย Motorlance ให้ครอบคลุมทุกพื้นที่ ช่วยผู้ป่วยฉุกเฉินได้เร็วขึ้น
+18	P018	ยกระดับศูนย์บัญชาการการแพทย์ฉุกเฉิน ส่งตัวผู้ป่วยได้เร็วขึ้น
+19	P019	พัฒนา Bangkok Minds ข้อมูลสุขภาพใจ คนกรุงเทพฯ รายเขต เพื่อดูแลได้ตรงจุด
+20	P020	เพิ่มทักษะบุคลากรให้คัดกรองความเสี่ยงด้านสุขภาพจิตได้เร็วขึ้น
+21	P021	ขยายเครือข่ายดูแลใจคนเมืองให้คนเข้าถึงบริการสุขภาพจิตได้ใกล้บ้าน
+22	P022	เพิ่มกิจกรรมฮีลใจในพื้นที่สาธารณะ สร้างภูมิคุ้มกันทางใจ
+23	P023	แจ้งเบาะแสยาเสพติดอย่างปลอดภัย ไร้ความกังวล
+24	P024	ตรวจสารเสพติด รู้ผลไว ใน 24 ชั่วโมง ส่งต่อรับการบำบัดได้ทันที
+25	P025	ร่วมมือกับตำรวจ ปปส.ปูพรมตรวจเชิงรุก ชุมชนสีขาว
+26	P026	ยกระดับบ้านพิชิตใจ ฟื้นฟูผู้ป่วยครบวงจร
+27	P027	คนทำงานมีที่อยู่อาศัยใกล้งาน ด้วยโมเดลเช่า - ออม
+28	P028	แก้ไขปัญหาชุมชนแออัด สนับสนุนการออมเพื่อบ้านที่มั่นคงในระยะยาว
+29	P029	ยกระดับบ้านมั่นคง สู่การพัฒนาคุณภาพชีวิตครบวงจร
+30	P030	แก้กฎหมายปรับปรุงอาคารเก่า เพิ่มตัวเลือกที่อยู่อาศัยให้คนเมือง
+31	P031	ปรับปรุงอาคารสงเคราะห์ของ กทม. ให้ได้มาตรฐาน บริหารอย่างมืออาชีพ
+32	P032	ศูนย์ประสานงานด้านที่อยู่อาศัย เข้าถึงข้อมูลเรื่องบ้านได้ครบ จบ ในจุดเดียว
+33	P033	ผลักดันการออกข้อบัญญัติจัดตั้งกองทุนชุมชน เข้มแข็ง ให้ชุมชนมีส่วนร่วมในการใช้งบประมาณ
+34	P034	กระตุ้นการรวมกลุ่ม แก้ไขระเบียบชุมชนให้ครอบคลุมที่อยู่อาศัยทุกประเภท
+35	P035	ตรวจสอบสิทธิและสวัสดิการได้ครบในจุดเดียวได้ที่เขตและทางออนไลน์
+36	P036	BKK Food Bank ครบวงจร เพิ่มครัวกลาง ชุมชน และหมวดของจำเป็นสำหรับเด็กและผู้สูงวัย
+37	P037	ขยายสวนผักชุมชน 50 เขต 1,000 แปลง แหล่งอาหารปลอดภัยของทุกคน
+38	P038	ขยายพื้นที่เรียนรู้ด้านดิจิทัลให้คนทุกช่วงวัยในชุมชน
+39	P039	จับคู่นักออกแบบกับผู้ผลิตกลุ่มเปราะบาง พัฒนาผลิตภัณฑ์สู่ Marketplace ชั้นนำ
+40	P040	จัดทำแผนพัฒนาชุมชน ทุกโครงการ ใช้รายงานเดียวร่วมกัน
+41	P041	จัดตั้งศูนย์ดูแลผู้สูงอายุครบวงจร บางขุนเทียน (Aging Institute & Integrated Palliative Care Center)
+42	P042	ขยายคลินิกผู้สูงอายุครบวงจรให้ครบในทุกศูนย์ บริการสาธารณสุขและโรงพยาบาลสังกัด กทม.
+43	P043	รับออกแบบบ้านปลอดภัยสำหรับผู้สูงอายุ
+44	P044	ผ้าอ้อมผู้ใหญ่ฟรีทุกบ้านสำหรับผู้ป่วยผู้สูงอายุ
+45	P045	ต่อยอดระบบธนาคารเวลา สู่เครือข่ายดูแลผู้สูงอายุ
+46	P046	สนับสนุนโรงเรียนผู้สูงอายุให้มีครบทั้ง 50 เขต
+47	P047	ส่งเสริมการจ้างงานผู้สูงอายุใกล้บ้านผ่าน เกษียณ Marketplace
+48	P048	ขยายเครือข่ายชมรมและกิจกรรมผู้สูงอายุให้ครอบคลุมทั้งเมือง
+49	P049	ขยายจุดสวัสดิการสังคม พร้อมเปิดศูนย์ พักกายให้พักพิงชั่วคราวใน 6 กลุ่มเขต
+50	P050	ขยายผลบ้านอิ่มใจ ให้เป็นศูนย์กลางการจ้างงานกลุ่มเปราะบาง
+51	P051	ผลักดันการออกข้อบัญญัติในการส่งตัวและจูงใจคนไร้ที่พึ่ง ออกจากพื้นที่สาธารณะเพื่อเข้าสู่กระบวนการดูแลสวัสดิการ
+52	P052	ผลักดันการจ้างงานคนพิการในภาครัฐและเอกชน
+53	P053	ส่งเสริมความเท่าเทียมในเมืองผ่านโครงการ Bangkok for All
+54	P054	รถรับส่งผู้ป่วยพิการและผู้สูงอายุมาโรงพยาบาลฟรี
+55	P055	เด็กพิการได้เรียนต่อในระดับมัธยม และเข้าสู่ระบบการศึกษาเพิ่ม 1,500 คน
+56	P056	ดูแลแม่และเด็กที่ฝากครรภ์กับโรงพยาบาล กทม.จนถึง 2 ขวบ
+57	P057	ขยายการดูแลเด็กเล็ก รองรับเด็กวัย 3 เดือน - 6 ปี 80,000 คน
+58	P058	ยกระดับการศึกษาปฐมวัยให้ได้มาตรฐาน โลก ส่งเสริมทักษะสมอง EF ในเด็ก 0-8 ปี
+59	P059	ขยายเวลาศูนย์บริการรับเลี้ยงเด็ก กทม. รองรับครอบครัวทำงานนอกเวลา
+60	P060	ยกระดับคุณภาพศูนย์พัฒนาเด็กเล็กในกรุงเทพฯ ทุกมิติ
+61	P061	เพิ่มบริการคลินิกพัฒนาการเด็กเคลื่อนที่หมุนเวียนในศูนย์พัฒนาเด็กเล็ก
+62	P062	ส่งเสริมกิจกรรมเล่นอิสระ (Free Play) ทั่วเมือง ตลอดปี
+63	P063	ขยายผล Toy Library ยืมของเล่นกลับบ้านได้ในทุกห้องสมุด
+64	P064	ส่งเสริมการอ่านตั้งแต่ในครรภ์ สร้างนิสัยรักการอ่าน
+65	P065	ผลักดันกรุงเทพฯ สู่เมืองแห่งความหลากหลาย ระดับโลก และเจ้าภาพ WorldPride 2030
+66	P066	ส่งเสริมให้กรุงเทพฯ เป็นเมืองแห่งความเท่าเทียม (DEI City)
+67	P067	ขยายบริการ Pride Clinic ให้ครอบคลุมเรื่องการวางแผนครอบครัว
+68	P068	ผลักดันการเข้าถึงสิทธิสุขภาพของพนักงานสถานบริการกลางคืน
+69	P069	ร้องเรียนได้อย่างปลอดภัย เด็กได้รับการคุ้มครอง
+70	P070	โรงเรียนเป็นพื้นที่ปลอดภัยทางใจ เด็กกล้าเปิดใจ มีครูคอยรับฟัง
+71	P071	โรงเรียนปลอดภัย สิ่งอำนวยความสะดวกได้มาตรฐาน
+72	P072	ส่งเสริมประชาธิปไตยในโรงเรียน ผ่านสภานักเรียนที่เสียงเด็กมีพลัง
+73	P073	ลดเวลาหน้าจอ เพิ่มเวลาเรียนรู้ และเวลาอยู่กับเพื่อน
+74	P074	เด็กเป็นพลเมืองโลก ได้ถาม ได้คิด ได้ทำ
+75	P075	เด็กได้เรียนในแบบของตัวเอง ขยายผลห้องเรียนดิจิทัล ป.4-ม.6 ทุกโรงเรียน
+76	P076	เด็กฝึกภาษาอังกฤษได้ทุกวัน ด้วยครู และ AI coach
+77	P077	เด็กหาเงินได้ ใช้เงินเป็น เข้าใจภาษีและการลงทุนเบื้องต้น
+78	P078	เด็กเรียนวิชาการผ่านการทดลอง และสร้างนวัตกรรม (STEAM)
+79	P079	เด็กมีทักษะเอาตัวรอดจากสาธารณภัย และภัยไซเบอร์
+80	P080	ระบบประเมินนักเรียนเพื่อพัฒนาศักยภาพในแบบของตัวเอง
+81	P081	ส่งเสริมทุนเรียนต่อมัธยม-มหาวิทยาลัย และแลกเปลี่ยนต่างประเทศ
+82	P082	โรงเรียนมาตรฐานนานาชาติ และยกระดับ โรงเรียนสองภาษา ให้ครอบคลุมทุกเขต
+83	P083	โรงเรียนสาธิตปฐมวัย และพัฒนาคุณภาพโรงเรียนอนุบาลทุกเขต
+84	P084	ทุกโรงเรียนมีจุดเด่น เสริมความเป็นเลิศเฉพาะด้าน
+85	P085	พื้นที่เรียนรู้ทั่วเมือง ให้เด็กเรียนรู้ได้ทุกวัน
+86	P086	ต่อยอดการลดภาระงานครู คืนเวลาให้ครูได้กลับมาอยู่กับนักเรียน
+87	P087	ครูโรงเรียน กทม. ได้มีบ้านใกล้งาน
+88	P088	คลินิกวิทยฐานะ และปรับเกณฑ์วิทยฐานะให้วัดผลจากตัวผู้เรียน
+89	P089	ครูออกแบบการเรียนรู้ของตัวเองได้ผ่าน BMA Learning Hub
+90	P090	สร้างชุมชนการเรียนรู้จากครูถึงครู เรียนรู้จากห้องเรียนเพื่อนครู
+91	P091	เพิ่มทักษะให้ผู้บริหารโรงเรียนเป็นผู้นำแห่งอนาคต
+92	P092	ลดภาระค่าใช้จ่าย เรียนฟรีจริง ไม่มีเก็บเพิ่ม
+93	P093	ขยายผลห้องเรียนพ่อแม่ เชื่อมบ้านกับโรงเรียนในการดูแลเด็ก
+94	P094	ต่อยอดการเยี่ยมบ้าน สู่การสร้างเครือข่ายเพื่อนเรียน
+95	P095	สนับสนุนโมเดล Learn to Earn เรียนได้เงิน ทำงานได้วุฒิ
+96	P096	อัปเกรดไฟจราจร เพิ่มระบบควบคุมไฟจราจรแบบเรียลไทม์
+97	P097	ปรับปรุงกายภาพ ลดจุดฝืด เพิ่มความคล่องตัวจราจร
+98	P098	ทะลุซอยตัน ปรับปรุงการเชื่อมต่อโครงข่ายถนน
+99	P099	พัฒนาช่องทางสำหรับจักรยานยนต์
+100	P100	ประเมินผลกระทบด้านจราจรจากโครงการขนาดใหญ่
+101	P101	บริการจัดการพื้นที่จอดรถและเก็บค่าจอดรถให้มีประสิทธิภาพขึ้น
+102	P102	ร่วมมือกับเอกชนพัฒนารถโรงเรียนร่วม ลด ความหนาแน่นของถนนรอบโรงเรียน
+103	P103	ปรับปรุง แก้ไขจุดเสี่ยงอุบัติเหตุด้วยการวิเคราะห์ข้อมูล
+104	P104	จัดตั้งศูนย์บริหารจัดการเหตุฉุกเฉิน เพิ่มประสิทธิภาพในการเผชิญเหตุ
+105	P105	บูรณาการการบังคับใช้กฎหมายร่วมกับหน่วยงานอื่นๆ เพื่อลดปัญหาจราจร
+106	P106	รวมข้อมูลขนส่งสาธารณะทุกรูปแบบไว้ในที่เดียว
+107	P107	เชื่อมจุดเปลี่ยนถ่ายการขนส่ง เพิ่มความสะดวกในการเดินทาง
+108	P108	ปรับปรุงจุดรอรถประจำทางให้ได้มาตรฐานครบทั้งกรุงเทพฯ
+109	P109	ส่งเสริมการเชื่อมต่อการขนส่งทางน้ำในคลองสายหลัก
+110	P110	ออกแบบค่าโดยสาร BTS ราคาพิเศษสำหรับผู้ใช้ประจำ
+111	P111	สนับสนุนการโอน BTS ให้เป็น Single Operator
+112	P112	เรียก Feeder ผ่านแอปพลิเคชันได้ แก้ปัญหารถว่าง ผู้โดยสารรอนาน
+113	P113	เชื่อมโยงรถขนส่งเอกชน (Feeder) มาให้บริการสาธารณะ
+114	P114	สร้างเมืองเดินได้
+115	P115	เสนอข้อกำหนดเพื่อประโยชน์ทางภูมิทัศน์เมือง
+116	P116	สร้างเมืองปั่นสะดวก
+117	P117	ขยายโครงข่ายจักรยานสาธารณะ
+118	P118	พัฒนาเมืองเป็นบล็อก ส่งเสริมโครงสร้างพื้นฐานระดับย่าน
+119	P119	ผลักดันกฎหมายผังเมืองใหม่ให้ประกาศใช้ในปี พ.ศ.2570
+120	P120	พัฒนาแพลตฟอร์มรวบรวมสิทธิประโยชน์และข้อกำหนดทางผังเมือง
+121	P121	จับ ปรับผู้ก่อฝุ่นที่ต้นตอ ด้วยทีมนักสืบฝุ่น 2.0
+122	P122	ยกระดับความแม่นยำและความละเอียดของการพยากรณ์ฝุ่น
+123	P123	เดินหน้ากฎหมายเพื่ออากาศสะอาดของคนกรุงเทพฯ
+124	P124	Bangkok and Beyond ติดตามการ เผา และ ช่วยเหลือเกษตรกรแบบครบวงจร
+125	P125	Low Emission Zone 2.0 ยกระดับความเข้มข้นเขตมลพิษต่ำ
+126	P126	BKK Industrial Watch ติดตามการปล่อย มลพิษจากภาคอุตสาหกรรมตามมาตรฐานใหม่
+127	P127	สร้างตลาดคาร์บอนระดับเมือง Bangkok Carbon Credit Hub ส่งเสริมการเปลี่ยนผ่านสู่พลังงานสะอาด
+128	P128	ยกระดับมาตรฐานการใช้พลังงานในอาคาร
+129	P129	เพิ่มจุดจอดชาร์จรถไฟฟ้า 1,000 จุด
+130	P130	สร้างแรงจูงใจเปลี่ยนรถขนส่งสาธารณะให้เป็นพลังงานไฟฟ้า
+131	P131	เปลี่ยนรถใน กทม. ให้เป็นรถยนต์ไฟฟ้า
+132	P132	Bangkok Reduce - Bangkok Reuse ลดขยะ และ ส่งเสริมการใช้ซ้ำ
+133	P133	ส่งเสริมการคัดแยก ผ่านการจัดตั้งศูนย์จัดการขยะในชุมชน
+134	P134	เดินหน้าผลักดันข้อบัญญัติจัดการขยะต้นทาง ส่งเสริมการแยกขยะในหมู่บ้าน
+135	P135	ส่งเสริมงานที่เกี่ยวข้องกับการจัดการขยะ ผ่านอาสาสมัครด้านสิ่งแวดล้อม
+136	P136	ต่อยอดไม่เทรวม เปลี่ยนขยะเป็นเงินผ่านระบบ MRF
+137	P137	ยกระดับอ่อนนุช สู่ Bangkok Green Eco Park พื้นที่จัดการขยะรูปแบบใหม่
+138	P138	ดึงเอกชนร่วมบริหารจัดการขยะ เพื่อลดปริมาณขยะที่เมืองต้องจัดการ
+139	P139	ยกระดับซาเล้ง ขยายขอบเขตการจัดเก็บขยะในระดับครัวเรือน
+140	P140	แปลงเศษกิ่งไม้เป็น Biochar ช่วยดูดซับคาร์บอน
+141	P141	พัฒนาการรวบรวมน้ำเสีย เพื่อบำบัดน้ำได้อย่างมีประสิทธิภาพขึ้น
+142	P142	พัฒนาคลองให้ทำกิจกรรมทางน้ำได้มากขึ้น
+143	P143	กวดขัน จูงใจให้อาคารที่เข้าข่ายส่งผลตรวจน้ำเสีย ประจำปี และเชื่อมน้ำเสียเข้ากับระบบของ กทม.
+144	P144	เร่งรัดการก่อสร้าง โรงบำบัดน้ำเสีย และระบบรวบรวมน้ำเสียให้แล้วเสร็จ
+145	P145	พัฒนาระบบจัดการน้ำเสียที่ต้นทางในพื้นที่หนาแน่นต่ำ
+146	P146	ศึกษาความเป็นไปได้ประตูกั้นน้ำคลองภาษีเจริญ กั้นน้ำเสียไม่ให้เข้ากรุงเทพฯ
+147	P147	จัดทีมสารวัตรสิ่งแวดล้อมเพื่อตรวจสอบการกระทำความผิด
+148	P148	เพิ่มสวนป่าล้อมเมือง ขนาดใหญ่ ครบ 6 กลุ่มเขต
+149	P149	ฟื้นฟูระบบนิเวศ ดูแลความหลากหลายของสิ่งมีชีวิตในเมือง
+150	P150	เพิ่มและเชื่อมโยงพื้นที่สีเขียวหลากหลายประเภทในเมือง
+151	P151	พัฒนาทางเดินสีเขียวให้ร่มรื่นทุกเส้นทาง
+152	P152	ปลูกต้นไม้เพิ่มอีก 2 ล้านต้น เพิ่มร่มเงาให้เมือง
+153	P153	ขึ้นทะเบียนต้นไม้มรดกกรุงเทพฯ ดูแลต้นไม้ใหญ่ในเมือง
+154	P154	ทดแทนพื้นที่สีเขียวที่หายไปด้วยกลไก Green Area Shifting
+155	P155	หาจุดพัฒนาพื้นที่สีเขียวเพิ่มเติมด้วยนักสืบพื้นที่สีเขียว
+156	P156	พัฒนาพิพิธภัณฑ์ลานคนเมือง
+157	P157	พัฒนาศูนย์คนเมืองฝั่งธนฯ - หอศิลป์ พิพิธภัณฑ์เด็ก พื้นที่สาธารณะ ลานกิจกรรม
+158	P158	ผลักดันสะพานคนเดินข้ามแม่น้ำแลนด์มาร์กแห่งใหม่ของเมือง
+159	P159	เพิ่มพิพิธภัณฑ์เด็ก 2 แห่ง
+160	P160	พัฒนาพื้นที่จัดงานขนาดใหญ่ เพื่อรองรับอีเวนต์ระดับโลก
+161	P161	ปรับปรุงหอศิลป์กรุงเทพฯ ครั้งใหญ่ในรอบ 15 ปี
+162	P162	ฟื้นชีวิตอาคารเก่า สู่พื้นที่สาธารณะสร้างสรรค์ของคนเมือง
+163	P163	เปิดโรงเรียนเป็นพื้นที่เรียนรู้ของทุกคน (Open School)
+164	P164	เปิดพื้นที่เมืองให้ศิลปินรุ่นใหม่ได้สร้างสรรค์ผลงาน (City as Canvas)
+165	P165	1 เขต 1 พื้นที่งานศิลปะ คนเมืองเสพงานศิลป์ได้ใกล้บ้าน
+166	P166	เปิด Maker Space พื้นที่ซ่อมแซมสิ่งของ สร้างสรรค์นวัตกรรม
+167	P167	สนับสนุนพื้นที่เรียนรู้ใกล้บ้าน สร้างเครือข่ายนักกิจกรรมการเรียนรู้
+168	P168	บริหารจัดการพื้นที่จัดแสดงให้เปิดกว้างสำหรับศิลปินทุกคน
+169	P169	เพิ่มอีบุ๊ก 10,000 เล่ม และพัฒนาระบบยืมคืนข้ามห้องสมุดให้สะดวกขึ้น
+170	P170	เพิ่มพื้นที่และกิจกรรมที่สามารถจองได้ผ่าน publicspace.bangkok.go.th
+171	P171	ยกระดับมาตรฐานการจัดอีเวนต์เมือง สะดวก ปลอดภัย ลดผลกระทบต่อชุมชน
+172	P172	เพิ่มศูนย์กีฬา และศูนย์นันทนาการ รวม 10 แห่ง
+173	P173	ยกระดับพื้นที่ออกกำลังกาย และลานกีฬาคุณภาพ ใกล้บ้านให้ครบ 500 แห่ง
+174	P174	เพิ่มสิ่งอำนวยความสะดวกในสวนสาธารณะให้ตอบโจทย์คนรักสุขภาพ
+175	P175	พัฒนาลานกีฬาเอ็กซ์ตรีมทั่วเมือง และต่อยอดเป็นพื้นที่สร้างสรรค์
+176	P176	ต่อยอดเทศกาลกีฬาของคนกรุงเทพฯ (Bangkok City Games)
+177	P177	สนับสนุนการปรับปรุงและบริหารจัดการหนองจอกอารีน่า
+178	P178	ทำหมัน ฉีดวัคซีนสัตว์ 250,000 ตัวต่อปี
+179	P179	เปิดบริการคลินิกสัตว์สังกัด กทม. ลดค่าใช้จ่ายให้ประชาชน
+180	P180	สนับสนุนการรับเลี้ยงสัตว์จรอย่างต่อเนื่อง
+181	P181	ส่งเสริมพื้นที่ Pet Friendly ในเมือง (กยส.)
+182	P182	ควบคุมการเพาะพันธุ์และจำหน่ายสัตว์เลี้ยงด้วยระบบไมโครชิป
+183	P183	ยกระดับและเพิ่มความถี่การตรวจสวัสดิภาพสัตว์ในฟาร์มและร้านค้า
+184	P184	ยกระดับมาตรฐานความปลอดภัยของอาคาร เพื่อควบคุมและช่วยเหลือได้รวดเร็วเมื่อเผชิญเหตุ
+185	P185	พัฒนาฐานข้อมูลด้านความปลอดภัยภายใน อาคารเข้าสู่ฐานข้อมูลความปลอดภัยของเมือง
+186	P186	ฝึกซ้อมเผชิญเหตุร่วมระหว่างอาคาร ขนส่งสาธารณะ และ กทม.
+187	P187	เพิ่มสถานีดับเพลิง และขยายการติดตั้งอุปกรณ์ดับเพลิงให้ครอบคลุมมากขึ้น
+188	P188	ยกระดับการเตือนภัยและกำหนดข้อบ่งชี้ในการอพยพ
+189	P189	นำนวัตกรรมมาใช้เพื่อเพิ่มประสิทธิภาพการดับเพลิง
+190	P190	จัดตั้งระบบการบริหารทรัพยากรกลางในการเผชิญเหตุ
+191	P191	พัฒนาและยกระดับทีมสหวิชาชีพในการเข้าให้ความช่วยเหลือและฟื้นฟูเบื้องต้น
+192	P192	ปรับเงินเยียวยาให้สอดคล้องกับค่าครองชีพ
+193	P193	เพิ่มความแม่นยำระบบพยากรณ์ฝน
+194	P194	พัฒนาระบบติดตามน้ำเหนือ-น้ำหนุน บูรณาการ ร่วมกับหน่วยงานอื่น เตือนภัยล่วงหน้าได้เร็วขึ้น
+195	P195	อุดรอยรั่วตามแม่น้ำเจ้าพระยาให้ครบ
+196	P196	ผลักดันการศึกษาแนวทางแก้ไขน้ำทะเลหนุนบริเวณปากแม่น้ำเจ้าพระยา
+197	P197	พัฒนาฝายเพื่อนำน้ำมาใช้ในการเกษตรช่วงหน้าแล้ง และกักเก็บน้ำในหน้าฝน
+198	P198	ขยายการดูแลจุดเสี่ยงน้ำท่วมเข้าสู่พื้นที่เอกชนที่เปิดให้สาธารณะใช้ประโยชน์
+199	P199	ใช้เทคโนโลยีสร้างโมเดลจำลองเพื่อบริหารจัดการน้ำได้อย่างมีประสิทธิภาพ
+200	P200	เร่งรัดผลักดันอุโมงค์ระบายน้ำประเวศ แก้ปัญหาน้ำท่วมกรุงเทพตะวันออก
+201	P201	เพิ่มศักยภาพคลองสายหลักให้รับน้ำและระบายน้ำได้อย่างเต็มประสิทธิภาพ
+202	P202	จำลองสถานการณ์น้ำท่วมจากน้ำฝนและน้ำหนุน เพื่อวางแผนรับมือระยะยาว
+203	P203	เพิ่มเครือข่าย CCTV และเชื่อมฐานข้อมูลความปลอดภัยของตำรวจ
+204	P204	ตรวจสอบแก้ไขไฟส่องสว่างเปลี่ยน LED ในจุดมืดอีก 100,000 ดวง
+205	P205	เทศกิจลาดตระเวนในพื้นที่สำคัญ
+206	P206	ยกระดับความปลอดภัยของเมืองเพื่อรองรับการท่องเที่ยว
+207	P207	กำหนดมาตรฐาน ‘หลังคาสามสี’ส่งเสริมสวนบนอาคารและใช้สีที่ลดการเก็บความร้อน
+208	P208	ปรับมาตรการเพิ่มการซึมผ่านของลม และลดความเข้มข้นของความร้อนในเมือง
+209	P209	ขยายห้องหลบร้อนอย่างน้อย 500 แห่ง
+210	P210	ส่งเสริมชุมชนสู้ภัยร้อน
+211	P211	Next Learn แพลตฟอร์มอัปสกิลสู่โอกาส อาชีพแห่งอนาคต เรียนจบพร้อมทำงาน
+212	P212	ปรับหลักสูตรฝึกอาชีพให้ทันสมัย ใช้ทำงานได้จริง เปิดสอนนอกเวลา
+213	P213	สร้างเครดิตให้กับธุรกิจฐานรากด้วยข้อมูล และจัดหา แหล่งเงินทุนสำหรับธุรกิจรายย่อยร่วมกับสถาบันการเงิน
+214	P214	เปิด Incubation Hub พื้นที่พร้อมอุปกรณ์ให้ทดลองทำธุรกิจ
+215	P215	พัฒนาแพลตฟอร์มแบ่งปันข้อมูลและผลการวิเคราะห์เพื่อต่อยอดธุรกิจ
+216	P216	ส่งเสริมให้ธุรกิจเพื่อสังคมเป็นกลไกขับเคลื่อนเมือง
+217	P217	กระจายศูนย์อิ่มท้องอย่างน้อย 50 แห่งทั่วกรุงเทพฯ
+218	P218	เพิ่มพื้นที่ค้าขาย เพิ่มโอกาสทางเศรษฐกิจให้รายย่อย
+219	P219	ร่วมมือกับหน่วยงานที่เกี่ยวข้องดึงดูดบรรษัทข้ามชาติ (MNC) มาลงทุน
+220	P220	Friends of Bangkok เครือข่ายเพื่อน เมือง ดึงดูดการลงทุนและโอกาสจากทั่วโลก
+221	P221	ยกระดับ Invest Bangkok เป็นประตูสู่นานาชาติ
+222	P222	ชู 4 เทศกาลให้เป็น World Class Festival ดึงดูดนักท่องเที่ยว
+223	P223	ยกระดับเมือง เพื่อรองรับการจัดงานระดับโลก
+224	P224	ดึงอัตลักษณ์ สร้างมาตรฐาน ยกระดับเศรษฐกิจ 50 ย่านทั่วกรุงเทพฯ
+225	P225	ต่อยอด VisitBangkok สู่แพลตฟอร์มการท่องเที่ยวของเมือง
+226	P226	กรุงเทพ Light Up ส่งเสริมการท่องเที่ยวยามค่ำคืนตลอดปี
+227	P227	พัฒนาแพลตฟอร์ม Bangkok Creative IP และมาสคอตเมืองกรุงเทพฯ ส่งเสริมเศรษฐกิจจากอัตลักษณ์เมือง
+228	P228	ต่อยอดระบบขออนุญาตออนไลน์ให้ครอบคลุมบริการที่หลากหลายขึ้น
+229	P229	ปรับกระบวนการลดภาระประชาชนเกี่ยวกับขออนุญาตและรับบริการ
+230	P230	BKK Works ยุบรวมทุกแอปพลิเคชันด้านบริการเมืองให้ครบจบในที่เดียว
+231	P231	ใช้เทคโนโลยีช่วยพิจารณาการอนุญาตต่างๆ
+232	P232	เปิดข้อมูลเมืองในสกุลไฟล์ที่ AI อ่านได้
+233	P233	เชื่อมโยงข้อมูลงบประมาณกับพิกัดโครงการ เพื่อ ให้ประชาชนร่วมตรวจสอบงบประมาณได้ง่ายขึ้น
+234	P234	ระบบตรวจสอบความเสี่ยงของการจัดซื้อจัด จ้าง ยับยั้งการเซ็นสัญญาเมื่อพบความผิดปกติ
+235	P235	พัฒนาระบบติดตามเคสการกระทำความ ผิด เพิ่มความรวดเร็วในการตรวจสอบทุจริต
+236	P236	ปรับกฎหมายให้สอดคล้องกับบริบทเมืองใน ปัจจุบัน เพิ่มประสิทธิภาพในการบริหารเมือง
+237	P237	ผลักดัน พ.ร.บ. กรุงเทพฯ 2568 ปรับขอบเขตอำนาจของ กทม.
+238	P238	ลดความซับซ้อนและระยะเวลาในการดำเนิน งานของระบบราชการ ด้วยระบบราชการดิจิทัล
+239	P239	ปรับบทบาทการพาณิชย์ กทม. เน้นประโยชน์ สาธารณะควบคู่กับการสร้างรายได้ให้เมือง
+240	P240	แพลตฟอร์มรวมประวัติการซื้อครุภัณฑ์และ วัสดุ เพื่อให้ กทม. จัดซื้อจัดจ้างในราคาที่เหมาะสม
+241	P241	จัดเก็บรายได้ให้มีประสิทธิภาพเพื่อพัฒนากรุงเทพฯ
+242	P242	ปรับโครงสร้างองค์กร ลดลำดับขั้น ยุบรวมงานที่ซ้ำซ้อน
+243	P243	ส่งเสริมบุคลากร กทม. ที่มีศักยภาพสูงให้เติบโตในสายอาชีพ
+244	P244	ปรับระบบค่าตอบแทนให้เชื่อมโยงกับเนื้องานที่ทำจริง
+245	P245	เดินหน้าเชิงรุกหาปัญหาเมือง ควบคู่กับ Traffy Fondue
+246	P246	วิเคราะห์ข้อมูลจากการแจ้งปัญหา ด้วย AI เพื่อยกระดับมาตรฐานการดูแลเมือง
+247	P247	ขยายขอบเขตรับเรื่องร้องเรียนให้ครอบคลุมมิติปัญหาเชิงสังคม
+248	P248	กำหนดมาตรฐานการแก้ปัญหาในทั้งเชิงปริมาณและคุณภาพ
+249	P249	สร้างแพลตฟอร์มให้ประชาชนเสนอไอเดียพัฒนาเมือง
+250	P250	ต่อยอด Bangkok City Lab แจกโจทย์เมือง ให้ เครือข่ายร่วมสร้างสรรค์นวัตกรรมเมือง
+251	P251	ยกระดับการมีส่วนร่วมของเด็กและเยาวชน ผ่านสภาเด็กและสภาคนรุ่นใหม่
+252	P252	ศูนย์กายภาพชุมชน
+253	P253	สงครามสู้หนู
+254	P254	จัดจุดรอสำหรับไรเดอร์
+255	P255	จัดระเบียบหาบเร่แผงลอย
+256	P256	ปรับโครงสร้างสอบวินัย
+257	P257	ออกแนวทางสำหรับการเขียน TOR ป้องกันการล็อคเสป็ค
+258	P258	นำร่องทดลองเพิ่มเส้นทางให้บริการ รถเมล์ ในพื้นที่ที่ขาด
+259	P259	อุดหนุนผู้ประกอบการรถเมล์ และ รถหมวด 4 ให้ เพิ่มความถี่และเส้นทางในการให้บริการ
+260	P260	จับคู่พื้นที่ ส่งเสริมการทำเกษตรในเมือง
+261	P261	ส่งเสริมความรู้และการรับรองวิชาชีพด้านการดูแลเด็ก
+\.
+
+
+--
 -- Data for Name: project_attachment_types; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.project_attachment_types VALUES (1, 'SYSTEM_DIAGRAM', 'system_diagram');
-INSERT INTO public.project_attachment_types VALUES (2, 'NETWORK_DIAGRAM', 'network_diagram');
-INSERT INTO public.project_attachment_types VALUES (3, 'USE_CASE_DIAGRAM', 'use_case_diagram');
-INSERT INTO public.project_attachment_types VALUES (4, 'SECURITY_DIAGRAM', 'security_diagram');
-INSERT INTO public.project_attachment_types VALUES (5, 'PRESENTATION', 'presentation');
-INSERT INTO public.project_attachment_types VALUES (6, 'REPORT', 'report');
-INSERT INTO public.project_attachment_types VALUES (7, 'EXPENSE_DOCUMENT', 'ใบเบิกเงิน');
-INSERT INTO public.project_attachment_types VALUES (8, 'OTHER', 'other');
-INSERT INTO public.project_attachment_types VALUES (9, 'QUOTATION', 'quotation');
-INSERT INTO public.project_attachment_types VALUES (10, 'ONE_PAGE_SUMMARY', 'one_page_summary');
-INSERT INTO public.project_attachment_types VALUES (11, 'APPROVAL_DOCUMENT', 'approval_document');
-INSERT INTO public.project_attachment_types VALUES (12, 'BMA_DC_USAGE', 'bma_dc_usage');
+COPY public.project_attachment_types (doc_type_id, code, doc_type_name) FROM stdin;
+1	SYSTEM_DIAGRAM	system_diagram
+2	NETWORK_DIAGRAM	network_diagram
+3	USE_CASE_DIAGRAM	use_case_diagram
+4	SECURITY_DIAGRAM	security_diagram
+5	PRESENTATION	presentation
+6	REPORT	report
+7	EXPENSE_DOCUMENT	ใบเบิกเงิน
+8	OTHER	other
+9	QUOTATION	quotation
+10	ONE_PAGE_SUMMARY	one_page_summary
+11	APPROVAL_DOCUMENT	approval_document
+12	BMA_DC_USAGE	bma_dc_usage
+13	CURRENT_DIAGRAM	current_diagram
+\.
+
 
 --
--- TOC entry 3964 (class 0 OID 16557)
--- Dependencies: 236
+-- Data for Name: project_attachments; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.project_attachments (id, project_id, doc_type_id, uploaded_by, file_name, file_url, file_type, file_size, description, created_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: project_sequences; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.project_sequences (year, last_value) FROM stdin;
+2569	3
+\.
+
+
+--
+-- Data for Name: project_status_logs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.project_status_logs (id, project_id, user_id, old_status_id, new_status_id, remark, created_at, source_operation, meeting_id, agenda_id, resolution_id) FROM stdin;
+\.
+
+
+--
 -- Data for Name: project_statuses; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.project_statuses VALUES (1, 'PROJECT_DRAFT', 'Draft');
-INSERT INTO public.project_statuses VALUES (2, 'PROJECT_PENDING_SECRETARY', 'Pending Secretary');
-INSERT INTO public.project_statuses VALUES (3, 'PROJECT_RETURNED_SECRETARY', 'Returned by Secretary');
-INSERT INTO public.project_statuses VALUES (4, 'PROJECT_REJECTED_SECRETARY', 'Rejected by Secretary');
-INSERT INTO public.project_statuses VALUES (5, 'PROJECT_PENDING_ASSIGNMENT', 'Pending Assignment');
-INSERT INTO public.project_statuses VALUES (6, 'PROJECT_IN_ANALYSIS', 'In Analysis');
-INSERT INTO public.project_statuses VALUES (7, 'PROJECT_RETURNED_ANALYST', 'Returned by Analyst');
-INSERT INTO public.project_statuses VALUES (8, 'PROJECT_REJECTED_ANALYST', 'Rejected by Analyst');
-INSERT INTO public.project_statuses VALUES (9, 'PROJECT_PENDING_SMALL_BOARD', 'Pending Small Board');
-INSERT INTO public.project_statuses VALUES (10, 'PROJECT_RETURNED_FROM_SMALL_BOARD', 'Returned from Small Board');
-INSERT INTO public.project_statuses VALUES (11, 'PROJECT_REJECTED_BY_SMALL_BOARD', 'Rejected by Small Board');
-INSERT INTO public.project_statuses VALUES (12, 'PROJECT_PENDING_BIG_BOARD', 'Pending Big Board');
-INSERT INTO public.project_statuses VALUES (13, 'PROJECT_RETURNED_FROM_BIG_BOARD', 'Returned from Big Board');
-INSERT INTO public.project_statuses VALUES (14, 'PROJECT_REJECTED_BY_BIG_BOARD', 'Rejected by Big Board');
-INSERT INTO public.project_statuses VALUES (15, 'PROJECT_APPROVED', 'Approved');
-INSERT INTO public.project_statuses VALUES (16, 'PROJECT_ACKNOWLEDGED', 'Acknowledged');
+COPY public.project_statuses (project_status_id, code, project_status_name) FROM stdin;
+1	PROJECT_DRAFT	Draft
+2	PROJECT_PENDING_SECRETARY	Pending Secretary
+3	PROJECT_RETURNED_SECRETARY	Returned by Secretary
+4	PROJECT_REJECTED_SECRETARY	Rejected by Secretary
+5	PROJECT_PENDING_ASSIGNMENT	Pending Assignment
+6	PROJECT_IN_ANALYSIS	In Analysis
+7	PROJECT_RETURNED_ANALYST	Returned by Analyst
+8	PROJECT_REJECTED_ANALYST	Rejected by Analyst
+9	PROJECT_PENDING_SMALL_BOARD	Pending Small Board
+10	PROJECT_RETURNED_FROM_SMALL_BOARD	Returned from Small Board
+11	PROJECT_REJECTED_BY_SMALL_BOARD	Rejected by Small Board
+12	PROJECT_PENDING_BIG_BOARD	Pending Big Board
+13	PROJECT_RETURNED_FROM_BIG_BOARD	Returned from Big Board
+14	PROJECT_REJECTED_BY_BIG_BOARD	Rejected by Big Board
+15	PROJECT_APPROVED	Approved
+16	PROJECT_ACKNOWLEDGED	Acknowledged
+\.
 
 
 --
--- TOC entry 3966 (class 0 OID 16568)
--- Dependencies: 238
 -- Data for Name: project_types; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.project_types VALUES (1, 'HARDWARE', 'คณะกรรมการพิจารณากลั่นกรองโครงการด้านโครงสร้างพื้นฐานดิจิทัลกรุงเทพมหานคร');
-INSERT INTO public.project_types VALUES (2, 'SOFTWARE', 'คณะกรรมการพิจารณากลั่นกรองโครงการด้านการพัฒนาระบบสารสนเทศดิจิทัลกรุงเทพมหานคร');
+COPY public.project_types (project_type_id, code, project_type_name) FROM stdin;
+1	HARDWARE	คณะกรรมการพิจารณากลั่นกรองโครงการด้านโครงสร้างพื้นฐานดิจิทัลกรุงเทพมหานคร
+2	SOFTWARE	คณะกรรมการพิจารณากลั่นกรองโครงการด้านการพัฒนาระบบสารสนเทศดิจิทัลกรุงเทพมหานคร
+\.
+
 
 --
--- TOC entry 3968 (class 0 OID 16579)
--- Dependencies: 240
+-- Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.projects (project_id, project_code, user_id, division_id, project_status_id, project_type_id, four_quadrants_id, deputy_governor_id, initial_requested_budget, latest_requested_budget, external_task_id, project_name, project_name_original, analyst_id, assigned_by, assigned_at, is_public, public_token, created_at, updated_at, updated_by, deleted_at, return_stage, workflow_version, final_approved_budget, initial_estimated_cost, latest_estimated_cost, final_estimated_cost) FROM stdin;
+01a18bfa-5783-770c-9b7a-ab785babf450	BMA-69-0002	01a10b32-bf51-7239-832a-c2b765e1ef06	369	1	\N	2	3	\N	0.00	\N	UAT-P2026-103002	UAT-P2026-103002	\N	\N	\N	f	\N	2026-10-30 08:43:21.871034	2026-11-02 06:14:39.437	01a10b32-bf51-7239-832a-c2b765e1ef06	\N	\N	0	\N	\N	0.00	\N
+01a18bf7-f30f-740b-9d83-ad8f7f530b9f	BMA-69-0001	01a10b32-bf51-7239-832a-c2b765e1ef06	369	1	\N	1	2	\N	100000.00	\N	UAT-P2026-103001	UAT-P2026-103001	\N	\N	\N	f	\N	2026-10-30 08:40:45.081519	2026-11-03 07:31:43.289	01a10b32-bf51-7239-832a-c2b765e1ef06	\N	\N	0	\N	\N	0.00	\N
+01a1d33d-ff7e-70b8-a059-a17d28550f19	BMA-69-0003	019fb671-e5d5-7133-80f7-b82404a5b474	369	1	\N	1	2	\N	\N	\N	UAT-P2026-1113001	UAT-P2026-1113001	\N	\N	\N	f	\N	2026-11-13 04:50:18.144261	2026-11-13 04:50:18.144261	\N	\N	\N	0	\N	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: proposal_budgets; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_budgets (id, proposal_id, year, amount, budget_type) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_cloud_requests; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_cloud_requests (id, proposal_id, system_name, requested_service_date, recorded_request_date) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_cloud_vms; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_cloud_vms (id, cloud_request_id, vm_description, os_database, vcpu, ram_gb, gpu_gb, storage_gb, price) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_drafts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_drafts (draft_id, project_id, user_id, project_name, objective, requested_budget_total, current_step, draft_payload, created_at, updated_at, updated_by, estimated_cost_total) FROM stdin;
+01a18bfb-dd06-7481-a5dc-b89948c0d4b1	01a18bfa-5783-770c-9b7a-ab785babf450	01a10b32-bf51-7239-832a-c2b765e1ef06	UAT-P2026-103002	\N	0.00	1	{"scope": "", "target": "", "isReady": false, "dcioName": "ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO)", "manpower": [], "agencyKpi": "", "dataOwner": "", "isBmaPlan": false, "objective": "", "agencyName": "สำนักดิจิทัลกรุงเทพมหานคร - กองยุทธศาสตร์ดิจิทัล", "background": "", "otherCosts": [], "agencyIssue": "", "isInRoadmap": false, "projectName": "UAT-P2026-103002", "projectType": "NEW", "durationDays": 0, "headOfAgency": "หัวหน้าส่วนราชการ", "ictPersonnel": [], "isAgencyPlan": false, "obstacleLaws": "", "budgetsByYear": [{"year": 25556, "amount": 0, "budgetType": "งบประมาณรายจ่ายประจำปี"}], "cloudRequests": [], "hardwareCosts": [], "softwareCosts": [], "agencyStrategy": "", "otherReadiness": "", "projectManager": "ทดสอบ ผู้ใช้งาน", "appArchitecture": "", "currentProblems": "", "relatedProjects": [], "trainingCourses": [], "dataExchangePlan": "", "expectedBenefits": "", "isGovernorPolicy": false, "readinessDetails": "", "existingEquipment": [], "governorPolicyCode": "", "governorPolicyName": "", "personnelAsstCosts": [], "personnelCoreCosts": [], "personnelSuppCosts": [], "currentSystemStatus": "", "personnelResponsibilities": []}	2026-10-30 08:45:01.575423	2026-11-02 06:14:39.432	01a10b32-bf51-7239-832a-c2b765e1ef06	0.00
+01a18bf8-784a-71a9-bd9f-d307d79a03f8	01a18bf7-f30f-740b-9d83-ad8f7f530b9f	01a10b32-bf51-7239-832a-c2b765e1ef06	UAT-P2026-103001	\N	100000.00	1	{"scope": "", "target": "", "isReady": false, "dcioName": "ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO)", "manpower": [], "agencyKpi": "", "dataOwner": "", "isBmaPlan": false, "objective": "", "agencyName": "สำนักดิจิทัลกรุงเทพมหานคร - กองยุทธศาสตร์ดิจิทัล", "background": "", "otherCosts": [], "agencyIssue": "", "isInRoadmap": false, "projectName": "UAT-P2026-103001", "projectType": "NEW", "durationDays": 0, "headOfAgency": "หัวหน้าส่วนราชการ", "ictPersonnel": [], "isAgencyPlan": false, "obstacleLaws": "", "budgetsByYear": [{"year": 2571, "amount": 100000, "budgetType": "งบประมาณรายจ่ายประจำปี"}], "cloudRequests": [], "hardwareCosts": [], "softwareCosts": [], "agencyStrategy": "", "otherReadiness": "", "projectManager": "ทดสอบ ผู้ใช้งาน", "appArchitecture": "", "currentProblems": "", "relatedProjects": [], "trainingCourses": [], "dataExchangePlan": "", "expectedBenefits": "", "isGovernorPolicy": false, "readinessDetails": "", "existingEquipment": [], "governorPolicyCode": "", "governorPolicyName": "", "personnelAsstCosts": [], "personnelCoreCosts": [], "personnelSuppCosts": [], "currentSystemStatus": "", "personnelResponsibilities": []}	2026-10-30 08:41:19.180051	2026-11-03 07:31:43.284	01a10b32-bf51-7239-832a-c2b765e1ef06	0.00
+\.
+
+
+--
+-- Data for Name: proposal_existing_equipments; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_existing_equipments (id, proposal_id, item_name, age_years, quantity, user_name, location, remark) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_hardware_costs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_hardware_costs (id, proposal_id, item_name, quantity, unit_price, reference_type, mdes_month, mdes_year, mdes_item_no, market_count, market_company, prev_project, prev_year, other_detail) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_ict_personnel; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_ict_personnel (id, proposal_id, "position", level, count) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_manpower; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_manpower (id, proposal_id, agency_part, position_limit, occupied, vacant) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_other_costs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_other_costs (id, proposal_id, item_name, quantity, unit_price, remark, cost_type) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_personnel_costs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_personnel_costs (id, proposal_id, personnel_type, "position", degree, field_of_study, experience_years, base_salary, multiplier, person_count, duration_months) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_personnel_responsibilities; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_personnel_responsibilities (id, proposal_id, "position", responsibility) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_related_projects; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_related_projects (id, proposal_id, project_name, agency, fiscal_year, relation_type, remark) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_software_costs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_software_costs (id, proposal_id, item_name, quantity, unit_price, reference_type, mdes_month, mdes_year, mdes_item_no, market_count, market_company, prev_project, prev_year, other_detail) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_training_food_costs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_training_food_costs (id, training_id, item_name, meals_count, rate_per_meal, trainees_count, days) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_training_speaker_costs; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_training_speaker_costs (id, training_id, item_name, hours, rate_per_hour, days) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposal_trainings; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposal_trainings (id, proposal_id, course_name, training_method, location_type, has_speaker_cost, speaker_reason) FROM stdin;
+\.
+
+
+--
+-- Data for Name: proposals; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.proposals (id, status, project_id, user_id, updated_by, version, project_name, agency_name, head_of_agency, dcio_name, project_manager, requested_budget_total, background, objective, target, scope, project_type, current_system_status, current_problems, is_bma_plan, is_agency_plan, agency_strategy, agency_issue, agency_kpi, is_governor_policy, governor_policy_code, governor_policy_name, obstacle_laws, app_architecture, data_owner, data_exchange_plan, is_ready, readiness_details, duration_days, other_readiness, expected_benefits, is_in_roadmap, created_at, updated_at, estimated_cost_total, submitted_at, department_id, division_id, project_ever_passed, prev_presented_year, prev_project_name_mode, prev_presented_project, prev_resolution, bma_plan_strategy, bma_plan_issue, bma_plan_kpi) FROM stdin;
+\.
+
+
+--
 -- Data for Name: resolution_statuses; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.resolution_statuses VALUES (1, 'Approved', 'APPROVED');
-INSERT INTO public.resolution_statuses VALUES (2, 'Conditional Approval', 'CONDITIONAL_APPROVAL');
-INSERT INTO public.resolution_statuses VALUES (3, 'Not Approved', 'NOT_APPROVED');
-INSERT INTO public.resolution_statuses VALUES (4, 'Acknowledged', 'ACKNOWLEDGED');
-INSERT INTO public.resolution_statuses VALUES (5, 'Pending (Legacy)', 'PENDING_LEGACY');
-INSERT INTO public.resolution_statuses VALUES (6, 'Reconsider', 'RECONSIDER');
-INSERT INTO public.resolution_statuses VALUES (7, 'Not Considered', 'NOT_CONSIDERED');
+COPY public.resolution_statuses (id, name, code) FROM stdin;
+1	Approved	APPROVED
+2	Conditional Approval	CONDITIONAL_APPROVAL
+3	Not Approved	NOT_APPROVED
+4	Acknowledged	ACKNOWLEDGED
+5	Pending (Legacy)	PENDING_LEGACY
+6	Reconsider	RECONSIDER
+7	Not Considered	NOT_CONSIDERED
+\.
 
 
 --
--- TOC entry 3969 (class 0 OID 16587)
--- Dependencies: 241
+-- Data for Name: resolutions; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.resolutions (id, agenda_id, resolution_status_id, comment, recorded_by, created_at, updated_at, resolution_type, remark, resolved_at, version, governed_proposal_id) FROM stdin;
+\.
+
+
+--
 -- Data for Name: role_user; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.role_user VALUES ('019fb671-e5d5-7133-80f7-b82404a5b474', 5, '019fb671-e5d5-7133-80f7-b82404a5b474', '2026-07-31 04:33:43.835483');
-INSERT INTO public.role_user VALUES ('019fb671-e5d5-7133-80f7-b82404a5b474', 4, '019fb671-e5d5-7133-80f7-b82404a5b474', '2026-07-31 04:33:43.835483');
-INSERT INTO public.role_user VALUES ('019fb671-e5d5-7133-80f7-b82404a5b474', 2, '019fb671-e5d5-7133-80f7-b82404a5b474', '2026-07-31 04:33:43.835483');
-INSERT INTO public.role_user VALUES ('019fb671-e5d5-7133-80f7-b82404a5b474', 3, '019fb671-e5d5-7133-80f7-b82404a5b474', '2026-07-31 04:33:43.835483');
-INSERT INTO public.role_user VALUES ('019fb671-e5d5-7133-80f7-b82404a5b474', 1, '019fb671-e5d5-7133-80f7-b82404a5b474', '2026-07-31 04:33:43.835483');
+COPY public.role_user (user_id, role_id, assigned_by, assigned_at) FROM stdin;
+019fb671-e5d5-7133-80f7-b82404a5b474	5	019fb671-e5d5-7133-80f7-b82404a5b474	2026-07-31 04:33:43.835483
+019fb671-e5d5-7133-80f7-b82404a5b474	4	019fb671-e5d5-7133-80f7-b82404a5b474	2026-07-31 04:33:43.835483
+019fb671-e5d5-7133-80f7-b82404a5b474	2	019fb671-e5d5-7133-80f7-b82404a5b474	2026-07-31 04:33:43.835483
+019fb671-e5d5-7133-80f7-b82404a5b474	3	019fb671-e5d5-7133-80f7-b82404a5b474	2026-07-31 04:33:43.835483
+019fb671-e5d5-7133-80f7-b82404a5b474	1	019fb671-e5d5-7133-80f7-b82404a5b474	2026-07-31 04:33:43.835483
+01a10b3c-1f88-74ce-89bb-2ee7ffcea3c8	2	019fb671-e5d5-7133-80f7-b82404a5b474	2026-10-05 08:46:17.959784
+01a10b32-bf51-7239-832a-c2b765e1ef06	1	019fb671-e5d5-7133-80f7-b82404a5b474	2026-10-05 08:46:34.929233
+01a10b3d-043d-750d-b06d-d716f3417a2b	4	019fb671-e5d5-7133-80f7-b82404a5b474	2026-10-05 08:46:42.801176
+01a180cd-6074-71de-b93e-1c203fae521c	3	019fb671-e5d5-7133-80f7-b82404a5b474	2026-10-28 04:39:14.431784
+01a18ba6-70df-73de-8ed2-0bc47048c4d6	1	\N	2026-10-30 07:11:43.32361
+\.
 
 
 --
--- TOC entry 3971 (class 0 OID 16594)
--- Dependencies: 243
 -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.roles VALUES (1, 'USER', 'USER', NULL);
-INSERT INTO public.roles VALUES (2, 'ANALYST', 'ANALYST', NULL);
-INSERT INTO public.roles VALUES (3, 'SECRETARY', 'SECRETARY', NULL);
-INSERT INTO public.roles VALUES (4, 'ADMIN', 'ADMIN', NULL);
-INSERT INTO public.roles VALUES (5, 'SUPER_ADMIN', 'SUPER_ADMIN', NULL);
+COPY public.roles (role_id, code, role_name, description) FROM stdin;
+1	USER	USER	\N
+2	ANALYST	ANALYST	\N
+3	SECRETARY	SECRETARY	\N
+4	ADMIN	ADMIN	\N
+5	SUPER_ADMIN	SUPER_ADMIN	\N
+\.
 
 
 --
--- TOC entry 3973 (class 0 OID 16613)
--- Dependencies: 245
+-- Data for Name: user_login_history; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.user_login_history (id, user_id, ip_address, user_agent, login_at) FROM stdin;
+826d7bcb-afd9-46d7-af6b-b0a1d54d60d3	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-10-05 08:32:34.458741
+843e10f9-5cb1-4ac9-98fb-8a8499e9b9fc	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-10-05 08:45:32.987673
+71e7e5ce-f427-4fec-9b55-e2be40557247	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-10-06 08:51:18.123222
+ce88643e-b1f9-4ba7-bcd2-60dd0c3e7815	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.140.0 Chrome/150.0.7871.250 Electron/43.7.3 Safari/537.36	2026-10-07 07:20:46.205459
+585f12e0-fb33-44ae-bba6-50b9e3c4a84b	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.140.0 Chrome/150.0.7871.250 Electron/43.7.3 Safari/537.36	2026-10-07 07:20:47.592334
+85812574-a086-47ff-b99e-444a45c4cdd6	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-10-14 07:47:32.029826
+5c1b2113-4c96-4257-883e-965827143a68	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-10-14 07:59:42.857936
+ffee6e1e-0258-4dc7-b76c-e959658118ae	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-10-28 04:30:03.226434
+0de291f3-2c4c-4678-b709-f5abbb3f24d6	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-10-28 04:31:22.294945
+88ef2b68-2ff1-4431-a53e-3d93b21b268d	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-10-28 04:39:46.654292
+b2915509-7bcd-4705-ac30-bbc48b2cf074	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	curl/8.5.0	2026-10-28 15:05:48.704765
+2e534b20-d972-4952-9104-48d2810b29e4	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	curl/8.5.0	2026-10-28 15:10:43.420075
+95be35a6-1e9c-4878-acc3-fdaf827b0234	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	curl/8.5.0	2026-10-28 15:18:48.710286
+2fdb8779-1d18-4125-b2de-40de7fad735e	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	curl/8.5.0	2026-10-28 15:32:18.75501
+2149412a-2fcc-43df-9804-9fb6af509df8	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-10-30 02:39:40.725039
+5be8d627-69ea-4732-b7ca-84921ad51fd5	01a180cd-6074-71de-b93e-1c203fae521c	unknown	node	2026-10-30 02:42:26.210633
+1f79766b-69c0-4c3a-8cd5-a02fd75c0009	01a10b3d-043d-750d-b06d-d716f3417a2b	unknown	node	2026-10-30 02:42:53.784531
+d76d32eb-e650-4f40-b6b5-a2cd850b6ac7	01a10b3c-1f88-74ce-89bb-2ee7ffcea3c8	unknown	node	2026-10-30 02:43:07.837072
+1674c830-3d6a-42ec-9413-b214e8ec757b	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	curl/8.5.0	2026-10-30 02:59:06.99704
+7dbf068b-97e0-4557-a5dc-7e96105bb103	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	curl/8.5.0	2026-10-30 02:59:14.222599
+243147a2-c4d4-4ba3-b0f4-d74ccf05f1ab	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-10-30 03:00:27.223852
+8b164347-2aac-44c0-967a-09e5ec6eaf10	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-10-30 04:06:35.183968
+1520650c-ade3-4e63-a28a-60142300d55f	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-10-30 08:36:55.725687
+cb1195f7-74dd-43e5-a8d0-ce6232556cab	01a18ba6-70df-73de-8ed2-0bc47048c4d6	unknown	node	2026-11-02 02:00:04.340427
+9b92ce94-e392-4884-a9cf-c53c0af74cfe	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-11-02 02:00:40.37284
+705f966d-5644-48c1-90c4-ba6c71613129	01a10b3d-043d-750d-b06d-d716f3417a2b	unknown	node	2026-11-02 06:42:38.210901
+89df175d-2d47-4504-936b-719f42962844	01a180cd-6074-71de-b93e-1c203fae521c	unknown	node	2026-11-02 06:46:10.235119
+2b82fdbf-0ea5-475b-9655-9460819ce19e	01a10b32-bf51-7239-832a-c2b765e1ef06	unknown	node	2026-11-02 06:51:27.689434
+be117b2c-dfcf-4a3a-ad5e-0ac7e0a03ad2	019fb671-e5d5-7133-80f7-b82404a5b474	unknown	node	2026-11-13 03:58:10.111261
+\.
+
+
+--
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.users VALUES ('019fb671-e5d5-7133-80f7-b82404a5b474', 'SUPER_ADMIN', '$argon2id$v=19$m=65536,t=2,p=1$ZfAfPvHAFUdo7c8Yfdk18efM4r12GPdfxC3OvWjX4MA$zAa5trPDWNwAEQ3ULfg85S826HmCQhOaP5Y88uP9xs8', 'Super', 'Admin', 'bma.dsdstrategy@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, true, NULL, NULL, '2026-07-31 04:32:25.548666', '2026-07-31 04:32:25.548666');
+COPY public.users (user_id, username, password, first_name, last_name, email, "position", level, management_position, division_id, mobile_phone, office_phone, internal_extension, is_active, reset_password_token, reset_password_expires, is_verified, verification_token, verification_expires, created_at, updated_at) FROM stdin;
+019fb671-e5d5-7133-80f7-b82404a5b474	SUPER_ADMIN	$argon2id$v=19$m=65536,t=2,p=1$ZfAfPvHAFUdo7c8Yfdk18efM4r12GPdfxC3OvWjX4MA$zAa5trPDWNwAEQ3ULfg85S826HmCQhOaP5Y88uP9xs8	Super	Admin	bma.dsdstrategy@gmail.com	\N	\N	\N	369	\N	\N	\N	t	\N	\N	t	\N	\N	2026-07-31 04:32:25.548666	2026-07-31 04:32:25.548666
+01a10b3c-1f88-74ce-89bb-2ee7ffcea3c8	analysis-test	$argon2id$v=19$m=65536,t=2,p=1$w+QdGP/OiOIgoLOtvRn5FRUL+CF1RqG/670HXSel9gs$SZigxwimB47yTB40op7CdCWBvYnn2pTd6JAQ+Q+QUKQ	ทดสอบ	ผู้วิเคราะห์	analysis@test-bangkok.go.th	นักวิชาการคอมพิวเตอร์	ชำนาญการ	\N	369	0812345678	022251535	1530	t	\N	\N	t	\N	\N	2026-10-05 08:44:12.039855	2026-10-05 08:45:41.883
+01a10b3d-043d-750d-b06d-d716f3417a2b	admin-test	$argon2id$v=19$m=65536,t=2,p=1$UCHM5wE4reGyjyO/nOc3dbdA9L9Mz4b3YKl2sjyRjeY$bBdixbtWrkqt5ZY492/GAtAOqohG5RhIzWp04K26IIU	ทดสอบ	ผู้ดูแล คกก	admin@test-bangkok.go.th	นักวิชาการคอมพิวเตอร์	ชำนาญการพิเศษ	หัวหน้ากลุ่มงานยุทธศาสตร์ดิจิทัล	369	0812345678	022251535	1530	t	\N	\N	t	\N	\N	2026-10-05 08:45:10.588452	2026-10-06 09:17:09.443
+01a180cd-6074-71de-b93e-1c203fae521c	secretary-test	$argon2id$v=19$m=65536,t=2,p=1$P9E09lXArr3yAiVuyzUucAQGXDrqp9Dpu0H0oyJRhHo$rn7C1La9rSb5U2FhAqXByWOq5WhYv9f+5O5ZnwoclOg	ทดสอบ	เลขานุการ คกก	secretary@test-bangkok.go.th	นักวิชาการคอมพิวเตอร์	ชำนาญการ		369	0812345678	022251535	1530	t	\N	\N	t	\N	\N	2026-10-28 04:38:25.650413	2026-10-28 04:38:49.377
+01a10b32-bf51-7239-832a-c2b765e1ef06	user-test	$argon2id$v=19$m=65536,t=2,p=1$uS5L7nLwcMgjH4bBSmf3VSR5/tdIvM0L711JtL8KYUM$EodrOolJs3oy9eD95J6U9pZcjLazwLZUUsPZIZJjvpk	ทดสอบ	ผู้ใช้งาน	user@test-bangkok.go.th	นักจัดการงานทั่วไป	ชำนาญการพิเศษ	\N	369	0812345678	022251535	1530	t	\N	\N	t	\N	\N	2026-10-05 08:33:57.584022	2026-10-30 02:59:01.448
+01a18ba6-70df-73de-8ed2-0bc47048c4d6	pisitpon	$argon2id$v=19$m=65536,t=2,p=1$6X4mfRigGGxMIkSf4pDsy4k/2khL58U+usOu74wRBZ4$iKUGYjgOs9h3TUWjAzBv/Ssmlpwtd4bPaxE02GAEIXA	พิสิฐพล	ณิทธิมนพันธุ์	pisitpon@bangkok.go.th	นักวิชาการคอมพิวเตอร์	ชำนาญการ		369	0897371193	022251535	1530	t	df1417ab886a43257cc9cb01b5375a94dc52bae97893e2a699a879c8faca9b6f	2026-10-30 08:04:32.599	t	\N	\N	2026-10-30 07:11:43.32361	2026-10-30 07:34:32.6
+\.
 
 
 --
--- TOC entry 4027 (class 0 OID 0)
--- Dependencies: 219
+-- Data for Name: workflow_audit_events; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.workflow_audit_events (id, actor_id, action, entity_type, entity_id, reason, metadata, created_at) FROM stdin;
+\.
+
+
+--
+-- Name: agenda_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.agenda_types_id_seq', 1, false);
+
+
+--
 -- Name: departments_department_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2074,8 +2512,6 @@ SELECT pg_catalog.setval('public.departments_department_id_seq', 79, true);
 
 
 --
--- TOC entry 4028 (class 0 OID 0)
--- Dependencies: 221
 -- Name: deputy_governors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2083,8 +2519,6 @@ SELECT pg_catalog.setval('public.deputy_governors_id_seq', 1, false);
 
 
 --
--- TOC entry 4029 (class 0 OID 0)
--- Dependencies: 223
 -- Name: divisions_division_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2092,8 +2526,6 @@ SELECT pg_catalog.setval('public.divisions_division_id_seq', 371, true);
 
 
 --
--- TOC entry 4030 (class 0 OID 0)
--- Dependencies: 225
 -- Name: four_quadrants_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2101,8 +2533,6 @@ SELECT pg_catalog.setval('public.four_quadrants_id_seq', 1, false);
 
 
 --
--- TOC entry 4031 (class 0 OID 0)
--- Dependencies: 227
 -- Name: meeting_attachment_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2110,8 +2540,6 @@ SELECT pg_catalog.setval('public.meeting_attachment_types_id_seq', 1, false);
 
 
 --
--- TOC entry 4032 (class 0 OID 0)
--- Dependencies: 229
 -- Name: meeting_statuses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2119,8 +2547,6 @@ SELECT pg_catalog.setval('public.meeting_statuses_id_seq', 5, true);
 
 
 --
--- TOC entry 4033 (class 0 OID 0)
--- Dependencies: 231
 -- Name: meeting_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2128,17 +2554,20 @@ SELECT pg_catalog.setval('public.meeting_types_id_seq', 1, false);
 
 
 --
--- TOC entry 4034 (class 0 OID 0)
--- Dependencies: 233
+-- Name: policy_governor_policy_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.policy_governor_policy_id_seq', 522, true);
+
+
+--
 -- Name: project_attachment_types_doc_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.project_attachment_types_doc_type_id_seq', 12, true);
+SELECT pg_catalog.setval('public.project_attachment_types_doc_type_id_seq', 13, true);
 
 
 --
--- TOC entry 4035 (class 0 OID 0)
--- Dependencies: 235
 -- Name: project_statuses_project_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2146,8 +2575,6 @@ SELECT pg_catalog.setval('public.project_statuses_project_status_id_seq', 16, tr
 
 
 --
--- TOC entry 4036 (class 0 OID 0)
--- Dependencies: 237
 -- Name: project_types_project_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2155,8 +2582,6 @@ SELECT pg_catalog.setval('public.project_types_project_type_id_seq', 1, false);
 
 
 --
--- TOC entry 4037 (class 0 OID 0)
--- Dependencies: 239
 -- Name: resolution_statuses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2164,8 +2589,6 @@ SELECT pg_catalog.setval('public.resolution_statuses_id_seq', 1, false);
 
 
 --
--- TOC entry 4038 (class 0 OID 0)
--- Dependencies: 242
 -- Name: roles_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -2173,7 +2596,6 @@ SELECT pg_catalog.setval('public.roles_role_id_seq', 1, false);
 
 
 --
--- TOC entry 3575 (class 2606 OID 17222)
 -- Name: agenda_types agenda_types_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2182,7 +2604,6 @@ ALTER TABLE ONLY public.agenda_types
 
 
 --
--- TOC entry 3577 (class 2606 OID 16485)
 -- Name: agenda_types agenda_types_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2191,7 +2612,6 @@ ALTER TABLE ONLY public.agenda_types
 
 
 --
--- TOC entry 3579 (class 2606 OID 16483)
 -- Name: agenda_types agenda_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2200,7 +2620,6 @@ ALTER TABLE ONLY public.agenda_types
 
 
 --
--- TOC entry 3713 (class 2606 OID 16806)
 -- Name: agendas agendas_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2209,7 +2628,6 @@ ALTER TABLE ONLY public.agendas
 
 
 --
--- TOC entry 3582 (class 2606 OID 17114)
 -- Name: departments departments_department_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2218,7 +2636,6 @@ ALTER TABLE ONLY public.departments
 
 
 --
--- TOC entry 3584 (class 2606 OID 16494)
 -- Name: departments departments_department_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2227,7 +2644,6 @@ ALTER TABLE ONLY public.departments
 
 
 --
--- TOC entry 3586 (class 2606 OID 16492)
 -- Name: departments departments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2236,7 +2652,6 @@ ALTER TABLE ONLY public.departments
 
 
 --
--- TOC entry 3588 (class 2606 OID 16501)
 -- Name: deputy_governors deputy_governors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2245,7 +2660,6 @@ ALTER TABLE ONLY public.deputy_governors
 
 
 --
--- TOC entry 3592 (class 2606 OID 17116)
 -- Name: divisions divisions_division_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2254,7 +2668,6 @@ ALTER TABLE ONLY public.divisions
 
 
 --
--- TOC entry 3594 (class 2606 OID 16508)
 -- Name: divisions divisions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2263,7 +2676,6 @@ ALTER TABLE ONLY public.divisions
 
 
 --
--- TOC entry 3596 (class 2606 OID 16517)
 -- Name: four_quadrants four_quadrants_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2272,7 +2684,6 @@ ALTER TABLE ONLY public.four_quadrants
 
 
 --
--- TOC entry 3598 (class 2606 OID 17224)
 -- Name: meeting_attachment_types meeting_attachment_types_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2281,7 +2692,6 @@ ALTER TABLE ONLY public.meeting_attachment_types
 
 
 --
--- TOC entry 3600 (class 2606 OID 16526)
 -- Name: meeting_attachment_types meeting_attachment_types_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2290,7 +2700,6 @@ ALTER TABLE ONLY public.meeting_attachment_types
 
 
 --
--- TOC entry 3602 (class 2606 OID 16524)
 -- Name: meeting_attachment_types meeting_attachment_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2299,7 +2708,6 @@ ALTER TABLE ONLY public.meeting_attachment_types
 
 
 --
--- TOC entry 3717 (class 2606 OID 16814)
 -- Name: meeting_attachments meeting_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2308,7 +2716,6 @@ ALTER TABLE ONLY public.meeting_attachments
 
 
 --
--- TOC entry 3732 (class 2606 OID 17151)
 -- Name: meeting_resolution_revisions meeting_resolution_revisions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2317,7 +2724,6 @@ ALTER TABLE ONLY public.meeting_resolution_revisions
 
 
 --
--- TOC entry 3604 (class 2606 OID 17226)
 -- Name: meeting_statuses meeting_statuses_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2326,7 +2732,6 @@ ALTER TABLE ONLY public.meeting_statuses
 
 
 --
--- TOC entry 3606 (class 2606 OID 16535)
 -- Name: meeting_statuses meeting_statuses_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2335,7 +2740,6 @@ ALTER TABLE ONLY public.meeting_statuses
 
 
 --
--- TOC entry 3608 (class 2606 OID 16533)
 -- Name: meeting_statuses meeting_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2344,7 +2748,6 @@ ALTER TABLE ONLY public.meeting_statuses
 
 
 --
--- TOC entry 3610 (class 2606 OID 17228)
 -- Name: meeting_types meeting_types_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2353,7 +2756,6 @@ ALTER TABLE ONLY public.meeting_types
 
 
 --
--- TOC entry 3612 (class 2606 OID 16544)
 -- Name: meeting_types meeting_types_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2362,7 +2764,6 @@ ALTER TABLE ONLY public.meeting_types
 
 
 --
--- TOC entry 3614 (class 2606 OID 16542)
 -- Name: meeting_types meeting_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2371,7 +2772,6 @@ ALTER TABLE ONLY public.meeting_types
 
 
 --
--- TOC entry 3719 (class 2606 OID 16823)
 -- Name: meetings meetings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2380,7 +2780,22 @@ ALTER TABLE ONLY public.meetings
 
 
 --
--- TOC entry 3616 (class 2606 OID 16553)
+-- Name: policy_governor policy_governor_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.policy_governor
+    ADD CONSTRAINT policy_governor_pkey PRIMARY KEY (policy_id);
+
+
+--
+-- Name: policy_governor policy_governor_policy_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.policy_governor
+    ADD CONSTRAINT policy_governor_policy_code_unique UNIQUE (policy_code);
+
+
+--
 -- Name: project_attachment_types project_attachment_types_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2389,7 +2804,6 @@ ALTER TABLE ONLY public.project_attachment_types
 
 
 --
--- TOC entry 3618 (class 2606 OID 16555)
 -- Name: project_attachment_types project_attachment_types_doc_type_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2398,7 +2812,6 @@ ALTER TABLE ONLY public.project_attachment_types
 
 
 --
--- TOC entry 3620 (class 2606 OID 16551)
 -- Name: project_attachment_types project_attachment_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2407,7 +2820,6 @@ ALTER TABLE ONLY public.project_attachment_types
 
 
 --
--- TOC entry 3660 (class 2606 OID 16639)
 -- Name: project_attachments project_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2416,7 +2828,6 @@ ALTER TABLE ONLY public.project_attachments
 
 
 --
--- TOC entry 3662 (class 2606 OID 16645)
 -- Name: project_sequences project_sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2425,7 +2836,6 @@ ALTER TABLE ONLY public.project_sequences
 
 
 --
--- TOC entry 3729 (class 2606 OID 16843)
 -- Name: project_status_logs project_status_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2434,7 +2844,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3622 (class 2606 OID 16564)
 -- Name: project_statuses project_statuses_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2443,7 +2852,6 @@ ALTER TABLE ONLY public.project_statuses
 
 
 --
--- TOC entry 3624 (class 2606 OID 16562)
 -- Name: project_statuses project_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2452,7 +2860,6 @@ ALTER TABLE ONLY public.project_statuses
 
 
 --
--- TOC entry 3626 (class 2606 OID 16566)
 -- Name: project_statuses project_statuses_project_status_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2461,7 +2868,6 @@ ALTER TABLE ONLY public.project_statuses
 
 
 --
--- TOC entry 3628 (class 2606 OID 16575)
 -- Name: project_types project_types_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2470,7 +2876,6 @@ ALTER TABLE ONLY public.project_types
 
 
 --
--- TOC entry 3630 (class 2606 OID 16573)
 -- Name: project_types project_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2479,7 +2884,6 @@ ALTER TABLE ONLY public.project_types
 
 
 --
--- TOC entry 3632 (class 2606 OID 16577)
 -- Name: project_types project_types_project_type_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2488,7 +2892,6 @@ ALTER TABLE ONLY public.project_types
 
 
 --
--- TOC entry 3665 (class 2606 OID 16660)
 -- Name: projects projects_external_task_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2497,7 +2900,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3667 (class 2606 OID 16656)
 -- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2506,7 +2908,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3669 (class 2606 OID 16658)
 -- Name: projects projects_project_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2515,7 +2916,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3671 (class 2606 OID 16662)
 -- Name: projects projects_public_token_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2524,7 +2924,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3678 (class 2606 OID 16679)
 -- Name: proposal_budgets proposal_budgets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2533,7 +2932,6 @@ ALTER TABLE ONLY public.proposal_budgets
 
 
 --
--- TOC entry 3680 (class 2606 OID 16686)
 -- Name: proposal_cloud_requests proposal_cloud_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2542,7 +2940,6 @@ ALTER TABLE ONLY public.proposal_cloud_requests
 
 
 --
--- TOC entry 3682 (class 2606 OID 16698)
 -- Name: proposal_cloud_vms proposal_cloud_vms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2551,7 +2948,6 @@ ALTER TABLE ONLY public.proposal_cloud_vms
 
 
 --
--- TOC entry 3674 (class 2606 OID 16672)
 -- Name: proposal_drafts proposal_drafts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2560,7 +2956,6 @@ ALTER TABLE ONLY public.proposal_drafts
 
 
 --
--- TOC entry 3676 (class 2606 OID 16674)
 -- Name: proposal_drafts proposal_drafts_project_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2569,7 +2964,6 @@ ALTER TABLE ONLY public.proposal_drafts
 
 
 --
--- TOC entry 3684 (class 2606 OID 16705)
 -- Name: proposal_existing_equipments proposal_existing_equipments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2578,7 +2972,6 @@ ALTER TABLE ONLY public.proposal_existing_equipments
 
 
 --
--- TOC entry 3686 (class 2606 OID 16712)
 -- Name: proposal_hardware_costs proposal_hardware_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2587,7 +2980,6 @@ ALTER TABLE ONLY public.proposal_hardware_costs
 
 
 --
--- TOC entry 3688 (class 2606 OID 16719)
 -- Name: proposal_ict_personnel proposal_ict_personnel_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2596,7 +2988,6 @@ ALTER TABLE ONLY public.proposal_ict_personnel
 
 
 --
--- TOC entry 3690 (class 2606 OID 16724)
 -- Name: proposal_manpower proposal_manpower_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2605,7 +2996,6 @@ ALTER TABLE ONLY public.proposal_manpower
 
 
 --
--- TOC entry 3692 (class 2606 OID 16731)
 -- Name: proposal_other_costs proposal_other_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2614,7 +3004,6 @@ ALTER TABLE ONLY public.proposal_other_costs
 
 
 --
--- TOC entry 3694 (class 2606 OID 16738)
 -- Name: proposal_personnel_costs proposal_personnel_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2623,7 +3012,6 @@ ALTER TABLE ONLY public.proposal_personnel_costs
 
 
 --
--- TOC entry 3696 (class 2606 OID 16745)
 -- Name: proposal_personnel_responsibilities proposal_personnel_responsibilities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2632,7 +3020,6 @@ ALTER TABLE ONLY public.proposal_personnel_responsibilities
 
 
 --
--- TOC entry 3698 (class 2606 OID 16752)
 -- Name: proposal_related_projects proposal_related_projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2641,7 +3028,6 @@ ALTER TABLE ONLY public.proposal_related_projects
 
 
 --
--- TOC entry 3700 (class 2606 OID 16759)
 -- Name: proposal_software_costs proposal_software_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2650,7 +3036,6 @@ ALTER TABLE ONLY public.proposal_software_costs
 
 
 --
--- TOC entry 3702 (class 2606 OID 16764)
 -- Name: proposal_training_food_costs proposal_training_food_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2659,7 +3044,6 @@ ALTER TABLE ONLY public.proposal_training_food_costs
 
 
 --
--- TOC entry 3704 (class 2606 OID 16771)
 -- Name: proposal_training_speaker_costs proposal_training_speaker_costs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2668,7 +3052,6 @@ ALTER TABLE ONLY public.proposal_training_speaker_costs
 
 
 --
--- TOC entry 3706 (class 2606 OID 16779)
 -- Name: proposal_trainings proposal_trainings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2677,7 +3060,6 @@ ALTER TABLE ONLY public.proposal_trainings
 
 
 --
--- TOC entry 3708 (class 2606 OID 16795)
 -- Name: proposals proposals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2686,7 +3068,6 @@ ALTER TABLE ONLY public.proposals
 
 
 --
--- TOC entry 3634 (class 2606 OID 17230)
 -- Name: resolution_statuses resolution_statuses_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2695,7 +3076,6 @@ ALTER TABLE ONLY public.resolution_statuses
 
 
 --
--- TOC entry 3636 (class 2606 OID 16586)
 -- Name: resolution_statuses resolution_statuses_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2704,7 +3084,6 @@ ALTER TABLE ONLY public.resolution_statuses
 
 
 --
--- TOC entry 3638 (class 2606 OID 16584)
 -- Name: resolution_statuses resolution_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2713,7 +3092,6 @@ ALTER TABLE ONLY public.resolution_statuses
 
 
 --
--- TOC entry 3722 (class 2606 OID 16834)
 -- Name: resolutions resolutions_agenda_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2722,7 +3100,6 @@ ALTER TABLE ONLY public.resolutions
 
 
 --
--- TOC entry 3726 (class 2606 OID 16832)
 -- Name: resolutions resolutions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2731,7 +3108,6 @@ ALTER TABLE ONLY public.resolutions
 
 
 --
--- TOC entry 3640 (class 2606 OID 16592)
 -- Name: role_user role_user_user_id_role_id_pk; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2740,7 +3116,6 @@ ALTER TABLE ONLY public.role_user
 
 
 --
--- TOC entry 3642 (class 2606 OID 16601)
 -- Name: roles roles_code_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2749,7 +3124,6 @@ ALTER TABLE ONLY public.roles
 
 
 --
--- TOC entry 3644 (class 2606 OID 16599)
 -- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2758,7 +3132,6 @@ ALTER TABLE ONLY public.roles
 
 
 --
--- TOC entry 3646 (class 2606 OID 16603)
 -- Name: roles roles_role_name_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2767,7 +3140,6 @@ ALTER TABLE ONLY public.roles
 
 
 --
--- TOC entry 3648 (class 2606 OID 16612)
 -- Name: user_login_history user_login_history_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2776,7 +3148,6 @@ ALTER TABLE ONLY public.user_login_history
 
 
 --
--- TOC entry 3650 (class 2606 OID 16627)
 -- Name: users users_email_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2785,7 +3156,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3652 (class 2606 OID 16623)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2794,7 +3164,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3654 (class 2606 OID 16629)
 -- Name: users users_reset_password_token_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2803,7 +3172,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3656 (class 2606 OID 16625)
 -- Name: users users_username_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2812,7 +3180,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3658 (class 2606 OID 16631)
 -- Name: users users_verification_token_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2821,7 +3188,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3739 (class 2606 OID 17160)
 -- Name: workflow_audit_events workflow_audit_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2830,7 +3196,6 @@ ALTER TABLE ONLY public.workflow_audit_events
 
 
 --
--- TOC entry 3710 (class 1259 OID 17232)
 -- Name: agendas_meeting_project_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2838,7 +3203,6 @@ CREATE UNIQUE INDEX agendas_meeting_project_idx ON public.agendas USING btree (m
 
 
 --
--- TOC entry 3711 (class 1259 OID 17231)
 -- Name: agendas_meeting_sort_order_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2846,7 +3210,6 @@ CREATE UNIQUE INDEX agendas_meeting_sort_order_idx ON public.agendas USING btree
 
 
 --
--- TOC entry 3714 (class 1259 OID 17215)
 -- Name: agendas_project_meeting_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2854,7 +3217,6 @@ CREATE INDEX agendas_project_meeting_idx ON public.agendas USING btree (project_
 
 
 --
--- TOC entry 3580 (class 1259 OID 17111)
 -- Name: departments_department_code_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2862,7 +3224,6 @@ CREATE INDEX departments_department_code_idx ON public.departments USING btree (
 
 
 --
--- TOC entry 3589 (class 1259 OID 17110)
 -- Name: divisions_department_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2870,7 +3231,6 @@ CREATE INDEX divisions_department_id_idx ON public.divisions USING btree (depart
 
 
 --
--- TOC entry 3590 (class 1259 OID 17112)
 -- Name: divisions_division_code_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2878,7 +3238,6 @@ CREATE INDEX divisions_division_code_idx ON public.divisions USING btree (divisi
 
 
 --
--- TOC entry 3715 (class 1259 OID 17216)
 -- Name: meeting_attachments_meeting_document_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2886,7 +3245,6 @@ CREATE INDEX meeting_attachments_meeting_document_idx ON public.meeting_attachme
 
 
 --
--- TOC entry 3733 (class 1259 OID 17242)
 -- Name: meeting_resolution_revisions_project_changed_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2894,7 +3252,6 @@ CREATE INDEX meeting_resolution_revisions_project_changed_idx ON public.meeting_
 
 
 --
--- TOC entry 3734 (class 1259 OID 17196)
 -- Name: meeting_resolution_revisions_project_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2902,7 +3259,6 @@ CREATE INDEX meeting_resolution_revisions_project_idx ON public.meeting_resoluti
 
 
 --
--- TOC entry 3735 (class 1259 OID 17195)
 -- Name: meeting_resolution_revisions_resolution_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2910,7 +3266,6 @@ CREATE INDEX meeting_resolution_revisions_resolution_idx ON public.meeting_resol
 
 
 --
--- TOC entry 3720 (class 1259 OID 17217)
 -- Name: meetings_workflow_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2918,7 +3273,6 @@ CREATE INDEX meetings_workflow_idx ON public.meetings USING btree (meeting_type_
 
 
 --
--- TOC entry 3727 (class 1259 OID 17220)
 -- Name: project_status_logs_meeting_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2926,7 +3280,6 @@ CREATE INDEX project_status_logs_meeting_idx ON public.project_status_logs USING
 
 
 --
--- TOC entry 3730 (class 1259 OID 17219)
 -- Name: project_status_logs_project_status_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2934,7 +3287,6 @@ CREATE INDEX project_status_logs_project_status_idx ON public.project_status_log
 
 
 --
--- TOC entry 3663 (class 1259 OID 17239)
 -- Name: projects_analyst_status_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2942,7 +3294,6 @@ CREATE INDEX projects_analyst_status_idx ON public.projects USING btree (analyst
 
 
 --
--- TOC entry 3672 (class 1259 OID 17238)
 -- Name: projects_status_budget_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2950,7 +3301,6 @@ CREATE INDEX projects_status_budget_idx ON public.projects USING btree (project_
 
 
 --
--- TOC entry 3709 (class 1259 OID 17240)
 -- Name: proposals_project_status_submitted_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2958,7 +3308,6 @@ CREATE INDEX proposals_project_status_submitted_idx ON public.proposals USING bt
 
 
 --
--- TOC entry 3723 (class 1259 OID 17218)
 -- Name: resolutions_agenda_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2966,7 +3315,6 @@ CREATE INDEX resolutions_agenda_idx ON public.resolutions USING btree (agenda_id
 
 
 --
--- TOC entry 3724 (class 1259 OID 17241)
 -- Name: resolutions_governed_proposal_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2974,7 +3322,6 @@ CREATE INDEX resolutions_governed_proposal_idx ON public.resolutions USING btree
 
 
 --
--- TOC entry 3736 (class 1259 OID 17198)
 -- Name: workflow_audit_events_actor_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2982,7 +3329,6 @@ CREATE INDEX workflow_audit_events_actor_idx ON public.workflow_audit_events USI
 
 
 --
--- TOC entry 3737 (class 1259 OID 17197)
 -- Name: workflow_audit_events_entity_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2990,7 +3336,6 @@ CREATE INDEX workflow_audit_events_entity_idx ON public.workflow_audit_events US
 
 
 --
--- TOC entry 3775 (class 2606 OID 17029)
 -- Name: agendas agendas_agenda_type_id_agenda_types_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2999,7 +3344,6 @@ ALTER TABLE ONLY public.agendas
 
 
 --
--- TOC entry 3776 (class 2606 OID 17019)
 -- Name: agendas agendas_meeting_id_meetings_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3008,7 +3352,6 @@ ALTER TABLE ONLY public.agendas
 
 
 --
--- TOC entry 3777 (class 2606 OID 17024)
 -- Name: agendas agendas_project_id_projects_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3017,7 +3360,6 @@ ALTER TABLE ONLY public.agendas
 
 
 --
--- TOC entry 3740 (class 2606 OID 16844)
 -- Name: divisions divisions_department_id_departments_department_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3026,7 +3368,6 @@ ALTER TABLE ONLY public.divisions
 
 
 --
--- TOC entry 3778 (class 2606 OID 17039)
 -- Name: meeting_attachments meeting_attachments_agenda_id_agendas_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3035,7 +3376,6 @@ ALTER TABLE ONLY public.meeting_attachments
 
 
 --
--- TOC entry 3779 (class 2606 OID 17044)
 -- Name: meeting_attachments meeting_attachments_meeting_doc_type_id_meeting_attachment_type; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3044,7 +3384,6 @@ ALTER TABLE ONLY public.meeting_attachments
 
 
 --
--- TOC entry 3780 (class 2606 OID 17034)
 -- Name: meeting_attachments meeting_attachments_meeting_id_meetings_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3053,7 +3392,6 @@ ALTER TABLE ONLY public.meeting_attachments
 
 
 --
--- TOC entry 3781 (class 2606 OID 17049)
 -- Name: meeting_attachments meeting_attachments_uploaded_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3062,7 +3400,6 @@ ALTER TABLE ONLY public.meeting_attachments
 
 
 --
--- TOC entry 3797 (class 2606 OID 17185)
 -- Name: meeting_resolution_revisions meeting_resolution_revisions_changed_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3071,7 +3408,6 @@ ALTER TABLE ONLY public.meeting_resolution_revisions
 
 
 --
--- TOC entry 3798 (class 2606 OID 17180)
 -- Name: meeting_resolution_revisions meeting_resolution_revisions_new_project_status_id_project_stat; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3080,7 +3416,6 @@ ALTER TABLE ONLY public.meeting_resolution_revisions
 
 
 --
--- TOC entry 3799 (class 2606 OID 17175)
 -- Name: meeting_resolution_revisions meeting_resolution_revisions_previous_project_status_id_project; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3089,7 +3424,6 @@ ALTER TABLE ONLY public.meeting_resolution_revisions
 
 
 --
--- TOC entry 3800 (class 2606 OID 17170)
 -- Name: meeting_resolution_revisions meeting_resolution_revisions_project_id_projects_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3098,7 +3432,6 @@ ALTER TABLE ONLY public.meeting_resolution_revisions
 
 
 --
--- TOC entry 3801 (class 2606 OID 17165)
 -- Name: meeting_resolution_revisions meeting_resolution_revisions_resolution_id_resolutions_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3107,7 +3440,6 @@ ALTER TABLE ONLY public.meeting_resolution_revisions
 
 
 --
--- TOC entry 3782 (class 2606 OID 17064)
 -- Name: meetings meetings_created_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3116,7 +3448,6 @@ ALTER TABLE ONLY public.meetings
 
 
 --
--- TOC entry 3783 (class 2606 OID 17059)
 -- Name: meetings meetings_meeting_status_id_meeting_statuses_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3125,7 +3456,6 @@ ALTER TABLE ONLY public.meetings
 
 
 --
--- TOC entry 3784 (class 2606 OID 17054)
 -- Name: meetings meetings_meeting_type_id_meeting_types_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3134,7 +3464,6 @@ ALTER TABLE ONLY public.meetings
 
 
 --
--- TOC entry 3785 (class 2606 OID 17069)
 -- Name: meetings meetings_updated_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3143,7 +3472,6 @@ ALTER TABLE ONLY public.meetings
 
 
 --
--- TOC entry 3746 (class 2606 OID 16879)
 -- Name: project_attachments project_attachments_doc_type_id_project_attachment_types_doc_ty; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3152,7 +3480,6 @@ ALTER TABLE ONLY public.project_attachments
 
 
 --
--- TOC entry 3747 (class 2606 OID 16874)
 -- Name: project_attachments project_attachments_project_id_projects_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3161,7 +3488,6 @@ ALTER TABLE ONLY public.project_attachments
 
 
 --
--- TOC entry 3748 (class 2606 OID 16884)
 -- Name: project_attachments project_attachments_uploaded_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3170,7 +3496,6 @@ ALTER TABLE ONLY public.project_attachments
 
 
 --
--- TOC entry 3790 (class 2606 OID 17204)
 -- Name: project_status_logs project_status_logs_agenda_id_agendas_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3179,7 +3504,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3791 (class 2606 OID 17199)
 -- Name: project_status_logs project_status_logs_meeting_id_meetings_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3188,7 +3512,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3792 (class 2606 OID 17104)
 -- Name: project_status_logs project_status_logs_new_status_id_project_statuses_project_stat; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3197,7 +3520,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3793 (class 2606 OID 17099)
 -- Name: project_status_logs project_status_logs_old_status_id_project_statuses_project_stat; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3206,7 +3528,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3794 (class 2606 OID 17089)
 -- Name: project_status_logs project_status_logs_project_id_projects_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3215,7 +3536,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3795 (class 2606 OID 17209)
 -- Name: project_status_logs project_status_logs_resolution_id_resolutions_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3224,7 +3544,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3796 (class 2606 OID 17094)
 -- Name: project_status_logs project_status_logs_user_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3233,7 +3552,6 @@ ALTER TABLE ONLY public.project_status_logs
 
 
 --
--- TOC entry 3749 (class 2606 OID 16914)
 -- Name: projects projects_deputy_governor_id_deputy_governors_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3242,7 +3560,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3750 (class 2606 OID 16894)
 -- Name: projects projects_division_id_divisions_division_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3251,7 +3568,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3751 (class 2606 OID 16909)
 -- Name: projects projects_four_quadrants_id_four_quadrants_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3260,7 +3576,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3752 (class 2606 OID 16899)
 -- Name: projects projects_project_status_id_project_statuses_project_status_id_f; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3269,7 +3584,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3753 (class 2606 OID 16904)
 -- Name: projects projects_project_type_id_project_types_project_type_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3278,7 +3592,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3754 (class 2606 OID 16889)
 -- Name: projects projects_user_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3287,7 +3600,6 @@ ALTER TABLE ONLY public.projects
 
 
 --
--- TOC entry 3757 (class 2606 OID 16929)
 -- Name: proposal_budgets proposal_budgets_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3296,7 +3608,6 @@ ALTER TABLE ONLY public.proposal_budgets
 
 
 --
--- TOC entry 3758 (class 2606 OID 16934)
 -- Name: proposal_cloud_requests proposal_cloud_requests_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3305,7 +3616,6 @@ ALTER TABLE ONLY public.proposal_cloud_requests
 
 
 --
--- TOC entry 3759 (class 2606 OID 16939)
 -- Name: proposal_cloud_vms proposal_cloud_vms_cloud_request_id_proposal_cloud_requests_id_; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3314,7 +3624,6 @@ ALTER TABLE ONLY public.proposal_cloud_vms
 
 
 --
--- TOC entry 3755 (class 2606 OID 16919)
 -- Name: proposal_drafts proposal_drafts_project_id_projects_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3323,7 +3632,6 @@ ALTER TABLE ONLY public.proposal_drafts
 
 
 --
--- TOC entry 3756 (class 2606 OID 16924)
 -- Name: proposal_drafts proposal_drafts_user_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3332,7 +3640,6 @@ ALTER TABLE ONLY public.proposal_drafts
 
 
 --
--- TOC entry 3760 (class 2606 OID 16944)
 -- Name: proposal_existing_equipments proposal_existing_equipments_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3341,7 +3648,6 @@ ALTER TABLE ONLY public.proposal_existing_equipments
 
 
 --
--- TOC entry 3761 (class 2606 OID 16949)
 -- Name: proposal_hardware_costs proposal_hardware_costs_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3350,7 +3656,6 @@ ALTER TABLE ONLY public.proposal_hardware_costs
 
 
 --
--- TOC entry 3762 (class 2606 OID 16954)
 -- Name: proposal_ict_personnel proposal_ict_personnel_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3359,7 +3664,6 @@ ALTER TABLE ONLY public.proposal_ict_personnel
 
 
 --
--- TOC entry 3763 (class 2606 OID 16959)
 -- Name: proposal_manpower proposal_manpower_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3368,7 +3672,6 @@ ALTER TABLE ONLY public.proposal_manpower
 
 
 --
--- TOC entry 3764 (class 2606 OID 16964)
 -- Name: proposal_other_costs proposal_other_costs_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3377,7 +3680,6 @@ ALTER TABLE ONLY public.proposal_other_costs
 
 
 --
--- TOC entry 3765 (class 2606 OID 16969)
 -- Name: proposal_personnel_costs proposal_personnel_costs_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3386,7 +3688,6 @@ ALTER TABLE ONLY public.proposal_personnel_costs
 
 
 --
--- TOC entry 3766 (class 2606 OID 16974)
 -- Name: proposal_personnel_responsibilities proposal_personnel_responsibilities_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3395,7 +3696,6 @@ ALTER TABLE ONLY public.proposal_personnel_responsibilities
 
 
 --
--- TOC entry 3767 (class 2606 OID 16979)
 -- Name: proposal_related_projects proposal_related_projects_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3404,7 +3704,6 @@ ALTER TABLE ONLY public.proposal_related_projects
 
 
 --
--- TOC entry 3768 (class 2606 OID 16984)
 -- Name: proposal_software_costs proposal_software_costs_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3413,7 +3712,6 @@ ALTER TABLE ONLY public.proposal_software_costs
 
 
 --
--- TOC entry 3769 (class 2606 OID 16989)
 -- Name: proposal_training_food_costs proposal_training_food_costs_training_id_proposal_trainings_id_; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3422,7 +3720,6 @@ ALTER TABLE ONLY public.proposal_training_food_costs
 
 
 --
--- TOC entry 3770 (class 2606 OID 16994)
 -- Name: proposal_training_speaker_costs proposal_training_speaker_costs_training_id_proposal_trainings_; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3431,7 +3728,6 @@ ALTER TABLE ONLY public.proposal_training_speaker_costs
 
 
 --
--- TOC entry 3771 (class 2606 OID 16999)
 -- Name: proposal_trainings proposal_trainings_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3440,7 +3736,22 @@ ALTER TABLE ONLY public.proposal_trainings
 
 
 --
--- TOC entry 3772 (class 2606 OID 17004)
+-- Name: proposals proposals_department_id_departments_department_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_department_id_departments_department_id_fk FOREIGN KEY (department_id) REFERENCES public.departments(department_id);
+
+
+--
+-- Name: proposals proposals_division_id_divisions_division_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposals
+    ADD CONSTRAINT proposals_division_id_divisions_division_id_fk FOREIGN KEY (division_id) REFERENCES public.divisions(division_id);
+
+
+--
 -- Name: proposals proposals_project_id_projects_project_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3449,7 +3760,6 @@ ALTER TABLE ONLY public.proposals
 
 
 --
--- TOC entry 3773 (class 2606 OID 17014)
 -- Name: proposals proposals_updated_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3458,7 +3768,6 @@ ALTER TABLE ONLY public.proposals
 
 
 --
--- TOC entry 3774 (class 2606 OID 17009)
 -- Name: proposals proposals_user_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3467,7 +3776,6 @@ ALTER TABLE ONLY public.proposals
 
 
 --
--- TOC entry 3786 (class 2606 OID 17074)
 -- Name: resolutions resolutions_agenda_id_agendas_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3476,7 +3784,6 @@ ALTER TABLE ONLY public.resolutions
 
 
 --
--- TOC entry 3787 (class 2606 OID 17233)
 -- Name: resolutions resolutions_governed_proposal_id_proposals_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3485,7 +3792,6 @@ ALTER TABLE ONLY public.resolutions
 
 
 --
--- TOC entry 3788 (class 2606 OID 17084)
 -- Name: resolutions resolutions_recorded_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3494,7 +3800,6 @@ ALTER TABLE ONLY public.resolutions
 
 
 --
--- TOC entry 3789 (class 2606 OID 17079)
 -- Name: resolutions resolutions_resolution_status_id_resolution_statuses_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3503,7 +3808,6 @@ ALTER TABLE ONLY public.resolutions
 
 
 --
--- TOC entry 3741 (class 2606 OID 16859)
 -- Name: role_user role_user_assigned_by_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3512,7 +3816,6 @@ ALTER TABLE ONLY public.role_user
 
 
 --
--- TOC entry 3742 (class 2606 OID 16854)
 -- Name: role_user role_user_role_id_roles_role_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3521,7 +3824,6 @@ ALTER TABLE ONLY public.role_user
 
 
 --
--- TOC entry 3743 (class 2606 OID 16849)
 -- Name: role_user role_user_user_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3530,7 +3832,6 @@ ALTER TABLE ONLY public.role_user
 
 
 --
--- TOC entry 3744 (class 2606 OID 16864)
 -- Name: user_login_history user_login_history_user_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3539,7 +3840,6 @@ ALTER TABLE ONLY public.user_login_history
 
 
 --
--- TOC entry 3745 (class 2606 OID 16869)
 -- Name: users users_division_id_divisions_division_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3548,7 +3848,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3802 (class 2606 OID 17190)
 -- Name: workflow_audit_events workflow_audit_events_actor_id_users_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3556,9 +3855,9 @@ ALTER TABLE ONLY public.workflow_audit_events
     ADD CONSTRAINT workflow_audit_events_actor_id_users_user_id_fk FOREIGN KEY (actor_id) REFERENCES public.users(user_id);
 
 
--- Completed on 2026-09-14 13:12:29
-
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict CMyKFzZMUdMA3QIge884e0dKlZPClsLb8d1sWAQNHdvi5rnPK03mI3a0ndVUnt2
 

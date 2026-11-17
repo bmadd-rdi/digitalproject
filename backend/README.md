@@ -144,6 +144,21 @@ production data.
 Proposal financial values use exact-decimal handling. Do not replace budget or
 cost calculations with JavaScript floating-point arithmetic.
 
+## Governor policy lookup
+
+After the database contains the `policy_governor` table defined in the schema,
+run `bun run db:seed:governor-policies` against the intended database to import
+the policy lookup used by proposal Step 3. The seed uses 261 validated policies
+from `database/261 นโยบายผู้ว่า สมัย2 นำเข้า db(1).xlsx`, sheet
+`รวม 261 นโยบาย`, columns E–F. Repeated imports preserve IDs and update names
+by policy code. The identical duplicate P218 is merged. The imported set is
+P001–P261, consistent with the 261-policy total published in the
+[official BMA policy report](https://policy.bangkok.go.th/mapping/report/).
+The extra uncoded row 264 is excluded from this set.
+
+Restart the Backend after importing to clear its in-memory lookup cache, and
+reload the proposal form to clear the browser lookup cache.
+
 ## Authentication and authorization
 
 Authentication is JWT-based and authorization is enforced by Backend policies.
