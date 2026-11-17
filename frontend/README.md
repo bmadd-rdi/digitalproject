@@ -28,8 +28,11 @@ and responsive access to the authoritative data served by the Backend.
 
 ## Prerequisites
 
-- Node.js 24 (the Docker image uses 24.6.0)
-- pnpm 11.13.0, managed through Corepack when needed
+- Node.js 24.6.0 (matching the Docker image); Node.js 20.9.0 is the minimum.
+  Installation rejects unsupported Node.js versions to avoid skipping native
+  dependencies. With standalone pnpm, run `pnpm env use --global 24.6.0` and
+  reopen the terminal before installing dependencies.
+- pnpm 11.20.0, pinned in `package.json` and managed through Corepack when needed
 - A running Backend for authenticated flows, API generation, and end-to-end
   browser verification
 
@@ -176,4 +179,5 @@ for Compose, immutable image references, Nginx, staging, and production steps.
 | Generated types do not match the API | Regenerate both outputs from the intended `OPENAPI_URL`; do not edit generated files. |
 | Hydration or client-boundary error | Check Server/Client Component boundaries and browser-only access in `use client` code. |
 | Production build fails | Run `pnpm typecheck`, inspect `.env.local`, and remove stale `.next` output with `pnpm clean`. |
+| `Error evaluating Node.js code` with missing `lightningcss.*.node` or Tailwind native binding | Check `pnpm exec node --version` (minimum 20.9.0), run `pnpm install --force --frozen-lockfile` in the environment that runs Next.js, then restart it. The workspace installs native dependencies for both glibc (Ubuntu) and musl (Alpine). For Docker, run `docker compose up -d --force-recreate frontend` from the repository root to reinstall inside the container. |
 | Nested scrolling or overflow | Check the route layout's height and `min-h-0`/overflow ownership; keep one intentional scroll region. |

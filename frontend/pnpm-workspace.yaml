@@ -1,3 +1,14 @@
+engineStrict: true
+
+supportedArchitectures:
+  os:
+    - current
+  cpu:
+    - current
+  libc:
+    - glibc
+    - musl
+
 allowBuilds:
   msw: true
   sharp: true
