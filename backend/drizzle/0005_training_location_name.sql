@@ -1,0 +1,1 @@
+ALTER TABLE "proposal_trainings" ADD COLUMN "location_name" text;

@@ -358,6 +358,21 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
                 </p>
               )}
             </div>
+            <div className="w-full">
+              <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
+                <span className="text-status-orange"></span>
+              </Label>
+              <SingleFileUploadWithDescBox
+                projectId={projectId}
+                title="Current Diagram"
+                docTypeName="current_diagram"
+                name="currentDiagramFile"
+                watch={watch}
+                setValue={setValue}
+                errors={errors}
+                onUploadingChange={handleChildUploadingChange}
+              />
+            </div>
 
             <div className="w-full">
               <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
@@ -376,21 +391,6 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
                 </p>
               )}
             </div>
-            <div className="w-full">
-              <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
-                6.3 ภาพประกอบหรือไดอะแกรม (Diagram) <span className="text-status-orange"></span>
-              </Label>
-              <SingleFileUploadWithDescBox
-                projectId={projectId}
-                title="Current Diagram"
-                docTypeName="current_diagram"
-                name="currentDiagramFile"
-                watch={watch}
-                setValue={setValue}
-                errors={errors}
-                onUploadingChange={handleChildUploadingChange}
-              />
-            </div>
           </div>
 
           {/* <div className="border-t border-border border-dashed" /> */}
@@ -402,14 +402,14 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
           <div>
             <div className="mb-6">
               <Label htmlFor="currentProblems" className="text-sm font-medium text-foreground">
-                6.4 คอมพิวเตอร์และอุปกรณ์ที่มีอยู่ในปัจจุบันของส่วนราชการ</Label>
+                6.3 คอมพิวเตอร์และอุปกรณ์ที่มีอยู่ในปัจจุบันของส่วนราชการ</Label>
               <p className="text-sm text-slate-gray">(เฉพาะกรณีโครงการที่มีการจัดหาครุภัณฑ์) (ให้ระบุรายการอุปกรณ์ของส่วนราชการที่มีอยู่ในปัจจุบัน สถานที่ติดตั้งของระบบ ส่วนที่รับผิดชอบ)</p>
             </div>
 
             {/* --- 4.1 ตารางแสดงอัตรากำลัง --- */}
             <div className="mb-10">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-                <Label className="text-sm font-bold text-foreground">1. ตารางแสดงอัตรากำลังของหน่วยงาน / ส่วนราชการ</Label>
+                <Label className="text-sm font-bold text-foreground">ตารางแสดงอัตรากำลังของหน่วยงาน / ส่วนราชการ</Label>
                 <Button
                   type="button" variant="soft" size="sm" className="rounded-full gap-2"
                   onClick={() => appendManpower({ agencyPart: "", positionLimit: 0, occupied: 0, vacant: 0 })}
@@ -466,7 +466,7 @@ export const ProposalStep2 = ({ projectId, onUploadingChange }: { projectId: str
             {/* --- 4.2 ตารางแสดงครุภัณฑ์คอมพิวเตอร์ --- */}
             <div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-                <Label className="text-sm font-bold text-foreground">2. ตารางแสดงครุภัณฑ์คอมพิวเตอร์ที่มีอยู่</Label>
+                <Label className="text-sm font-bold text-foreground">ตารางแสดงครุภัณฑ์คอมพิวเตอร์ที่มีอยู่</Label>
                 <Button
                   type="button" variant="soft" size="sm" className="rounded-full gap-2"
                   onClick={() => appendEquipment({ itemName: "", ageYears: 0, quantity: 0, user: "", location: "", remark: "" })}

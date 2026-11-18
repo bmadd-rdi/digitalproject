@@ -390,6 +390,7 @@ async function syncTrainings(
       courseName: row.courseName,
       trainingMethod: row.trainingMethod,
       locationType: row.locationType,
+      locationName: row.locationName,
       hasSpeakerCost: row.hasSpeakerCost,
       speakerReason: row.speakerReason,
     };

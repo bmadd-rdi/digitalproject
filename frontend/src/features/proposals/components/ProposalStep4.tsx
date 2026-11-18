@@ -87,7 +87,7 @@ export const ProposalStep4 = () => {
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full min-w-0 pb-10">
-      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">ง. รายการค่าใช้จ่ายตามโครงการ</h2>
+      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">ข. รายการค่าใช้จ่ายตามโครงการ</h2>
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3", "item-4", "item-5"]} className="w-full space-y-4">
 
@@ -95,7 +95,7 @@ export const ProposalStep4 = () => {
         <AccordionItem value="item-1" className="border border-border rounded-lg bg-white px-4">
           <AccordionTrigger className="hover:no-underline py-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">1. ค่าใช้จ่ายครุภัณฑ์คอมพิวเตอร์</span>
+              <h3 className="text-lg font-bold text-foreground">8.1 ค่าใช้จ่ายครุภัณฑ์คอมพิวเตอร์</h3>
               {hasHardwareError && <AlertCircle className="w-5 h-5 text-status-orange" />}
             </div>
           </AccordionTrigger>
@@ -108,7 +108,7 @@ export const ProposalStep4 = () => {
         <AccordionItem value="item-2" className="border border-border rounded-lg bg-white px-4">
           <AccordionTrigger className="hover:no-underline py-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">2. ค่าใช้จ่ายซอฟต์แวร์และเครื่องมือ</span>
+              <h3 className="text-lg font-bold text-foreground">8.2 ค่าใช้จ่ายซอฟต์แวร์และเครื่องมือ</h3>
               {hasSoftwareError && <AlertCircle className="w-5 h-5 text-status-orange" />}
             </div>
           </AccordionTrigger>
@@ -121,7 +121,7 @@ export const ProposalStep4 = () => {
         <AccordionItem value="item-3" className="border border-border rounded-lg bg-white px-4">
           <AccordionTrigger className="hover:no-underline py-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">3. ค่าใช้จ่ายบุคลากรที่ใช้ในการพัฒนาระบบ</span>
+              <h3 className="text-lg font-bold text-foreground">8.3 ค่าใช้จ่ายบุคลากรที่ใช้ในการพัฒนาระบบ</h3>
               {hasPersonnelError && <AlertCircle className="w-5 h-5 text-status-orange" />}
             </div>
           </AccordionTrigger>
@@ -134,7 +134,7 @@ export const ProposalStep4 = () => {
         <AccordionItem value="item-4" className="border border-border rounded-lg bg-white px-4">
           <AccordionTrigger className="hover:no-underline py-4">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">4. ค่าใช้จ่ายการฝึกอบรม</span>
+              <h3 className="text-lg font-bold text-foreground">8.4 ค่าใช้จ่ายการฝึกอบรม</h3>
               {hasTrainingError && <AlertCircle className="w-5 h-5 text-status-orange" />}
             </div>
           </AccordionTrigger>
@@ -147,7 +147,7 @@ export const ProposalStep4 = () => {
         <AccordionItem value="item-5" className="border border-border rounded-lg bg-white px-4">
           <AccordionTrigger className="hover:no-underline py-4 text-left">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">5. ค่าใช้จ่ายอื่น ๆ</span>
+              <h3 className="text-lg font-bold text-foreground">8.5 ค่าใช้จ่ายอื่น ๆ</h3>
               {hasOtherError && <AlertCircle className="w-5 h-5 text-status-orange shrink-0" />}
             </div>
           </AccordionTrigger>
@@ -169,38 +169,38 @@ export const ProposalStep4 = () => {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-slate-200/60">
               <tr className="hover:bg-white/50 transition-colors">
-                <td className="py-3 text-slate-600 font-medium w-3/4">1. ค่าใช้จ่ายครุภัณฑ์คอมพิวเตอร์</td>
+                <td className="py-3 text-slate-600 font-medium w-3/4">8.1 ค่าใช้จ่ายครุภัณฑ์คอมพิวเตอร์</td>
                 <td className="py-3 text-right font-mono text-slate-800">{totalHwCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
               <tr className="hover:bg-white/50 transition-colors">
-                <td className="py-3 text-slate-600 font-medium">2. ค่าใช้จ่ายซอฟต์แวร์และเครื่องมือ</td>
+                <td className="py-3 text-slate-600 font-medium">8.2 ค่าใช้จ่ายซอฟต์แวร์และเครื่องมือ</td>
                 <td className="py-3 text-right font-mono text-slate-800">{totalSwCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
               <tr className="hover:bg-white/50 transition-colors">
-                <td className="py-3 text-slate-600 font-medium">3. ค่าใช้จ่ายบุคลากรที่ใช้ในการพัฒนาระบบ</td>
+                <td className="py-3 text-slate-600 font-medium">8.3 ค่าใช้จ่ายบุคลากรที่ใช้ในการพัฒนาระบบ</td>
                 <td className="py-3 text-right font-mono text-slate-800">{totalPersonnelCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
               <tr className="hover:bg-white/50 transition-colors">
-                <td className="py-3 text-slate-600 font-medium">4. ค่าใช้จ่ายการฝึกอบรม</td>
+                <td className="py-3 text-slate-600 font-medium">8.4 ค่าใช้จ่ายการฝึกอบรม</td>
                 <td className="py-3 text-right font-mono text-slate-800">{totalTrainingCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
 
               {/* หมวดที่ 5 แยกบรรทัดให้เห็นชัดเจน */}
-              <tr className="bg-slate-100/50">
-                <td className="py-3 text-slate-600 font-medium">5. ค่าใช้จ่ายอื่น ๆ</td>
+              <tr className="hover:bg-white/50 transition-colors">
+                <td className="py-3 text-slate-600 font-medium">8.5 ค่าใช้จ่ายอื่น ๆ</td>
                 <td className="py-3 text-right font-mono text-slate-800">{totalOtherCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
-              <tr className="text-xs text-slate-500 bg-slate-50/50">
+              <tr className="text-xs text-slate-500 bg-slate-100/50">
                 <td className="py-1.5 pl-6 flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-blue-400"></div> ส่วนที่เป็น IT
                 </td>
-                <td className="py-1.5 text-right font-mono text-blue-600">{totalOtherIT.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+                <td className="py-1.5 text-right font-mono text-gray-600">{totalOtherIT.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
-              <tr className="text-xs text-slate-500 bg-slate-50/50">
+              <tr className="text-xs text-slate-500 bg-slate-100/50">
                 <td className="py-1.5 pl-6 flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-orange-400"></div> ส่วนที่เป็น Non-IT
                 </td>
-                <td className="py-1.5 text-right font-mono text-orange-600 pb-3">{totalOtherNonIT.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+                <td className="py-1.5 text-right font-mono text-gray-600 pb-3">{totalOtherNonIT.toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
               </tr>
             </tbody>
 
@@ -220,13 +220,13 @@ export const ProposalStep4 = () => {
       {/* --- สรุปรวม Grand Total ไว้ล่างสุด (Sticky) --- */}
       <div className="bg-primary-container text-primary p-4 rounded-xl shadow-md sticky bottom-4 z-10 border border-primary/20 backdrop-blur-sm bg-primary-container/95 flex flex-col gap-2 text-right">
         <div className="flex justify-between items-center">
-          <span className="text-sm font-bold">รวมทั้งสิ้น:</span>
+          <span className="text-sm font-bold">รวมทั้งสิ้น</span>
           <span className={`text-xl font-black font-mono tracking-tight ${grandTotalColorClass}`}>
             {grandTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })} <span className="text-base font-normal">บาท</span>
           </span>
         </div>
         <div className="flex justify-between items-center border-t border-primary/10 pt-2">
-          <span className="text-sm font-bold">งบประมาณที่ขอรับการจัดสรร:</span>
+          <span className="text-sm font-bold">งบประมาณที่ขอรับการจัดสรร</span>
           <span className="text-xl font-black font-mono tracking-tight">
             {totalBudgetAll.toLocaleString('th-TH', { minimumFractionDigits: 2 })} <span className="text-base font-normal">บาท</span>
           </span>

@@ -216,12 +216,12 @@ export const ProposalStep5 = () => {
     <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full min-w-0 pb-10">
 
       <div>
-        <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">จ. ความพร้อมและประโยชน์ที่คาดว่าจะได้รับ</h2>
+        <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">ข. ความพร้อมและประโยชน์ที่คาดว่าจะได้รับ</h2>
       </div>
 
       {/* --- 1. ระยะเวลาดำเนินงาน --- */}
       <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
-        <Label className="text-lg font-bold text-foreground block mb-2">9. ระยะเวลาดำเนินงาน <span className="text-status-orange">*</span></Label>
+        <Label className="text-lg font-bold text-foreground block mb-2">9. ระยะเวลาดำเนินงาน <span className="text-status-orange"></span></Label>
         <p className="text-sm text-muted-foreground mb-4">
           (โครงการปีเดียว งบประมาณรายจ่ายประจำปี หรืองบกลาง ระยะเวลาไม่เกิน 270 วัน)
         </p>

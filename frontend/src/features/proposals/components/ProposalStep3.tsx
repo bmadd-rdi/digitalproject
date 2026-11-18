@@ -403,15 +403,13 @@ export const ProposalStep3 = ({
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2">
-        ค. สถาปัตยกรรมองค์กร (EA)
-      </h2>
+      <h2 className="text-2xl font-bold text-foreground border-b border-border pb-2"> ข. สถาปัตยกรรมองค์กร (Enterprise Architecture)</h2>
 
       <EAStrategySection />
 
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-2">
-          <Label>ระเบียบ/กฎหมาย/ข้อบังคับที่เป็นอุปสรรภูมิ <span className="text-status-orange">(7.1.2)</span></Label>
+          <Label>7.1.2 ระเบียบ/กฎหมาย/ข้อบังคับที่เป็นอุปสรรภูมิ <span className="text-status-orange"></span></Label>
           <RichTextarea
             {...register("obstacleLaws")}
             placeholder="ระบุรายละเอียด หรือพิมพ์ 'ไม่มี' (กด Tab เพื่อย่อหน้า)"
@@ -420,9 +418,9 @@ export const ProposalStep3 = ({
           />
         </div>
         <div className="space-y-2">
-          <Label>
-            สถาปัตยกรรมด้านระบบสารสนเทศ (Application Architecture)<span className="text-status-orange">(7.2)</span>
-          </Label>
+          <h3 className="text-lg font-bold text-foreground mb-4">
+            7.2 สถาปัตยกรรมด้านระบบสารสนเทศ (Application Architecture)<span className="text-status-orange"></span>
+          </h3>
           <RichTextarea
             {...register("appArchitecture")}
             placeholder="อธิบายการทำงานร่วมกันโดยการแลกเปลี่ยนข้อมูล (กด Tab เพื่อย่อหน้า)"
@@ -440,32 +438,32 @@ export const ProposalStep3 = ({
             </p>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3">
-          <SingleFileUploadWithDescBox
-            projectId={projectId}
-            title="System Diagram"
-            docTypeName="system_diagram"
-            name="systemDiagramFile"
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            onUploadingChange={handleChildUploadingChange}
-          />
-          <SingleFileUploadWithDescBox
-            projectId={projectId}
-            title="Use Case Diagram"
-            docTypeName="use_case_diagram"
-            name="useCaseDiagramFile"
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            onUploadingChange={handleChildUploadingChange}
-          />
+            <SingleFileUploadWithDescBox
+              projectId={projectId}
+              title="System Diagram"
+              docTypeName="system_diagram"
+              name="systemDiagramFile"
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+              onUploadingChange={handleChildUploadingChange}
+            />
+            <SingleFileUploadWithDescBox
+              projectId={projectId}
+              title="Use Case Diagram"
+              docTypeName="use_case_diagram"
+              name="useCaseDiagramFile"
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+              onUploadingChange={handleChildUploadingChange}
+            />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>
-            สถาปัตยกรรมการจัดการองค์กรด้านข้อมูล (Data Architecture)<span className="text-status-orange">(7.3)</span>
-          </Label>
+          <h3 className="text-lg font-bold text-foreground mb-4">
+            7.3 สถาปัตยกรรมด้านข้อมูล (Data Architecture)<span className="text-status-orange"></span>
+          </h3>
           <Label>
             หน่วยงานเจ้าของข้อมูล
           </Label>
@@ -485,7 +483,7 @@ export const ProposalStep3 = ({
         </div>
         <div className="space-y-2">
           <Label>
-            แนวทางการแลกเปลี่ยน/เชื่อมโยงข้อมูล
+            แนวทางการนำเข้า แลกเปลี่ยน และเชื่อมโยงข้อมูล
           </Label>
           <RichTextarea
             {...register("dataExchangePlan")}
@@ -504,26 +502,26 @@ export const ProposalStep3 = ({
             </p>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3">
-          <SingleFileUploadWithDescBox
-            projectId={projectId}
-            title="ER Diagram"
-            docTypeName="er_diagram"
-            name="erDiagramFile"
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            onUploadingChange={handleChildUploadingChange}
-          />
-          <SingleFileUploadWithDescBox
-            projectId={projectId}
-            title="Data Flow Diagram"
-            docTypeName="data_flow_diagram"
-            name="dataFlowDiagramFile"
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            onUploadingChange={handleChildUploadingChange}
-          />
+            <SingleFileUploadWithDescBox
+              projectId={projectId}
+              title="ER Diagram"
+              docTypeName="er_diagram"
+              name="erDiagramFile"
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+              onUploadingChange={handleChildUploadingChange}
+            />
+            <SingleFileUploadWithDescBox
+              projectId={projectId}
+              title="Data Flow Diagram"
+              docTypeName="data_flow_diagram"
+              name="dataFlowDiagramFile"
+              watch={watch}
+              setValue={setValue}
+              errors={errors}
+              onUploadingChange={handleChildUploadingChange}
+            />
           </div>
         </div>
       </div>
@@ -531,12 +529,12 @@ export const ProposalStep3 = ({
       {/* --- ส่วนแนบไฟล์ (UI อัปโหลด 1 รูป + คำอธิบาย) --- */}
       <div className="border-t border-border pt-6 mt-2">
         <div className="mb-4">
-          <h3 className="text-base font-bold text-foreground">
-            แผนผังหรือแผนภาพ (Diagrams)
+          <h3 className="text-lg font-bold text-foreground mb-4">
+            7.4 สถาปัตยกรรมด้านเทคโนโลยี (Technology Architecture) <span className="text-status-orange"></span>
           </h3>
-          <p className="text-sm text-slate-gray">
+          {/* <p className="text-sm text-slate-gray">
             รองรับ 1 ไฟล์รูปภาพต่อหัวข้อ พร้อมบังคับระบุคำอธิบาย
-          </p>
+          </p> */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SingleFileUploadWithDescBox

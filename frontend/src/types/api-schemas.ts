@@ -834,6 +834,7 @@ const SubmitProposalRequest = z
             courseName: z.string().min(1),
             trainingMethod: z.string().min(1),
             locationType: z.enum(["GOVERNMENT", "PRIVATE"]),
+            locationName: z.string().optional(),
             hasSpeakerCost: z.boolean().optional().default(false),
             speakerReason: z.string().optional(),
             speakerCosts: z

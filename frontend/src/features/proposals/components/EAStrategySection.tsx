@@ -53,9 +53,12 @@ export const EAStrategySection = () => {
 
   return (
     <div className="space-y-4">
+      <h3 className="text-lg font-bold text-foreground mb-4">
+        7.1 สถาปัตยกรรมด้านพันธกิจหรือภารกิจ (Business Architecture)<span className="text-status-orange"></span>
+      </h3>
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">
-          ความสอดคล้องเชิงยุทธศาสตร์ <span className="text-status-orange">(7.1.1)</span>
+          7.1.1 ความสอดคล้องเชิงยุทธศาสตร์ <span className="text-status-orange"></span>
         </h3>
         {errors.isBmaPlan && <p className="text-sm text-status-orange mb-3">{errors.isBmaPlan.message as string}</p>}
 

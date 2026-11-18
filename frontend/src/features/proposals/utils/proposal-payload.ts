@@ -322,6 +322,7 @@ export function normalizeProposalForForm(source: unknown): JsonRecord {
       courseName: stringValue(course.courseName),
       trainingMethod: stringValue(course.trainingMethod),
       locationType: LOCATION_TYPE_LABELS[stringValue(course.locationType)] ?? stringValue(course.locationType, "GOVERNMENT"),
+      locationName: stringValue(course.locationName),
       hasSpeakerCost: booleanValue(course.hasSpeakerCost),
       speakerReason: stringValue(course.speakerReason),
       speakerCosts: rows(course.speakerCosts).map((row) => ({

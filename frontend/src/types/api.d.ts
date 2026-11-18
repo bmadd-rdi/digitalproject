@@ -5736,6 +5736,7 @@ export interface components {
                 courseName: string | null;
                 trainingMethod: string | null;
                 locationType: string | null;
+                locationName: string | null;
                 hasSpeakerCost: boolean | null;
                 speakerReason: string | null;
                 speakerCosts: ({
@@ -5994,6 +5995,7 @@ export interface components {
                 trainingMethod: string;
                 /** @enum {string} */
                 locationType: "GOVERNMENT" | "PRIVATE";
+                locationName?: string;
                 /** @default false */
                 hasSpeakerCost: boolean;
                 speakerReason?: string;

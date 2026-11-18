@@ -352,6 +352,7 @@ const trainingCourseSchema = z.object({
   courseName: z.string().min(1, "กรุณาระบุหลักสูตร"),
   trainingMethod: z.string().min(1, "กรุณาระบุวิธีการฝึกอบรม"),
   locationType: z.enum(["GOVERNMENT", "PRIVATE"]),
+  locationName: z.string().optional(),
 
   // ตารางวิทยากร (แสดง/ซ่อน ผ่าน UI แต่ข้อมูลเก็บตรงนี้)
   hasSpeakerCost: z.boolean().default(false),

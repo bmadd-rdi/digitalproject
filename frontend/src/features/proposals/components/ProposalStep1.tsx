@@ -142,7 +142,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label className="text-sm font-medium text-foreground">
-              ส่วนราชการ <span className="text-status-orange">*</span>
+              2.2 ส่วนราชการ <span className="text-status-orange">*</span>
             </Label>
             <div className="mt-1.5">
               <Controller
@@ -173,7 +173,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="headOfAgency" className="text-sm font-medium text-foreground">
-              หัวหน้าส่วนราชการ <span className="text-status-orange">*</span>
+              2.3 หัวหน้าส่วนราชการ <span className="text-status-orange">*</span>
             </Label>
             <Input
               id="headOfAgency"
@@ -189,7 +189,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="dcioName" className="text-sm font-medium text-foreground">
-              ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO) <span className="text-status-orange">*</span>
+              2.4 ผู้บริหารเทคโนโลยีสารสนเทศระดับสูง (DCIO) <span className="text-status-orange">*</span>
             </Label>
             <Input
               id="dcioName"
@@ -205,7 +205,7 @@ export const ProposalStep1 = ({ project }: ProposalStep1Props) => {
           </div>
           <div>
             <Label htmlFor="projectManager" className="text-sm font-medium text-foreground">
-              ผู้รับผิดชอบโครงการ <span className="text-status-orange">*</span>
+              2.5 ผู้รับผิดชอบโครงการ <span className="text-status-orange">*</span>
             </Label>
             <Input
               id="projectManager"

@@ -166,6 +166,7 @@ function mapTraining(
     courseName: stringValue(row.courseName),
     trainingMethod: stringValue(row.trainingMethod),
     locationType: canonicalLabel(row.locationType, LOCATION_TYPE_LABELS, "GOVERNMENT"),
+    locationName: stringValue(row.locationName),
     hasSpeakerCost: booleanValue(row.hasSpeakerCost),
     speakerReason: stringValue(row.speakerReason),
     speakerCosts: speakerRows

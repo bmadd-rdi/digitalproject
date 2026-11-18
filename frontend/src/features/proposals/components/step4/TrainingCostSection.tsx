@@ -27,7 +27,7 @@ interface TrainingRowType {
 // กำหนด Type สำหรับ Props ของ Component
 interface TrainingCourseItemProps {
   index: number;
-  control: Control<ProposalStep4Values>;  
+  control: Control<ProposalStep4Values>;
   register: UseFormRegister<ProposalStep4Values>;
   setValue: UseFormSetValue<ProposalStep4Values>;
   watch: UseFormWatch<ProposalStep4Values>;
@@ -48,7 +48,7 @@ const TrainingCourseItem = ({ index, control, register, setValue, watch, remove,
   const speakerCostsPath = `${coursePath}.speakerCosts` as `trainingCourses.${number}.speakerCosts`;
   const foodCostsPath = `${coursePath}.foodCosts` as `trainingCourses.${number}.foodCosts`;
   const rowErrors = errors?.trainingCourses?.[index] || {};
-  
+
   const hasSpeaker = useWatch({ control, name: speakerEnabledPath });
   const watchedSpeakerCosts = useWatch({ control, name: speakerCostsPath }) || [];
   const watchedFoodCosts = useWatch({ control, name: foodCostsPath }) || [];
@@ -77,7 +77,7 @@ const TrainingCourseItem = ({ index, control, register, setValue, watch, remove,
         </div>
         <div>
           <Label className="mb-2 block">สถานที่ฝึกอบรม <span className="text-status-orange">*</span></Label>
-          <RadioGroup 
+          <RadioGroup
             value={watch(`${coursePath}.locationType`)}
             onValueChange={(val) => setValue(`${coursePath}.locationType`, val as "GOVERNMENT" | "PRIVATE", { shouldValidate: true })}
             className="flex flex-col sm:flex-row gap-4"
@@ -86,18 +86,29 @@ const TrainingCourseItem = ({ index, control, register, setValue, watch, remove,
             <div className="flex items-center space-x-2"><RadioGroupItem value="PRIVATE" id={`loc-prv-${index}`} /><Label htmlFor={`loc-prv-${index}`}>สถานที่เอกชน</Label></div>
           </RadioGroup>
         </div>
+        <div>
+          <Label htmlFor={`training-location-name-${index}`} className="mb-1 block">ชื่อสถานที่ฝึกอบรม</Label>
+          <Input
+            id={`training-location-name-${index}`}
+            type="text"
+            {...register(`${coursePath}.locationName`)}
+            className={`bg-surface ${rowErrors.locationName ? 'border-status-orange' : ''}`}
+            placeholder="ระบุชื่อสถานที่ฝึกอบรม"
+          />
+          {rowErrors.locationName && <p className="text-status-orange text-xs mt-1">{rowErrors.locationName.message}</p>}
+        </div>
       </div>
 
       <hr className="border-t border-border my-6" />
 
       <div className="mb-6">
         <div className="flex items-center space-x-2 mb-4">
-          <Checkbox 
-            id={`has-spk-${index}`} 
+          <Checkbox
+            id={`has-spk-${index}`}
             // แปลงค่า hasSpeaker ให้ชัวร์ว่าเป็น boolean แน่ๆ
-            checked={!!hasSpeaker} 
+            checked={!!hasSpeaker}
             // แก้ไขที่ 2: เช็คให้แน่ใจว่าค่าที่เข้า setValue คือ boolean แน่นอน (checked === true)
-            onCheckedChange={(checked) => setValue(`${coursePath}.hasSpeakerCost`, checked === true)} 
+            onCheckedChange={(checked) => setValue(`${coursePath}.hasSpeakerCost`, checked === true)}
           />
           <Label htmlFor={`has-spk-${index}`} className="font-bold text-md cursor-pointer text-foreground">ตารางค่าสมนาคุณวิทยากร (ถ้ามี) <span className="text-muted-foreground font-normal">(วิทยากรต้องไม่ใช่บุคลากรที่ใช้ในการพัฒนาระบบ)</span></Label>
         </div>
@@ -143,7 +154,7 @@ const TrainingCourseItem = ({ index, control, register, setValue, watch, remove,
                 </tbody>
               </table>
             </div>
-            
+
             <div>
               <Label className="mb-1 block">เหตุผลความจำเป็นที่ต้องใช้วิทยากรเชี่ยวชาญเฉพาะด้าน <span className="text-status-orange">*</span></Label>
               <Textarea {...register(`${coursePath}.speakerReason`)} className={`bg-surface min-h-15 ${rowErrors.speakerReason ? 'border-status-orange' : ''}`} placeholder="ระบุเหตุผล..." />
@@ -191,10 +202,10 @@ const TrainingCourseItem = ({ index, control, register, setValue, watch, remove,
             </tbody>
           </table>
         </div>
-        <div className="mt-2 text-xs text-muted-foreground">หมายเหตุ: ระเบียบกรุงเทพมหานครว่าด้วยค่าใช้จ่ายในการฝึกอบรม พ.ศ. 2541</div>
+        <div className="mt-2 text-xs text-muted-foreground">หมายเหตุ: ระเบียบกรุงเทพมหานครว่าด้วยค่าใช้จ่ายในการฝึกอบรม พ.ศ.2541 และหนังสือสำนักงาน ก.ก. ด่วนที่สุด ที่ กท 0303/2 ลงวันที่ 25 มีนาคม 2569 </div>
         <div className="text-right text-sm font-bold text-foreground mt-2">รวมค่าอาหาร: {totalFoodCost.toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท</div>
       </div>
-      
+
       <div className="mt-6 bg-primary/10 p-3 rounded-md text-right font-bold text-primary">
         รวมงบประมาณหลักสูตรที่ {index + 1}: {(totalSpkCost + totalFoodCost).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท
       </div>
@@ -210,21 +221,21 @@ export const TrainingCostSection = () => {
     <div>
       <div className="flex justify-between items-center mb-4">
         <Label className="text-md font-bold text-foreground">ค่าใช้จ่ายการฝึกอบรม (หลักสูตร วิธีการฝึกอบรม ระยะเวลา ค่าใช้จ่าย จำนวนผู้ฝึกอบรมและวิทยากร)</Label>
-        <Button 
-          type="button" 
-          onClick={() => appendCourse({ 
-            courseName: "", trainingMethod: "", locationType: "GOVERNMENT",
-            hasSpeakerCost: false, speakerReason: "", speakerCosts: [], 
+        <Button
+          type="button"
+          onClick={() => appendCourse({
+            courseName: "", trainingMethod: "", locationType: "GOVERNMENT", locationName: "",
+            hasSpeakerCost: false, speakerReason: "", speakerCosts: [],
             foodCosts: [
               { itemName: "FULL_MEAL", mealsCount: "0", ratePerMeal: "0", traineesCount: "0", days: "0" },
               { itemName: "PARTIAL_MEAL", mealsCount: "0", ratePerMeal: "0", traineesCount: "0", days: "0" },
               { itemName: "SNACK", mealsCount: "0", ratePerMeal: "0", traineesCount: "0", days: "0" }
-            ] 
-          } as any)} 
-          size="sm" 
+            ]
+          } as any)}
+          size="sm"
           className="rounded-full gap-2"
         >
-          <Plus className="w-4 h-4"/> เพิ่มหลักสูตร
+          <Plus className="w-4 h-4" /> เพิ่มหลักสูตร
         </Button>
       </div>
 

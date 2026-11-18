@@ -231,6 +231,7 @@ export const proposalTrainings = pgTable("proposal_trainings", {
   courseName: text("course_name"),
   trainingMethod: varchar("training_method", { length: 255 }),
   locationType: locationTypeEnum("location_type"),
+  locationName: text("location_name"),
   hasSpeakerCost: boolean("has_speaker_cost").default(false),
   speakerReason: text("speaker_reason"),
 });

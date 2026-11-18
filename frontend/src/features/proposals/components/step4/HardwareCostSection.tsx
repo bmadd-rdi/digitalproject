@@ -23,7 +23,7 @@ export function HardwareCostSection() {
       {/* ส่วนหัวของ Section */}
       <div className="flex justify-between items-center">
         <h3 className="text-base font-semibold text-foreground">
-          ค่าใช้จ่ายครุภัณฑ์คอมพิวเตอร์ที่จัดหาในโครงการ 
+          ตารางค่าใช้จ่ายครุภัณฑ์คอมพิวเตอร์ที่จัดหาในโครงการ
         </h3>
         <Button
           type="button"
@@ -44,7 +44,7 @@ export function HardwareCostSection() {
 
       {/* Table-Grid Layout (กะทัดรัดและประหยัดพื้นที่) */}
       <div className="border rounded-md bg-card overflow-hidden shadow-sm">
-        
+
         {/* หัวตาราง (ซ่อนในจอมือถือ) */}
         <div className="hidden md:flex items-center gap-3 bg-muted/50 p-3 text-xs font-medium text-muted-foreground border-b">
           <div className="w-8 text-center">ลำดับ</div> {/* 📍 เพิ่มคอลัมน์ลำดับ */}
@@ -68,10 +68,10 @@ export function HardwareCostSection() {
 
             return (
               <div key={field.id} className="p-3 transition-colors hover:bg-muted/20 group">
-                
+
                 {/* แถวหลัก: ข้อมูลพื้นฐาน */}
                 <div className="flex flex-col md:flex-row items-start gap-3">
-                  
+
                   {/* เลข Index */}
                   <div className="hidden md:flex w-8 h-9 items-center justify-center text-sm font-medium text-muted-foreground">
                     {index + 1}.
@@ -151,9 +151,9 @@ export function HardwareCostSection() {
                   <div className="hidden md:flex w-8 justify-center pt-2 text-muted-foreground/40">
                     <CornerDownRight className="w-4 h-4 ml-2" />
                   </div>
-                  
+
                   <div className="flex-1 bg-muted/40 p-3 rounded-md border border-border/50">
-                    
+
                     {refType === "MDES" && (
                       <div className="grid grid-cols-3 gap-3">
                         <div>

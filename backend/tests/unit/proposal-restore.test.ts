@@ -35,7 +35,10 @@ test("maps the submitted graph into a complete canonical draft", () => {
     softwareCosts: [],
     personnelCosts: [],
     personnelResponsibilities: [],
-    trainings: [{ id: "old-training", courseName: "หลักสูตรระบบ", trainingMethod: "อบรม", locationType: "PRIVATE", hasSpeakerCost: false }],
+    trainings: [
+      { id: "old-training", courseName: "หลักสูตรระบบ", trainingMethod: "อบรม", locationType: "PRIVATE", locationName: "ห้องประชุมโรงแรม", hasSpeakerCost: false },
+      { id: "legacy-training", courseName: "หลักสูตรเดิม", trainingMethod: "อบรม", locationType: "GOVERNMENT", locationName: null, hasSpeakerCost: false },
+    ],
     trainingSpeakerCosts: [],
     trainingFoodCosts: [],
     otherCosts: [],
@@ -52,6 +55,9 @@ test("maps the submitted graph into a complete canonical draft", () => {
   expect(payload.cloudRequests[0].requestedServiceDate).toBe("2027-01-02");
   expect(payload.cloudRequests[0].vms[0].price).toBe(0);
   expect(payload.trainingCourses[0].foodCosts.length).toBeGreaterThan(0);
+  expect(payload.trainingCourses[0].locationName).toBe("ห้องประชุมโรงแรม");
+  expect(payload.trainingCourses[1].locationName).toBe("");
+  expect(submitProposalSchema.parse(payload).trainingCourses[0].locationName).toBe("ห้องประชุมโรงแรม");
   expect(submitProposalSchema.safeParse(payload).success).toBe(true);
 });
 
